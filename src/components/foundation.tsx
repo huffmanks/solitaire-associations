@@ -2,7 +2,6 @@ import { CardType } from "@/types";
 import { StyleSheet, Text, View } from "react-native";
 
 export default function Foundation({ foundation, columnCount }: { foundation: Record<string, CardType[]>; columnCount: number }) {
-  // Create an array the size of columnCount to ensure we show empty slots
   const slots = Array.from({ length: columnCount });
 
   return (
@@ -18,10 +17,8 @@ export default function Foundation({ foundation, columnCount }: { foundation: Re
           <View key={i} style={[styles.slot, topCard && styles.goldBorder]}>
             {topCard ? (
               <>
-                {/* Rule: Top Left Symbol */}
                 <Text style={styles.symbol}>⭐</Text>
 
-                {/* Rule: Top Right Counter (e.g., 0/5) */}
                 <Text style={styles.counter}>
                   {currentCount}/{totalNeeded}
                 </Text>
@@ -42,10 +39,13 @@ export default function Foundation({ foundation, columnCount }: { foundation: Re
 const styles = StyleSheet.create({
   foundationRow: {
     flexDirection: "row",
+    flex: 1,
+    gap: 10,
     justifyContent: "space-around",
-    paddingVertical: 20,
-    paddingHorizontal: 5,
-    backgroundColor: "rgba(0,0,0,0.1)", // Light shadow to define the area
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    borderRadius: 10,
+    backgroundColor: "rgba(0,0,0,0.1)",
     marginBottom: 10,
   },
   slot: {
@@ -57,7 +57,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
-    position: "relative", // Necessary for absolute positioning of symbol/counter
+    position: "relative",
+    flex: 1,
   },
   goldBorder: {
     borderColor: "#FFD700",

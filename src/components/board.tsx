@@ -1,29 +1,26 @@
 import Card from "@/components/card";
+import Deck from "@/components/deck";
 import Foundation from "@/components/foundation";
 import { useGameLogic } from "@/hooks/use-game-logic";
 import React, { useState } from "react";
 import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import Deck from "./deck";
 
 const { width } = Dimensions.get("window");
 
-export default function Board({ level }: { level: number }) {
+export default function Board() {
   const [selectedCol, setSelectedCol] = useState<number | null>(null);
 
-  const { gameState, revealCard, selectedCardInfo, setSelectedCardInfo, moveCard, drawCard, moveWasteToFoundation } = useGameLogic(level);
+  const { gameState, revealCard, selectedCardInfo, setSelectedCardInfo, moveCard, drawCard, moveWasteToFoundation } = useGameLogic();
   const colWidth = width / gameState.columns.length - 10;
 
   const onColumnPress = (colIndex: number) => {
-    // If nothing is selected, we try to pick up the top card of this column
     if (selectedCardInfo === null) {
       const col = gameState.columns[colIndex];
       if (col.length > 0 && col[col.length - 1].isFaceUp) {
         setSelectedCardInfo({ type: "tableau", colIndex });
       }
-    }
-    // If something is already selected, this column is our "target"
-    else {
+    } else {
       moveCard(colIndex);
     }
   };
@@ -45,14 +42,6 @@ export default function Board({ level }: { level: number }) {
         />
       </View>
       <View style={styles.board}>
-        {/* Foundation slots at the top */}
-        <View style={styles.foundationRow}>
-          {Object.keys(gameState.foundation).map((cat) => (
-            <View key={cat} style={[styles.slot, { width: colWidth }]} />
-          ))}
-        </View>
-
-        {/* Dynamic Tableau */}
         <View style={styles.tableau}>
           {gameState.columns.map((col, colIdx) => (
             <View key={colIdx} style={[styles.column, { width: colWidth }]}>
@@ -72,19 +61,33 @@ export default function Board({ level }: { level: number }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#1a472a", // Classic card table green
+    backgroundColor: "#1a472a",
+    width: "100%",
   },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
+    gap: 10,
     alignItems: "center",
     paddingHorizontal: 10,
     paddingTop: 10,
-    zIndex: 100, // Ensure deck menu stays on top
+    zIndex: 100,
   },
   board: { flex: 1, backgroundColor: "#1a472a", padding: 5 },
   foundationRow: { flexDirection: "row", justifyContent: "space-around", marginBottom: 20 },
-  tableau: { flexDirection: "row", justifyContent: "space-between" },
+  tableau: { flexDirection: "row", justifyContent: "space-between", gap: 10 },
   column: { alignItems: "center", flex: 1 },
   slot: { height: 80, borderStyle: "dashed", borderWidth: 1, borderColor: "rgba(255,255,255,0.5)", borderRadius: 4 },
+  emptyColumnSpace: {
+    height: 100,
+    backgroundColor: "rgba(255,255,255,0.1)",
+    borderStyle: "dashed",
+    borderWidth: 2,
+    borderColor: "rgba(255,255,255,0.3)",
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    flex: 1,
+    width: "100%",
+  },
 });

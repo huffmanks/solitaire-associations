@@ -4,7 +4,7 @@ import { StyleSheet, View } from "react-native";
 export default function Index() {
   return (
     <View style={styles.container}>
-      <Board level={1} />
+      <Board />
     </View>
   );
 }

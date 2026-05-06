@@ -3,8 +3,8 @@ export type CardType = {
   content: string;
   category: string;
   isFaceUp: boolean;
-  type: "word" | "category" | "key"; // Added 'key' type
-  lockCount?: number; // 0 = unlocked, 1-3 = requires X keys
+  type: "word" | "category" | "key";
+  lockCount?: number;
   totalInCategory?: number;
 };
 

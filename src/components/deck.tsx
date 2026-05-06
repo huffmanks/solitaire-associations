@@ -4,7 +4,6 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 export default function Deck({ deckCount, topWasteCard, onDraw, onWastePress }: any) {
   return (
     <View style={styles.container}>
-      {/* Waste Slot: Shows the most recent card drawn */}
       <TouchableOpacity onPress={onWastePress} style={[styles.slot, !topWasteCard && styles.emptySlot]}>
         {topWasteCard ? (
           <View style={styles.wasteCard}>
@@ -15,7 +14,6 @@ export default function Deck({ deckCount, topWasteCard, onDraw, onWastePress }: 
         )}
       </TouchableOpacity>
 
-      {/* Deck Slot: The stack to draw from */}
       <TouchableOpacity onPress={onDraw} style={styles.deckStack}>
         <View style={styles.cardBack}>
           <Text style={styles.deckCount}>{deckCount}</Text>
@@ -32,7 +30,7 @@ const styles = StyleSheet.create({
   },
   slot: {
     width: 60,
-    height: 90,
+    height: 100,
     borderRadius: 6,
     backgroundColor: "#fff",
     justifyContent: "center",
@@ -47,14 +45,13 @@ const styles = StyleSheet.create({
   },
   wasteCard: {
     width: "100%",
-    height: "100%",
+    height: 100,
     backgroundColor: "#ffffff",
     borderRadius: 4,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 1,
     borderColor: "#ddd",
-    // Give it a little "lift" shadow
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 1 },
     shadowOpacity: 0.2,

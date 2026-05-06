@@ -2,7 +2,8 @@ import { generateInitialColumns } from "@/lib/utils";
 import { CardType, GameState } from "@/types";
 import { useState } from "react";
 
-export const useGameLogic = (level: number) => {
+export const useGameLogic = () => {
+  const level = 1;
   const [gameState, setGameState] = useState<GameState>(() => {
     const columnCount = Math.min(3 + Math.floor((level - 1) / 2), 7);
     return generateInitialColumns(columnCount, level);
@@ -18,15 +19,12 @@ export const useGameLogic = (level: number) => {
       const column = [...newColumns[colIndex]];
       const card = column[cardIndex];
 
-      // Only allow interaction with the top-most card of the stack
       const isTopCard = cardIndex === column.length - 1;
       if (!isTopCard) return prev;
 
-      // Handle Lock Logic
       const isLocked = (card.lockCount ?? 0) > prev.keysCollected;
       if (isLocked) return prev;
 
-      // Flip card
       if (!card.isFaceUp) {
         card.isFaceUp = true;
         let newKeys = prev.keysCollected;
@@ -46,7 +44,6 @@ export const useGameLogic = (level: number) => {
       let movingCard: CardType | undefined;
       let sourceCol: CardType[] | undefined;
 
-      // 1. Identify where the card is coming from
       if (selectedCardInfo?.type === "tableau" && selectedCardInfo.colIndex !== undefined) {
         sourceCol = newColumns[selectedCardInfo.colIndex];
         movingCard = sourceCol[sourceCol.length - 1];
@@ -56,15 +53,12 @@ export const useGameLogic = (level: number) => {
 
       if (!movingCard) return prev;
 
-      // 2. Target Column Logic
       const targetCol = newColumns[targetColIndex];
       const topTargetCard = targetCol[targetCol.length - 1];
 
-      // Logic: Allowed if column is empty OR categories match
       const canMove = targetCol.length === 0 || topTargetCard.category === movingCard.category;
 
       if (canMove) {
-        // Remove from source
         if (selectedCardInfo?.type === "tableau" && sourceCol) {
           sourceCol.pop();
           if (sourceCol.length > 0) sourceCol[sourceCol.length - 1].isFaceUp = true;
@@ -72,13 +66,12 @@ export const useGameLogic = (level: number) => {
           prev.waste.pop();
         }
 
-        // Add to target
         targetCol.push(movingCard);
-        setSelectedCardInfo(null); // Clear selection after move
+        setSelectedCardInfo(null);
         return { ...prev, columns: newColumns, waste: [...prev.waste] };
       }
 
-      setSelectedCardInfo(null); // Clear selection if move was illegal
+      setSelectedCardInfo(null);
       return prev;
     });
   };
@@ -87,11 +80,10 @@ export const useGameLogic = (level: number) => {
     setGameState((prev) => {
       const newColumns = [...prev.columns];
       const column = [...newColumns[colIndex]];
-      const card = column[column.length - 1]; // Get top card
+      const card = column[column.length - 1];
 
       if (!card || !card.isFaceUp) return prev;
 
-      // If it's a Category Anchor, it must go into an empty slot
       if (card.type === "category") {
         const existingFoundation = prev.foundation[card.category];
         if (!existingFoundation) {
@@ -102,7 +94,6 @@ export const useGameLogic = (level: number) => {
         }
       }
 
-      // If it's a Word, it must match an existing foundation category
       if (card.type === "word") {
         const targetStack = prev.foundation[card.category];
         if (targetStack) {
@@ -120,11 +111,8 @@ export const useGameLogic = (level: number) => {
     });
   };
 
-  // Inside useGameLogic.ts
-
   const drawCard = () => {
     setGameState((prev) => {
-      // If deck is empty, recycle waste (Rule: "can be recycled")
       if (prev.deck.length === 0) {
         return {
           ...prev,
@@ -154,7 +142,6 @@ export const useGameLogic = (level: number) => {
 
       const card = prev.waste[prev.waste.length - 1];
 
-      // Check if it matches an anchor in foundation
       if (prev.foundation[card.category]) {
         const newWaste = [...prev.waste];
         newWaste.pop();
