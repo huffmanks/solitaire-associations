@@ -1,122 +1,117 @@
-import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
-import { useGameLogic } from "@/hooks/use-game-logic";
+import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 import { CardType } from "@/types";
 
-interface Props {
+interface CardProps {
   card: CardType;
-  isSelected: boolean;
-  keysCollected: number;
-  onPress: () => void;
   index: number;
+  isSelected: boolean;
+  onPress: () => void;
 }
 
-export default function Card({ card, isSelected, keysCollected, onPress, index }: Props) {
-  const isLocked = (card.lockCount ?? 0) > keysCollected;
-  const isAnchor = card.type === "category";
+export default function Card({ card, index, isSelected, onPress }: CardProps) {
+  const foundation = useLevelStore((state) => state.foundation);
 
-  const { gameState } = useGameLogic();
+  const categoryKey = Object.keys(foundation)[index];
+  const stack = categoryKey ? foundation[categoryKey] : null;
+  const topCard = stack ? stack[stack.length - 1] : null;
+  const currentCount = stack ? stack.length - 1 : 0;
+  const totalNeeded = topCard?.totalInCategory || 0;
 
   const cardStyle = {
     marginTop: index === 0 ? 0 : -60,
     zIndex: index,
   };
 
-  const categoryKey = Object.keys(gameState.foundation)[index];
-  const stack = categoryKey ? gameState.foundation[categoryKey] : null;
-  const topCard = stack ? stack[stack.length - 1] : null;
-  const currentCount = stack ? stack.length - 1 : 0;
-  const totalNeeded = topCard?.totalInCategory || 0;
-
   return (
-    <TouchableOpacity
-      activeOpacity={0.8}
-      onPress={onPress}
-      style={[styles.card, cardStyle, !card.isFaceUp && styles.cardHidden, isAnchor && styles.anchorBorder, isSelected && styles.selectedCard, isLocked && styles.cardLocked]}>
-      {isLocked ? (
-        <Text style={styles.lockText}>🔒 {card.lockCount}</Text>
-      ) : card.isFaceUp ? (
-        <View style={styles.contentWrapper}>
-          {isAnchor && (
-            <>
-              <Text style={styles.anchorIcon}>⭐</Text>
-              <Text style={styles.counter}>
-                {currentCount}/{totalNeeded}
-              </Text>
-            </>
-          )}
-          <Text style={styles.cardText}>{card.type === "key" ? "🔑" : card.content}</Text>
-        </View>
-      ) : (
-        <Text style={styles.cardBackSymbol}>?</Text>
-      )}
-    </TouchableOpacity>
+    <Pressable style={cardStyle} onPress={onPress}>
+      <View style={styles.container}>
+        {card.isFaceUp ? (
+          <>
+            {card.type === "category" ? (
+              <CategoryCard cardContent={card.content} currentCount={currentCount} totalNeeded={totalNeeded} />
+            ) : (
+              <View style={[styles.card, styles.visible]}>
+                <View style={styles.textWrapper}>
+                  <Text style={[styles.text, styles.textContent]}>{card.content}</Text>
+                </View>
+              </View>
+            )}
+          </>
+        ) : (
+          <View style={[styles.card, styles.hidden]} />
+        )}
+      </View>
+    </Pressable>
+  );
+}
+
+function CategoryCard({ cardContent, currentCount, totalNeeded }: { cardContent: string; currentCount: number; totalNeeded: number }) {
+  return (
+    <View style={[styles.card, styles.category]}>
+      <View style={styles.categoryHeader}>
+        <Text style={styles.text}>
+          {currentCount}/{totalNeeded}
+        </Text>
+        <FontAwesome6 name="crown" size={20} color={theme.colors.primary} />
+      </View>
+      <View style={[styles.textWrapper, styles.categoryTextWrapper]}>
+        <Text style={[styles.text, styles.textContent]}>{cardContent}</Text>
+      </View>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
+  container: {
+    aspectRatio: 2 / 3,
+    flexGrow: 1,
+    flexShrink: 1,
+    flexBasis: 60,
+  },
   card: {
-    height: 90,
-    width: "100%",
-    backgroundColor: theme.colors.cardFront,
-    borderRadius: 6,
-    justifyContent: "center",
-    alignItems: "center",
+    flex: 1,
+    borderWidth: 3,
+    borderStyle: "solid",
+    borderRadius: 10,
     elevation: 3,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
   },
-  anchorBorder: {
-    borderColor: theme.colors.secondary,
-    borderWidth: 3,
+  hidden: {
     backgroundColor: theme.colors.cardBack,
+    borderColor: theme.colors.foreground,
   },
-  anchorIcon: {
-    position: "absolute",
-    top: -10,
-    left: -10,
-    fontSize: 12,
-  },
-  selectedCard: {
+  visible: {
+    backgroundColor: theme.colors.cardFront,
     borderColor: theme.colors.cardForeground,
-    borderWidth: 2,
-    transform: [{ scale: 1.05 }],
   },
-  cardHidden: {
-    backgroundColor: theme.colors.cardBack,
-    borderWidth: 2,
-    borderColor: theme.colors.border,
+  category: {
+    backgroundColor: theme.colors.cardFront,
+    borderColor: theme.colors.primary,
   },
-  contentWrapper: {
-    padding: 20,
+  categoryHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 5,
   },
-  cardText: {
-    fontSize: 12,
-    fontWeight: "bold",
+  textWrapper: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  categoryTextWrapper: {
+    paddingBlockEnd: 30,
+  },
+  text: {
     color: theme.colors.cardForeground,
-    textAlign: "center",
+    fontWeight: 700,
   },
-  counter: {
-    position: "absolute",
-    top: -10,
-    right: -10,
-    fontSize: 10,
-    fontWeight: "bold",
-    color: theme.colors.cardForeground,
-  },
-  cardBackSymbol: {
-    fontSize: 24,
-    color: theme.colors.border,
-    fontWeight: "bold",
-  },
-  cardLocked: {
-    backgroundColor: theme.colors.locked,
-    borderColor: theme.colors.lockedBorder,
-  },
-  lockText: {
-    color: theme.colors.foreground,
-    fontWeight: "bold",
-    fontSize: 14,
+  textContent: {
+    fontSize: 20,
   },
 });

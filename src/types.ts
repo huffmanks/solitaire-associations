@@ -3,16 +3,11 @@ export type CardType = {
   content: string;
   category: string;
   isFaceUp: boolean;
-  type: "word" | "category" | "key";
-  lockCount?: number;
+  type: "word" | "category";
   totalInCategory?: number;
 };
 
-export type GameState = {
-  columns: CardType[][];
-  foundation: Record<string, CardType[]>;
-  deck: CardType[];
-  waste: CardType[];
-  keysCollected: number;
-  level: number;
+export type SelectedCardInfo = {
+  type: "tableau" | "waste";
+  colIndex?: number;
 };

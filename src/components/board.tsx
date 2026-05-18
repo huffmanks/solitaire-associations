@@ -1,24 +1,36 @@
-import { useState } from "react";
-import { Dimensions, Pressable, StyleSheet, View } from "react-native";
+import { useEffect, useState } from "react";
+import { Pressable, StyleSheet, View } from "react-native";
+import { useShallow } from "zustand/shallow";
 
-import { useGameLogic } from "@/hooks/use-game-logic";
 import { theme } from "@/lib/theme";
 
 import Card from "@/components/card";
 import Deck from "@/components/deck";
 import Foundation from "@/components/foundation";
-
-const { width } = Dimensions.get("window");
+import { useLevelStore } from "@/lib/store/level";
 
 export default function Board() {
   const [selectedCol, setSelectedCol] = useState<number | null>(null);
 
-  const { gameState, revealCard, selectedCardInfo, setSelectedCardInfo, moveCard, drawCard, moveWasteToFoundation } = useGameLogic();
-  const colWidth = width / gameState.columns.length - 10;
+  const { deck, waste, columns, foundation, revealCard, selectedCardInfo, setSelectedCardInfo, moveCard, drawCard, moveWasteToFoundation, initializeLevel } = useLevelStore(
+    useShallow((state) => ({
+      deck: state.deck,
+      waste: state.waste,
+      columns: state.columns,
+      foundation: state.foundation,
+      revealCard: state.revealCard,
+      selectedCardInfo: state.selectedCardInfo,
+      setSelectedCardInfo: state.setSelectedCardInfo,
+      moveCard: state.moveCard,
+      drawCard: state.drawCard,
+      moveWasteToFoundation: state.moveWasteToFoundation,
+      initializeLevel: state.initializeLevel,
+    })),
+  );
 
   const onColumnPress = (colIndex: number) => {
     if (selectedCardInfo === null) {
-      const col = gameState.columns[colIndex];
+      const col = columns[colIndex];
       if (col.length > 0 && col[col.length - 1].isFaceUp) {
         setSelectedCardInfo({ type: "tableau", colIndex });
       }
@@ -27,29 +39,33 @@ export default function Board() {
     }
   };
 
+  useEffect(() => {
+    initializeLevel(1);
+  }, []);
+
   return (
     <View style={styles.container}>
       <Deck
-        deckCount={gameState.deck.length}
-        topWasteCard={gameState.waste[gameState.waste.length - 1]}
+        deckCount={deck.length}
+        topWasteCard={waste[waste.length - 1]}
         onDraw={drawCard}
         onWastePress={() => {
-          if (gameState.waste.length > 0) {
+          if (waste.length > 0) {
             setSelectedCardInfo({ type: "waste" });
           }
         }}
       />
 
       <View style={styles.header}>
-        <Foundation foundation={gameState.foundation} columnCount={gameState.columns.length} />
+        <Foundation foundation={foundation} columnCount={columns.length} />
       </View>
       <View style={styles.board}>
         <View style={styles.tableau}>
-          {gameState.columns.map((col, colIdx) => (
-            <View key={colIdx} style={[styles.column, { width: colWidth }]}>
+          {columns.map((col, colIdx) => (
+            <View key={colIdx} style={styles.column}>
               {col.map((card, cardIdx) => {
                 const isSelected = selectedCardInfo?.type === "tableau" && selectedCardInfo?.colIndex === colIdx && cardIdx === col.length - 1;
-                return <Card key={card.id} card={card} isSelected={isSelected} index={cardIdx} keysCollected={gameState.keysCollected} onPress={() => onColumnPress(colIdx)} />;
+                return <Card key={card.id} card={card} isSelected={isSelected} index={cardIdx} onPress={() => onColumnPress(colIdx)} />;
               })}
               {col.length === 0 && <Pressable style={styles.emptyColumnSpace} onPress={() => onColumnPress(colIdx)} />}
             </View>
@@ -86,10 +102,11 @@ const styles = StyleSheet.create({
   tableau: {
     flexDirection: "row",
     justifyContent: "space-between",
-    gap: 10,
+    gap: 8,
+    width: "100%",
   },
   column: {
-    alignItems: "center",
+    alignItems: "stretch",
     flex: 1,
   },
   slot: {
@@ -100,15 +117,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
   },
   emptyColumnSpace: {
-    height: 100,
+    aspectRatio: 2 / 3,
     backgroundColor: theme.colors.muted,
     borderStyle: "dashed",
     borderWidth: 2,
     borderColor: theme.colors.border,
     borderRadius: 8,
-    justifyContent: "center",
-    alignItems: "center",
-    flex: 1,
     width: "100%",
   },
 });
