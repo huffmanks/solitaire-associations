@@ -1,5 +1,7 @@
-import { CardType } from "@/types";
 import { StyleSheet, Text, View } from "react-native";
+
+import { theme } from "@/lib/theme";
+import { CardType } from "@/types";
 
 export default function Foundation({ foundation, columnCount }: { foundation: Record<string, CardType[]>; columnCount: number }) {
   const slots = Array.from({ length: columnCount });
@@ -27,7 +29,7 @@ export default function Foundation({ foundation, columnCount }: { foundation: Re
                 {stack!.length > 1 && <Text style={styles.wordText}>{topCard.content}</Text>}
               </>
             ) : (
-              <Text style={styles.emptyText}>Empty</Text>
+              <View style={styles.empty} />
             )}
           </View>
         );
@@ -45,15 +47,14 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 10,
     borderRadius: 10,
-    backgroundColor: "rgba(0,0,0,0.1)",
     marginBottom: 10,
   },
   slot: {
     height: 100,
-    backgroundColor: "rgba(255,255,255,0.1)",
-    borderStyle: "dashed",
+    backgroundColor: theme.colors.muted,
+    borderStyle: "solid",
     borderWidth: 2,
-    borderColor: "rgba(255,255,255,0.3)",
+    borderColor: theme.colors.border,
     borderRadius: 8,
     justifyContent: "center",
     alignItems: "center",
@@ -61,11 +62,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   goldBorder: {
-    borderColor: "#FFD700",
+    borderColor: theme.colors.primary,
     borderWidth: 3,
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.foreground,
     // iOS Shadow
-    shadowColor: "#FFD700",
+    shadowColor: theme.colors.primary,
     shadowOffset: { width: 0, height: 0 },
     shadowOpacity: 0.5,
     shadowRadius: 5,
@@ -84,22 +85,24 @@ const styles = StyleSheet.create({
     right: 4,
     fontSize: 10,
     fontWeight: "bold",
-    color: "#333",
+    color: theme.colors.cardForeground,
   },
   slotText: {
     fontSize: 10,
     fontWeight: "bold",
-    color: "#FFD700",
+    color: theme.colors.secondary,
     textTransform: "uppercase",
     textAlign: "center",
   },
   wordText: {
     fontSize: 12,
-    color: "#2c3e50",
+    color: theme.colors.cardForeground,
     marginTop: 5,
   },
-  emptyText: {
-    color: "rgba(255,255,255,0.2)",
-    fontSize: 10,
+  empty: {
+    width: 20,
+    height: 20,
+    borderRadius: "50%",
+    backgroundColor: theme.colors.border,
   },
 });

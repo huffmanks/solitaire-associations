@@ -1,7 +1,8 @@
-import { useGameLogic } from "@/hooks/use-game-logic";
-import { CardType } from "@/types";
-import React from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
+
+import { useGameLogic } from "@/hooks/use-game-logic";
+import { theme } from "@/lib/theme";
+import { CardType } from "@/types";
 
 interface Props {
   card: CardType;
@@ -58,19 +59,18 @@ const styles = StyleSheet.create({
   card: {
     height: 90,
     width: "100%",
-    backgroundColor: "#fff",
+    backgroundColor: theme.colors.cardFront,
     borderRadius: 6,
     justifyContent: "center",
     alignItems: "center",
     elevation: 3,
-    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
   },
   anchorBorder: {
-    borderColor: "#FFD700",
+    borderColor: theme.colors.secondary,
     borderWidth: 3,
-    backgroundColor: "#fffdf0",
+    backgroundColor: theme.colors.cardBack,
   },
   anchorIcon: {
     position: "absolute",
@@ -79,34 +79,43 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   selectedCard: {
-    borderColor: "#00fbff",
+    borderColor: theme.colors.cardForeground,
     borderWidth: 2,
     transform: [{ scale: 1.05 }],
   },
-  cardHidden: { backgroundColor: "#2c3e50", borderWidth: 2, borderColor: "#ecf0f1" },
+  cardHidden: {
+    backgroundColor: theme.colors.cardBack,
+    borderWidth: 2,
+    borderColor: theme.colors.border,
+  },
   contentWrapper: {
     padding: 20,
   },
-  cardText: { fontSize: 12, fontWeight: "bold", color: "#2c3e50", textAlign: "center" },
+  cardText: {
+    fontSize: 12,
+    fontWeight: "bold",
+    color: theme.colors.cardForeground,
+    textAlign: "center",
+  },
   counter: {
     position: "absolute",
     top: -10,
     right: -10,
     fontSize: 10,
     fontWeight: "bold",
-    color: "#333",
+    color: theme.colors.cardForeground,
   },
   cardBackSymbol: {
     fontSize: 24,
-    color: "rgba(255,255,255,0.4)",
+    color: theme.colors.border,
     fontWeight: "bold",
   },
   cardLocked: {
-    backgroundColor: "#576574",
-    borderColor: "#222f3e",
+    backgroundColor: theme.colors.locked,
+    borderColor: theme.colors.lockedBorder,
   },
   lockText: {
-    color: "#ff9ff3",
+    color: theme.colors.foreground,
     fontWeight: "bold",
     fontSize: 14,
   },
