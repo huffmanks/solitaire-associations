@@ -74,7 +74,6 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           return { columns: newColumns };
         });
       },
-
       moveCard: (targetColIndex) => {
         set((state) => {
           const newColumns = state.columns.map((col) => [...col]);
@@ -93,6 +92,11 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           const targetCol = newColumns[targetColIndex] || [];
           const topTargetCard = targetCol[targetCol.length - 1];
+
+          if (topTargetCard && topTargetCard.type === "category") {
+            return { selectedCardInfo: null };
+          }
+
           const canMove = targetCol.length === 0 || topTargetCard?.category === movingCard.category;
 
           if (!canMove) return { selectedCardInfo: null };
@@ -100,8 +104,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           if (state.selectedCardInfo?.type === "tableau" && sourceCol) {
             sourceCol.pop();
             if (sourceCol.length > 0) {
-              const lastIdx = sourceCol.length - 1;
-              sourceCol[lastIdx] = { ...sourceCol[lastIdx], isFaceUp: true };
+              sourceCol[sourceCol.length - 1] = { ...sourceCol[sourceCol.length - 1], isFaceUp: true };
             }
           } else if (state.selectedCardInfo?.type === "waste") {
             newWaste.pop();
@@ -113,41 +116,66 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           return { columns: newColumns, waste: newWaste, selectedCardInfo: null };
         });
       },
-
-      moveToFoundation: (colIndex) => {
+      moveToFoundation: (targetSlotIdx) => {
         set((state) => {
-          const newColumns = [...state.columns];
-          const column = [...(newColumns[colIndex] || [])];
-          const card = column[column.length - 1];
+          const newColumns = state.columns.map((col) => [...col]);
+          const newWaste = [...state.waste];
+          let movingCard: CardType | undefined;
+          let sourceCol: CardType[] | undefined;
 
-          if (!card || !card.isFaceUp) return state;
-
-          let updatedFoundation = { ...state.foundation };
-          let cardMoved = false;
-
-          if (card.type === "category" && !updatedFoundation[card.category]) {
-            updatedFoundation[card.category] = [card];
-            cardMoved = true;
-          } else if (card.type === "word" && updatedFoundation[card.category]) {
-            updatedFoundation[card.category] = [...updatedFoundation[card.category], card];
-            cardMoved = true;
+          if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
+            sourceCol = newColumns[state.selectedCardInfo.colIndex];
+            movingCard = sourceCol?.[sourceCol.length - 1];
+          } else if (state.selectedCardInfo?.type === "waste") {
+            movingCard = newWaste[newWaste.length - 1];
           }
 
-          if (!cardMoved) return state;
+          if (!movingCard) return { selectedCardInfo: null };
 
-          column.pop();
-          newColumns[colIndex] = column;
+          const activeCategoryKeys = Object.keys(state.foundation);
+          const existingCategoryAtSlot = activeCategoryKeys[targetSlotIdx];
 
-          const win = checkWinCondition(updatedFoundation, newColumns, state.deck, state.waste);
+          let updatedFoundation = { ...state.foundation };
+          let moveSuccessful = false;
+
+          if (!existingCategoryAtSlot) {
+            if (movingCard.type === "category") {
+              updatedFoundation[movingCard.category] = [movingCard];
+              moveSuccessful = true;
+            }
+          } else {
+            if (movingCard.category === existingCategoryAtSlot && movingCard.type === "word") {
+              updatedFoundation[existingCategoryAtSlot] = [...updatedFoundation[existingCategoryAtSlot], movingCard];
+              moveSuccessful = true;
+            }
+          }
+
+          if (!moveSuccessful) return { selectedCardInfo: null };
+
+          if (state.selectedCardInfo?.type === "tableau" && sourceCol) {
+            sourceCol.pop();
+            if (sourceCol.length > 0) {
+              sourceCol[sourceCol.length - 1] = { ...sourceCol[sourceCol.length - 1], isFaceUp: true };
+            }
+          } else if (state.selectedCardInfo?.type === "waste") {
+            newWaste.pop();
+          }
+
+          const win = checkWinCondition(updatedFoundation, newColumns, state.deck, newWaste);
           if (win) {
             useGameStore.getState().completeCurrentLevel(250);
             setTimeout(() => get().initializeLevel(), 100);
           }
 
-          return { columns: newColumns, foundation: updatedFoundation, hasWon: win };
+          return {
+            columns: newColumns,
+            waste: newWaste,
+            foundation: updatedFoundation,
+            selectedCardInfo: null,
+            hasWon: win,
+          };
         });
       },
-
       moveWasteToFoundation: () => {
         set((state) => {
           if (state.waste.length === 0) return state;
@@ -172,20 +200,21 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           return { waste: newWaste, foundation: updatedFoundation, hasWon: win };
         });
       },
-
       drawCard: () => {
         set((state) => {
           if (state.deck.length === 0) {
+            if (state.waste.length === 0) return state;
             return {
               deck: [...state.waste].reverse().map((c) => ({ ...c, isFaceUp: false })),
               waste: [],
+              selectedCardInfo: null,
             };
           }
 
           const newDeck = [...state.deck];
           const card = newDeck.pop();
 
-          return card ? { deck: newDeck, waste: [...state.waste, { ...card, isFaceUp: true }] } : state;
+          return card ? { deck: newDeck, waste: [...state.waste, { ...card, isFaceUp: true }], selectedCardInfo: null } : state;
         });
       },
 

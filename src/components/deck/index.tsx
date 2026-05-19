@@ -1,14 +1,16 @@
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
-import { DeckCard } from "@/components/card";
+import { DeckCard, EmptyCard } from "@/components/card";
 import Moves from "@/components/deck/moves";
 import Waste from "@/components/deck/waste";
 
 export default function Deck() {
   const deck = useLevelStore((state) => state.deck);
+  const drawCard = useLevelStore((state) => state.drawCard);
 
   return (
     <View style={styles.container}>
@@ -21,9 +23,17 @@ export default function Deck() {
         </View>
 
         <View style={styles.slotWrapper}>
-          <DeckCard>
-            <Text style={styles.deckCount}>{deck.length}</Text>
-          </DeckCard>
+          {deck.length > 0 ? (
+            <DeckCard>
+              <Text style={styles.deckCount}>{deck.length}</Text>
+            </DeckCard>
+          ) : (
+            <EmptyCard onPress={drawCard}>
+              <View style={styles.recycleCenter}>
+                <FontAwesome6 name="rotate-left" size={20} color={theme.colors.accent} />
+              </View>
+            </EmptyCard>
+          )}
         </View>
       </View>
     </View>
@@ -54,5 +64,9 @@ const styles = StyleSheet.create({
   deckCount: {
     color: theme.colors.foreground,
     fontWeight: "bold",
+  },
+  recycleCenter: {
+    alignItems: "center",
+    justifyContent: "center",
   },
 });

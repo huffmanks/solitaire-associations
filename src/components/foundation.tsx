@@ -8,15 +8,15 @@ import { theme } from "@/lib/theme";
 import Card, { EmptyCard } from "@/components/card";
 
 export default function Foundation() {
-  const { numberOfColumns, foundation } = useLevelStore(
+  const { numberOfColumns, foundation, moveToFoundation } = useLevelStore(
     useShallow((state) => ({
       numberOfColumns: state.numberOfColumns,
       foundation: state.foundation,
+      moveToFoundation: state.moveToFoundation,
     })),
   );
 
   const slots = Array.from({ length: numberOfColumns });
-
   const activeCategoryKeys = Object.keys(foundation);
 
   return (
@@ -29,9 +29,11 @@ export default function Foundation() {
         return (
           <View key={i} style={styles.slot}>
             {topCard ? (
-              <Card index={i} card={topCard} onPress={() => {}} />
+              <Card index={0} card={topCard} onPress={() => moveToFoundation(i)} />
             ) : (
-              <EmptyCard>
+              <EmptyCard
+                // TODO check if needed
+                onPress={() => moveToFoundation(i)}>
                 <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
               </EmptyCard>
             )}

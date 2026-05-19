@@ -19,20 +19,29 @@ export default function Board() {
     })),
   );
 
-  function onColumnPress(colIndex: number) {
-    if (selectedCardInfo === null) {
-      const col = columns[colIndex];
-      if (col.length > 0 && col[col.length - 1].isFaceUp) {
-        setSelectedCardInfo({ type: "tableau", colIndex });
-      }
-    } else {
-      moveCard(colIndex);
-    }
-  }
-
   useEffect(() => {
     initializeLevel();
   }, []);
+
+  function handleColumnInteraction(colIndex: number) {
+    const col = columns[colIndex] || [];
+
+    if (selectedCardInfo === null) {
+      if (col.length > 0) {
+        const topCard = col[col.length - 1];
+        if (topCard.isFaceUp) {
+          setSelectedCardInfo({ cardId: topCard.id, type: "tableau", colIndex });
+        }
+      }
+    } else {
+      if (selectedCardInfo.type === "tableau" && selectedCardInfo.colIndex === colIndex) {
+        setSelectedCardInfo(null);
+        return;
+      }
+
+      moveCard(colIndex);
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -43,12 +52,14 @@ export default function Board() {
         <View style={styles.tableau}>
           {columns.map((col, colIdx) => (
             <View key={colIdx} style={styles.column}>
-              {col.map((card, cardIdx) => (
-                <Card key={card.id} card={card} index={cardIdx} onPress={() => onColumnPress(colIdx)} />
-              ))}
+              {col.map((card, cardIdx) => {
+                const isTopCard = cardIdx === col.length - 1;
+                return <Card key={card.id} card={card} index={cardIdx} onPress={isTopCard ? () => handleColumnInteraction(colIdx) : () => {}} />;
+              })}
+
               {col.length === 0 && (
-                <EmptyCard onPress={() => onColumnPress(colIdx)}>
-                  <View></View>
+                <EmptyCard onPress={() => handleColumnInteraction(colIdx)}>
+                  <View />
                 </EmptyCard>
               )}
             </View>

@@ -18,8 +18,8 @@ export default function Waste() {
   const topWasteCard = waste[waste.length - 1];
 
   function handleWastePress() {
-    if (waste.length > 0) {
-      setSelectedCardInfo({ type: "waste" });
+    if (topWasteCard) {
+      setSelectedCardInfo({ cardId: topWasteCard.id, type: "waste" });
     }
   }
 

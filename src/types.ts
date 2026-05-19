@@ -8,6 +8,7 @@ export type CardType = {
 };
 
 export type SelectedCardInfo = {
+  cardId: string;
   type: "tableau" | "waste";
   colIndex?: number;
 };

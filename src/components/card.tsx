@@ -19,6 +19,12 @@ export default function Card({ card, index, onPress }: CardProps) {
 
   const foundation = useLevelStore((state) => state.foundation);
 
+  // TODO for testing
+  const selectedCardInfo = useLevelStore((state) => state.selectedCardInfo);
+
+  const isSelected = selectedCardInfo?.cardId === card.id;
+  // END TODO
+
   const stack = foundation[card.category] || null;
   const currentCount = stack ? stack.length - 1 : 0;
   const totalNeeded = card.totalInCategory || 0;
@@ -38,12 +44,12 @@ export default function Card({ card, index, onPress }: CardProps) {
   }
 
   if (!card.isFaceUp) {
-    return <CardLayout variant="hidden" containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout} />;
+    return <CardLayout variant="hidden" isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout} />;
   }
 
   if (card.type === "category") {
     return (
-      <CardLayout variant="category" containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
+      <CardLayout variant="category" isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
         <View style={styles.categoryHeader}>
           <Text style={styles.text}>{`${currentCount}/${totalNeeded}`}</Text>
           <FontAwesome6 name="crown" size={18} color={theme.colors.primary} />
@@ -54,7 +60,7 @@ export default function Card({ card, index, onPress }: CardProps) {
   }
 
   return (
-    <CardLayout variant="visible" containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
+    <CardLayout variant="visible" isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
       <Text style={[styles.text, styles.textContent]}>{card.content}</Text>
     </CardLayout>
   );
@@ -62,14 +68,15 @@ export default function Card({ card, index, onPress }: CardProps) {
 
 interface BaseLayoutProps {
   variant: "visible" | "hidden" | "category" | "empty";
+  isSelected?: boolean;
   children?: React.ReactNode;
   containerStyle?: ViewStyle;
   onPress?: () => void;
   onLayout?: (event: LayoutChangeEvent) => void;
 }
 
-function CardLayout({ variant, children, containerStyle, onPress, onLayout }: BaseLayoutProps) {
-  const cardStyles = [styles.card, styles[variant]];
+function CardLayout({ variant, isSelected, children, containerStyle, onPress, onLayout }: BaseLayoutProps) {
+  const cardStyles = [styles.card, styles[variant], isSelected && styles.selectedOverride];
 
   function renderPattern() {
     const icons = [];
@@ -95,7 +102,7 @@ function CardLayout({ variant, children, containerStyle, onPress, onLayout }: Ba
     </View>
   );
 
-  if (onPress) {
+  if (onPress && onPress.toString() !== "() => {}") {
     return (
       <Pressable style={[styles.baseSize, containerStyle]} onPress={onPress} onLayout={onLayout}>
         {content}
@@ -141,6 +148,9 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     overflow: "hidden",
+  },
+  selectedOverride: {
+    borderColor: "red",
   },
   textWrapper: {
     flex: 1,
