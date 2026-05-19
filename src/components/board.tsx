@@ -19,7 +19,7 @@ export default function Board() {
     })),
   );
 
-  const onColumnPress = (colIndex: number) => {
+  function onColumnPress(colIndex: number) {
     if (selectedCardInfo === null) {
       const col = columns[colIndex];
       if (col.length > 0 && col[col.length - 1].isFaceUp) {
@@ -28,10 +28,10 @@ export default function Board() {
     } else {
       moveCard(colIndex);
     }
-  };
+  }
 
   useEffect(() => {
-    initializeLevel(1);
+    initializeLevel();
   }, []);
 
   return (

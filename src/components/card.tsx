@@ -1,6 +1,9 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import { useState } from "react";
+import { LayoutChangeEvent, Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 
+import { CARD_COLUMN_VISIBLE_PEEK } from "@/lib/constants";
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 import { CardType } from "@/types";
@@ -12,26 +15,35 @@ interface CardProps {
 }
 
 export default function Card({ card, index, onPress }: CardProps) {
+  const [cardHeight, setCardHeight] = useState<number>(0);
+
   const foundation = useLevelStore((state) => state.foundation);
 
-  const categoryKey = Object.keys(foundation)[index];
-  const stack = categoryKey ? foundation[categoryKey] : null;
-  const topCard = stack ? stack[stack.length - 1] : null;
+  const stack = foundation[card.category] || null;
   const currentCount = stack ? stack.length - 1 : 0;
-  const totalNeeded = topCard?.totalInCategory || 0;
+  const totalNeeded = card.totalInCategory || 0;
+
+  const dynamicMarginTop = index === 0 || cardHeight === 0 ? 0 : -(cardHeight - CARD_COLUMN_VISIBLE_PEEK);
 
   const containerStyle: ViewStyle = {
-    marginTop: index === 0 ? 0 : -175,
+    marginTop: dynamicMarginTop,
     zIndex: index,
   };
 
+  function handleLayout(event: LayoutChangeEvent) {
+    const { height } = event.nativeEvent.layout;
+    if (height && height !== cardHeight) {
+      setCardHeight(height);
+    }
+  }
+
   if (!card.isFaceUp) {
-    return <CardLayout variant="hidden" containerStyle={containerStyle} onPress={onPress} />;
+    return <CardLayout variant="hidden" containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout} />;
   }
 
   if (card.type === "category") {
     return (
-      <CardLayout variant="category" containerStyle={containerStyle} onPress={onPress}>
+      <CardLayout variant="category" containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
         <View style={styles.categoryHeader}>
           <Text style={styles.text}>{`${currentCount}/${totalNeeded}`}</Text>
           <FontAwesome6 name="crown" size={18} color={theme.colors.primary} />
@@ -42,7 +54,7 @@ export default function Card({ card, index, onPress }: CardProps) {
   }
 
   return (
-    <CardLayout variant="visible" containerStyle={containerStyle} onPress={onPress}>
+    <CardLayout variant="visible" containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
       <Text style={[styles.text, styles.textContent]}>{card.content}</Text>
     </CardLayout>
   );
@@ -53,30 +65,57 @@ interface BaseLayoutProps {
   children?: React.ReactNode;
   containerStyle?: ViewStyle;
   onPress?: () => void;
+  onLayout?: (event: LayoutChangeEvent) => void;
 }
 
-function CardLayout({ variant, children, containerStyle, onPress }: BaseLayoutProps) {
+function CardLayout({ variant, children, containerStyle, onPress, onLayout }: BaseLayoutProps) {
   const cardStyles = [styles.card, styles[variant]];
+
+  function renderPattern() {
+    const icons = [];
+    const rows = 15;
+    const cols = 15;
+
+    for (let r = 0; r < rows; r++) {
+      for (let c = 0; c < cols; c++) {
+        icons.push(<MaterialCommunityIcons key={`${r}-${c}`} name="cards-diamond" size={32} color={theme.colors.cardBackIcon} style={styles.patternIcon} />);
+      }
+    }
+    return icons;
+  }
 
   const content = (
     <View style={cardStyles}>
+      {variant === "hidden" && (
+        <View style={styles.patternContainer} pointerEvents="none">
+          <View style={styles.patternGrid}>{renderPattern()}</View>
+        </View>
+      )}
       <View style={styles.textWrapper}>{children}</View>
     </View>
   );
 
   if (onPress) {
     return (
-      <Pressable style={[styles.baseSize, containerStyle]} onPress={onPress}>
+      <Pressable style={[styles.baseSize, containerStyle]} onPress={onPress} onLayout={onLayout}>
         {content}
       </Pressable>
     );
   }
 
-  return <View style={[styles.baseSize, containerStyle]}>{content}</View>;
+  return (
+    <View style={[styles.baseSize, containerStyle]} onLayout={onLayout}>
+      {content}
+    </View>
+  );
 }
 
-export function EmptyCard({ children }: { children: React.ReactNode }) {
-  return <CardLayout variant="empty">{children}</CardLayout>;
+export function EmptyCard({ onPress, children }: { onPress?: () => void; children: React.ReactNode }) {
+  return (
+    <CardLayout variant="empty" onPress={onPress}>
+      {children}
+    </CardLayout>
+  );
 }
 
 export function DeckCard({ children }: { children: React.ReactNode }) {
@@ -111,7 +150,7 @@ const styles = StyleSheet.create({
   },
   visible: {
     backgroundColor: theme.colors.cardFront,
-    borderColor: theme.colors.cardForeground,
+    borderColor: theme.colors.cardFrontBorder,
   },
   hidden: {
     backgroundColor: theme.colors.cardBack,
@@ -146,5 +185,20 @@ const styles = StyleSheet.create({
   textContent: {
     fontSize: 14,
     textAlign: "center",
+  },
+  patternContainer: {
+    ...StyleSheet.absoluteFill,
+    overflow: "hidden",
+  },
+  patternGrid: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    width: 200,
+    height: 200,
+  },
+  patternIcon: {
+    marginInline: -6,
+    marginBlock: -4,
+    lineHeight: 32,
   },
 });

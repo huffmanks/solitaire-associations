@@ -5,6 +5,7 @@ import { theme } from "@/lib/theme";
 
 export default function GoldCount() {
   const goldCount = useGameStore((state) => state.goldCount);
+
   return (
     <View style={styles.container}>
       <View style={styles.gold} />

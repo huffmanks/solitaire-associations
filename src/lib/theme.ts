@@ -5,7 +5,9 @@ export const theme = {
     secondary: "hsl(57, 100%, 54%)",
     accent: "hsl(151, 100%, 33%)",
     cardFront: "hsl(43, 100%, 99%)",
+    cardFrontBorder: "hsl(34, 77%, 88%)",
     cardBack: "hsl(200, 100%, 50%)",
+    cardBackIcon: "hsl(205, 100%, 50%)",
     muted: "hsl(144, 100%, 10%)",
     border: "hsl(142, 100%, 21%)",
 

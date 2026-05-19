@@ -17,9 +17,7 @@ type GameStoreState = {
 };
 
 type GameStoreActions = {
-  setCurrentLevel: (currentLevel: number) => void;
-  setGoldCount: (goldCount: number) => void;
-  increaseLevelsWon: () => void;
+  completeCurrentLevel: (rewardGold: number) => void;
 
   reset: () => void;
 };
@@ -34,11 +32,11 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
   persist(
     (set) => ({
       ...initialGameStoreState,
-      setCurrentLevel: (currentLevel) => set({ currentLevel }),
-      setGoldCount: (goldCount) => set({ goldCount }),
-      increaseLevelsWon: () =>
+      completeCurrentLevel: (rewardGold) =>
         set((state) => ({
           levelsWon: state.levelsWon + 1,
+          currentLevel: state.currentLevel + 1,
+          goldCount: state.goldCount + rewardGold,
         })),
       reset: () => set(initialGameStoreState),
     }),

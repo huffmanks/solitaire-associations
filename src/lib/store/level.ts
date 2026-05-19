@@ -2,7 +2,8 @@ import { createMMKV } from "react-native-mmkv";
 import { create } from "zustand";
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 
-import { generateInitialColumns } from "@/lib/utils";
+import { useGameStore } from "@/lib/store/game";
+import { checkWinCondition, generateInitialColumns } from "@/lib/utils";
 import { CardType, SelectedCardInfo } from "@/types";
 
 const levelStorage = createMMKV({ id: "level" });
@@ -14,7 +15,7 @@ const levelZustandStorage: StateStorage = {
 };
 
 type LevelStoreState = {
-  level: number;
+  numberOfColumns: number;
   columns: CardType[][];
   foundation: Record<string, CardType[]>;
   deck: CardType[];
@@ -24,19 +25,19 @@ type LevelStoreState = {
 };
 
 type LevelStoreActions = {
-  initializeLevel: (levelNum?: number) => void;
+  initializeLevel: () => void;
   setSelectedCardInfo: (info: SelectedCardInfo | null) => void;
   revealCard: (colIndex: number, cardIndex: number) => void;
   moveCard: (targetColIndex: number) => void;
   moveToFoundation: (colIndex: number) => void;
-  drawCard: () => void;
   moveWasteToFoundation: () => void;
+  drawCard: () => void;
 
   reset: () => void;
 };
 
 const initialLevelStoreState: LevelStoreState = {
-  level: 1,
+  numberOfColumns: 3,
   columns: [],
   foundation: {},
   deck: [],
@@ -47,23 +48,18 @@ const initialLevelStoreState: LevelStoreState = {
 
 export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...initialLevelStoreState,
-      initializeLevel: (levelNum) => {
-        set((state) => {
-          const currentLevel = levelNum ?? state.level;
-          const columnCount = Math.min(3 + Math.floor((currentLevel - 1) / 2), 7);
-          const initialGameState = generateInitialColumns(columnCount, currentLevel);
+      initializeLevel: () => {
+        const activeLevel = useGameStore.getState().currentLevel;
+        const initialGameState = generateInitialColumns(activeLevel);
 
-          return {
-            ...initialGameState,
-            level: currentLevel,
-            selectedCardInfo: null,
-            hasWon: false,
-          };
+        set({
+          ...initialGameState,
+          selectedCardInfo: null,
+          hasWon: false,
         });
       },
-
       setSelectedCardInfo: (info) => set({ selectedCardInfo: info }),
       revealCard: (colIndex, cardIndex) => {
         set((state) => {
@@ -71,20 +67,11 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const column = [...(newColumns[colIndex] || [])];
           const card = column[cardIndex];
 
-          if (!card) return state;
+          if (!card || cardIndex !== column.length - 1 || card.isFaceUp) return state;
 
-          const isTopCard = cardIndex === column.length - 1;
-          if (!isTopCard) return state;
-
-          if (!card.isFaceUp) {
-            const updatedCard = { ...card, isFaceUp: true };
-            column[cardIndex] = updatedCard;
-            newColumns[colIndex] = column;
-
-            return { columns: newColumns };
-          }
-
-          return state;
+          column[cardIndex] = { ...card, isFaceUp: true };
+          newColumns[colIndex] = column;
+          return { columns: newColumns };
         });
       },
 
@@ -97,7 +84,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
             sourceCol = newColumns[state.selectedCardInfo.colIndex];
-            movingCard = sourceCol ? sourceCol[sourceCol.length - 1] : undefined;
+            movingCard = sourceCol?.[sourceCol.length - 1];
           } else if (state.selectedCardInfo?.type === "waste") {
             movingCard = newWaste[newWaste.length - 1];
           }
@@ -106,31 +93,24 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           const targetCol = newColumns[targetColIndex] || [];
           const topTargetCard = targetCol[targetCol.length - 1];
-
           const canMove = targetCol.length === 0 || topTargetCard?.category === movingCard.category;
 
-          if (canMove) {
-            if (state.selectedCardInfo?.type === "tableau" && sourceCol) {
-              sourceCol.pop();
-              if (sourceCol.length > 0) {
-                const lastIdx = sourceCol.length - 1;
-                sourceCol[lastIdx] = { ...sourceCol[lastIdx], isFaceUp: true };
-              }
-            } else if (state.selectedCardInfo?.type === "waste") {
-              newWaste.pop();
+          if (!canMove) return { selectedCardInfo: null };
+
+          if (state.selectedCardInfo?.type === "tableau" && sourceCol) {
+            sourceCol.pop();
+            if (sourceCol.length > 0) {
+              const lastIdx = sourceCol.length - 1;
+              sourceCol[lastIdx] = { ...sourceCol[lastIdx], isFaceUp: true };
             }
-
-            targetCol.push(movingCard);
-            newColumns[targetColIndex] = targetCol;
-
-            return {
-              columns: newColumns,
-              waste: newWaste,
-              selectedCardInfo: null,
-            };
+          } else if (state.selectedCardInfo?.type === "waste") {
+            newWaste.pop();
           }
 
-          return { selectedCardInfo: null };
+          targetCol.push(movingCard);
+          newColumns[targetColIndex] = targetCol;
+
+          return { columns: newColumns, waste: newWaste, selectedCardInfo: null };
         });
       },
 
@@ -142,30 +122,54 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           if (!card || !card.isFaceUp) return state;
 
-          if (card.type === "category") {
-            const existingFoundation = state.foundation[card.category];
-            if (!existingFoundation) {
-              const newFoundation = { ...state.foundation, [card.category]: [card] };
-              column.pop();
-              newColumns[colIndex] = column;
-              return { columns: newColumns, foundation: newFoundation };
-            }
+          let updatedFoundation = { ...state.foundation };
+          let cardMoved = false;
+
+          if (card.type === "category" && !updatedFoundation[card.category]) {
+            updatedFoundation[card.category] = [card];
+            cardMoved = true;
+          } else if (card.type === "word" && updatedFoundation[card.category]) {
+            updatedFoundation[card.category] = [...updatedFoundation[card.category], card];
+            cardMoved = true;
           }
 
-          if (card.type === "word") {
-            const targetStack = state.foundation[card.category];
-            if (targetStack) {
-              const newFoundation = {
-                ...state.foundation,
-                [card.category]: [...targetStack, card],
-              };
-              column.pop();
-              newColumns[colIndex] = column;
-              return { columns: newColumns, foundation: newFoundation };
-            }
+          if (!cardMoved) return state;
+
+          column.pop();
+          newColumns[colIndex] = column;
+
+          const win = checkWinCondition(updatedFoundation, newColumns, state.deck, state.waste);
+          if (win) {
+            useGameStore.getState().completeCurrentLevel(250);
+            setTimeout(() => get().initializeLevel(), 100);
           }
 
-          return state;
+          return { columns: newColumns, foundation: updatedFoundation, hasWon: win };
+        });
+      },
+
+      moveWasteToFoundation: () => {
+        set((state) => {
+          if (state.waste.length === 0) return state;
+
+          const newWaste = [...state.waste];
+          const card = newWaste[newWaste.length - 1];
+
+          if (!state.foundation[card.category]) return state;
+
+          const updatedFoundation = {
+            ...state.foundation,
+            [card.category]: [...state.foundation[card.category], card],
+          };
+          newWaste.pop();
+
+          const win = checkWinCondition(updatedFoundation, state.columns, state.deck, newWaste);
+          if (win) {
+            useGameStore.getState().completeCurrentLevel(250);
+            setTimeout(() => get().initializeLevel(), 100);
+          }
+
+          return { waste: newWaste, foundation: updatedFoundation, hasWon: win };
         });
       },
 
@@ -181,35 +185,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const newDeck = [...state.deck];
           const card = newDeck.pop();
 
-          if (card) {
-            return {
-              deck: newDeck,
-              waste: [...state.waste, { ...card, isFaceUp: true }],
-            };
-          }
-          return state;
-        });
-      },
-
-      moveWasteToFoundation: () => {
-        set((state) => {
-          if (state.waste.length === 0) return state;
-
-          const card = state.waste[state.waste.length - 1];
-
-          if (state.foundation[card.category]) {
-            const newWaste = [...state.waste];
-            newWaste.pop();
-
-            return {
-              waste: newWaste,
-              foundation: {
-                ...state.foundation,
-                [card.category]: [...state.foundation[card.category], card],
-              },
-            };
-          }
-          return state;
+          return card ? { deck: newDeck, waste: [...state.waste, { ...card, isFaceUp: true }] } : state;
         });
       },
 

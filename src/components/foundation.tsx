@@ -1,24 +1,28 @@
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { StyleSheet, View } from "react-native";
 import { useShallow } from "zustand/shallow";
 
 import { useLevelStore } from "@/lib/store/level";
+import { theme } from "@/lib/theme";
 
 import Card, { EmptyCard } from "@/components/card";
 
 export default function Foundation() {
-  const { columns, foundation } = useLevelStore(
+  const { numberOfColumns, foundation } = useLevelStore(
     useShallow((state) => ({
-      columns: state.columns,
+      numberOfColumns: state.numberOfColumns,
       foundation: state.foundation,
     })),
   );
 
-  const slots = Array.from({ length: columns.length });
+  const slots = Array.from({ length: numberOfColumns });
+
+  const activeCategoryKeys = Object.keys(foundation);
 
   return (
     <View style={styles.foundationRow}>
       {slots.map((_, i) => {
-        const categoryKey = Object.keys(foundation)[i];
+        const categoryKey = activeCategoryKeys[i];
         const stack = categoryKey ? foundation[categoryKey] : null;
         const topCard = stack ? stack[stack.length - 1] : null;
 
@@ -28,7 +32,7 @@ export default function Foundation() {
               <Card index={i} card={topCard} onPress={() => {}} />
             ) : (
               <EmptyCard>
-                <View></View>
+                <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
               </EmptyCard>
             )}
           </View>
