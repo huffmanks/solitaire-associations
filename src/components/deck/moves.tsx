@@ -14,8 +14,13 @@ export default function Moves() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.accent,
-    padding: 10,
-    borderRadius: 4,
+    marginInlineStart: 5,
+    padding: 15,
+    borderRadius: 10,
+    aspectRatio: 1 / 1,
+    alignItems: "center",
+    justifyContent: "center",
+    width: "100%",
   },
   text: {
     color: theme.colors.muted,

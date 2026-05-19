@@ -1,12 +1,14 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { useGameStore } from "@/lib/store/game";
 import { theme } from "@/lib/theme";
 
 export default function GoldCount() {
+  const goldCount = useGameStore((state) => state.goldCount);
   return (
     <View style={styles.container}>
       <View style={styles.gold} />
-      <Text style={styles.count}>8276</Text>
+      <Text style={styles.count}>{goldCount}</Text>
     </View>
   );
 }

@@ -1,5 +1,5 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
@@ -8,11 +8,10 @@ import { CardType } from "@/types";
 interface CardProps {
   card: CardType;
   index: number;
-  isSelected: boolean;
   onPress: () => void;
 }
 
-export default function Card({ card, index, isSelected, onPress }: CardProps) {
+export default function Card({ card, index, onPress }: CardProps) {
   const foundation = useLevelStore((state) => state.foundation);
 
   const categoryKey = Object.keys(foundation)[index];
@@ -21,56 +20,78 @@ export default function Card({ card, index, isSelected, onPress }: CardProps) {
   const currentCount = stack ? stack.length - 1 : 0;
   const totalNeeded = topCard?.totalInCategory || 0;
 
-  const cardStyle = {
-    marginTop: index === 0 ? 0 : -60,
+  const containerStyle: ViewStyle = {
+    marginTop: index === 0 ? 0 : -175,
     zIndex: index,
   };
 
+  if (!card.isFaceUp) {
+    return <CardLayout variant="hidden" containerStyle={containerStyle} onPress={onPress} />;
+  }
+
+  if (card.type === "category") {
+    return (
+      <CardLayout variant="category" containerStyle={containerStyle} onPress={onPress}>
+        <View style={styles.categoryHeader}>
+          <Text style={styles.text}>{`${currentCount}/${totalNeeded}`}</Text>
+          <FontAwesome6 name="crown" size={18} color={theme.colors.primary} />
+        </View>
+        <Text style={[styles.text, styles.textContent, styles.categoryTextOffset]}>{card.content}</Text>
+      </CardLayout>
+    );
+  }
+
   return (
-    <Pressable style={cardStyle} onPress={onPress}>
-      <View style={styles.container}>
-        {card.isFaceUp ? (
-          <>
-            {card.type === "category" ? (
-              <CategoryCard cardContent={card.content} currentCount={currentCount} totalNeeded={totalNeeded} />
-            ) : (
-              <View style={[styles.card, styles.visible]}>
-                <View style={styles.textWrapper}>
-                  <Text style={[styles.text, styles.textContent]}>{card.content}</Text>
-                </View>
-              </View>
-            )}
-          </>
-        ) : (
-          <View style={[styles.card, styles.hidden]} />
-        )}
-      </View>
-    </Pressable>
+    <CardLayout variant="visible" containerStyle={containerStyle} onPress={onPress}>
+      <Text style={[styles.text, styles.textContent]}>{card.content}</Text>
+    </CardLayout>
   );
 }
 
-function CategoryCard({ cardContent, currentCount, totalNeeded }: { cardContent: string; currentCount: number; totalNeeded: number }) {
-  return (
-    <View style={[styles.card, styles.category]}>
-      <View style={styles.categoryHeader}>
-        <Text style={styles.text}>
-          {currentCount}/{totalNeeded}
-        </Text>
-        <FontAwesome6 name="crown" size={20} color={theme.colors.primary} />
-      </View>
-      <View style={[styles.textWrapper, styles.categoryTextWrapper]}>
-        <Text style={[styles.text, styles.textContent]}>{cardContent}</Text>
-      </View>
+interface BaseLayoutProps {
+  variant: "visible" | "hidden" | "category" | "empty";
+  children?: React.ReactNode;
+  containerStyle?: ViewStyle;
+  onPress?: () => void;
+}
+
+function CardLayout({ variant, children, containerStyle, onPress }: BaseLayoutProps) {
+  const cardStyles = [styles.card, styles[variant]];
+
+  const content = (
+    <View style={cardStyles}>
+      <View style={styles.textWrapper}>{children}</View>
     </View>
+  );
+
+  if (onPress) {
+    return (
+      <Pressable style={[styles.baseSize, containerStyle]} onPress={onPress}>
+        {content}
+      </Pressable>
+    );
+  }
+
+  return <View style={[styles.baseSize, containerStyle]}>{content}</View>;
+}
+
+export function EmptyCard({ children }: { children: React.ReactNode }) {
+  return <CardLayout variant="empty">{children}</CardLayout>;
+}
+
+export function DeckCard({ children }: { children: React.ReactNode }) {
+  const drawCard = useLevelStore((state) => state.drawCard);
+  return (
+    <CardLayout variant="hidden" onPress={drawCard}>
+      {children}
+    </CardLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  baseSize: {
+    width: "100%",
     aspectRatio: 2 / 3,
-    flexGrow: 1,
-    flexShrink: 1,
-    flexBasis: 60,
   },
   card: {
     flex: 1,
@@ -80,38 +101,50 @@ const styles = StyleSheet.create({
     elevation: 3,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
-  },
-  hidden: {
-    backgroundColor: theme.colors.cardBack,
-    borderColor: theme.colors.foreground,
-  },
-  visible: {
-    backgroundColor: theme.colors.cardFront,
-    borderColor: theme.colors.cardForeground,
-  },
-  category: {
-    backgroundColor: theme.colors.cardFront,
-    borderColor: theme.colors.primary,
-  },
-  categoryHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    padding: 5,
+    overflow: "hidden",
   },
   textWrapper: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
+    width: "100%",
   },
-  categoryTextWrapper: {
-    paddingBlockEnd: 30,
+  visible: {
+    backgroundColor: theme.colors.cardFront,
+    borderColor: theme.colors.cardForeground,
+  },
+  hidden: {
+    backgroundColor: theme.colors.cardBack,
+    borderColor: theme.colors.foreground,
+  },
+  category: {
+    backgroundColor: theme.colors.cardFront,
+    borderColor: theme.colors.primary,
+  },
+  empty: {
+    backgroundColor: theme.colors.muted,
+    borderColor: theme.colors.border,
+  },
+  categoryHeader: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    padding: 4,
+  },
+  categoryTextOffset: {
+    paddingTop: 10,
   },
   text: {
     color: theme.colors.cardForeground,
-    fontWeight: 700,
+    fontWeight: "700",
+    fontSize: 12,
   },
   textContent: {
-    fontSize: 20,
+    fontSize: 14,
+    textAlign: "center",
   },
 });

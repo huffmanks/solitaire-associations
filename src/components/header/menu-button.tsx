@@ -1,25 +1,31 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
+import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
 
 import { theme } from "@/lib/theme";
 
-export default function MenuButton({ handlePress }: { handlePress: () => void }) {
+export default function MenuButton() {
   const scaleValue = useRef(new Animated.Value(1)).current;
+  const router = useRouter();
 
-  const onPressIn = () => {
+  function handlePress() {
+    router.navigate("/");
+  }
+
+  function onPressIn() {
     Animated.spring(scaleValue, {
       toValue: 0.9,
       useNativeDriver: true,
     }).start();
-  };
+  }
 
-  const onPressOut = () => {
+  function onPressOut() {
     Animated.spring(scaleValue, {
       toValue: 1,
       useNativeDriver: true,
     }).start();
-  };
+  }
 
   return (
     <Pressable onPress={handlePress} onPressIn={onPressIn} onPressOut={onPressOut}>

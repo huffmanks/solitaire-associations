@@ -1,7 +1,7 @@
 import { WORD_BANK } from "@/lib/constants";
-import { CardType, GameState } from "@/types";
+import { CardType } from "@/types";
 
-export const generateInitialColumns = (count: number, level: number): GameState => {
+export const generateInitialColumns = (count: number, level: number) => {
   const categoryNames = Object.keys(WORD_BANK).slice(0, count);
   let allCards: CardType[] = [];
 
@@ -29,16 +29,6 @@ export const generateInitialColumns = (count: number, level: number): GameState 
     });
   });
 
-  if (level > 1) {
-    allCards.push({
-      id: "key-1",
-      content: "KEY",
-      category: "System",
-      type: "key",
-      isFaceUp: false,
-    });
-  }
-
   allCards = allCards.sort(() => Math.random() - 0.5);
 
   const columns: CardType[][] = Array.from({ length: count }, () => []);
@@ -55,16 +45,11 @@ export const generateInitialColumns = (count: number, level: number): GameState 
     if (col.length > 0) col[col.length - 1].isFaceUp = true;
   });
 
-  if (level > 1 && columns[0].length > 0) {
-    columns[0][0].lockCount = 1;
-  }
-
   return {
     columns: columns,
     foundation: {},
     deck: remainingCards,
     waste: [],
-    keysCollected: 0,
     level: level,
   };
 };

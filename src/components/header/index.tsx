@@ -1,4 +1,3 @@
-import { useRouter } from "expo-router";
 import { StyleSheet, View } from "react-native";
 
 import Completion from "@/components/header/completion";
@@ -6,15 +5,10 @@ import GoldCount from "@/components/header/gold-count";
 import MenuButton from "@/components/header/menu-button";
 
 export default function Header() {
-  const router = useRouter();
-  function handlePress() {
-    router.navigate("/");
-  }
-
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        <MenuButton handlePress={handlePress} />
+        <MenuButton />
         <GoldCount />
       </View>
       <View style={styles.right}>
@@ -32,6 +26,8 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     width: "100%",
+    marginBlockStart: 10,
+    paddingInlineEnd: 5,
   },
   left: {
     flexDirection: "row",
