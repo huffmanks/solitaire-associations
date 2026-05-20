@@ -13,8 +13,6 @@ export default function Header() {
       </View>
       <View style={styles.right}>
         <Completion />
-        <Completion />
-        <Completion />
       </View>
     </View>
   );

@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 
 import { useGameStore } from "@/lib/store/game";
-import { checkWinCondition, generateInitialColumns } from "@/lib/utils";
+import { checkWinCondition, generateInitialColumns, getLevelConfig } from "@/lib/utils";
 import { CardType, SelectedCardInfo } from "@/types";
 
 const levelStorage = createMMKV({ id: "level" });
@@ -22,6 +22,7 @@ type LevelStoreState = {
   waste: CardType[];
   selectedCardInfo: SelectedCardInfo | null;
   hasWon: boolean;
+  completedCategories: string[];
 };
 
 type LevelStoreActions = {
@@ -30,7 +31,6 @@ type LevelStoreActions = {
   revealCard: (colIndex: number, cardIndex: number) => void;
   moveCard: (targetColIndex: number) => void;
   moveToFoundation: (colIndex: number) => void;
-  moveWasteToFoundation: () => void;
   drawCard: () => void;
 
   reset: () => void;
@@ -44,6 +44,7 @@ const initialLevelStoreState: LevelStoreState = {
   waste: [],
   selectedCardInfo: null,
   hasWon: false,
+  completedCategories: [],
 };
 
 export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
@@ -58,6 +59,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           ...initialGameState,
           selectedCardInfo: null,
           hasWon: false,
+          completedCategories: [],
         });
       },
       setSelectedCardInfo: (info) => set({ selectedCardInfo: info }),
@@ -78,18 +80,39 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         set((state) => {
           const newColumns = state.columns.map((col) => [...col]);
           const newWaste = [...state.waste];
-          let movingCard: CardType | undefined;
-          let sourceCol: CardType[] | undefined;
+
+          let movingCardsList: CardType[] = [];
+          let sourceColIndex: number | null = null;
 
           if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
-            sourceCol = newColumns[state.selectedCardInfo.colIndex];
-            movingCard = sourceCol?.[sourceCol.length - 1];
+            sourceColIndex = state.selectedCardInfo.colIndex;
+            const sourceCol = newColumns[sourceColIndex];
+
+            if (sourceCol.length > 0) {
+              const topCard = sourceCol[sourceCol.length - 1];
+              const chainCategory = topCard.category;
+
+              let chainStartIndex = sourceCol.length - 1;
+              while (chainStartIndex > 0 && sourceCol[chainStartIndex - 1].isFaceUp && sourceCol[chainStartIndex - 1].category === chainCategory) {
+                chainStartIndex--;
+              }
+
+              let rawGroup = sourceCol.slice(chainStartIndex);
+
+              movingCardsList = rawGroup.sort((a, b) => {
+                if (a.type === "category") return -1;
+                if (b.type === "category") return 1;
+                return 0;
+              });
+            }
           } else if (state.selectedCardInfo?.type === "waste") {
-            movingCard = newWaste[newWaste.length - 1];
+            const topWaste = newWaste[newWaste.length - 1];
+            if (topWaste) movingCardsList = [topWaste];
           }
 
-          if (!movingCard) return { selectedCardInfo: null };
+          if (movingCardsList.length === 0) return { selectedCardInfo: null };
 
+          const leadMovingCard = movingCardsList[0];
           const targetCol = newColumns[targetColIndex] || [];
           const topTargetCard = targetCol[targetCol.length - 1];
 
@@ -97,12 +120,13 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             return { selectedCardInfo: null };
           }
 
-          const canMove = targetCol.length === 0 || topTargetCard?.category === movingCard.category;
-
+          const canMove = targetCol.length === 0 || topTargetCard?.category === leadMovingCard.category;
           if (!canMove) return { selectedCardInfo: null };
 
-          if (state.selectedCardInfo?.type === "tableau" && sourceCol) {
-            sourceCol.pop();
+          if (state.selectedCardInfo?.type === "tableau" && sourceColIndex !== null) {
+            const sourceCol = newColumns[sourceColIndex];
+            sourceCol.splice(sourceCol.length - movingCardsList.length);
+
             if (sourceCol.length > 0) {
               sourceCol[sourceCol.length - 1] = { ...sourceCol[sourceCol.length - 1], isFaceUp: true };
             }
@@ -110,8 +134,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             newWaste.pop();
           }
 
-          targetCol.push(movingCard);
-          newColumns[targetColIndex] = targetCol;
+          newColumns[targetColIndex] = [...targetCol, ...movingCardsList];
 
           return { columns: newColumns, waste: newWaste, selectedCardInfo: null };
         });
@@ -120,18 +143,39 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         set((state) => {
           const newColumns = state.columns.map((col) => [...col]);
           const newWaste = [...state.waste];
-          let movingCard: CardType | undefined;
-          let sourceCol: CardType[] | undefined;
+
+          let movingCardsList: CardType[] = [];
+          let sourceColIndex: number | null = null;
 
           if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
-            sourceCol = newColumns[state.selectedCardInfo.colIndex];
-            movingCard = sourceCol?.[sourceCol.length - 1];
+            sourceColIndex = state.selectedCardInfo.colIndex;
+            const sourceCol = newColumns[sourceColIndex];
+
+            if (sourceCol.length > 0) {
+              const topCard = sourceCol[sourceCol.length - 1];
+              const chainCategory = topCard.category;
+
+              let chainStartIndex = sourceCol.length - 1;
+              while (chainStartIndex > 0 && sourceCol[chainStartIndex - 1].isFaceUp && sourceCol[chainStartIndex - 1].category === chainCategory) {
+                chainStartIndex--;
+              }
+
+              let rawGroup = sourceCol.slice(chainStartIndex);
+
+              movingCardsList = rawGroup.sort((a, b) => {
+                if (a.type === "category") return -1;
+                if (b.type === "category") return 1;
+                return 0;
+              });
+            }
           } else if (state.selectedCardInfo?.type === "waste") {
-            movingCard = newWaste[newWaste.length - 1];
+            const topWaste = newWaste[newWaste.length - 1];
+            if (topWaste) movingCardsList = [topWaste];
           }
 
-          if (!movingCard) return { selectedCardInfo: null };
+          if (movingCardsList.length === 0) return { selectedCardInfo: null };
 
+          const leadMovingCard = movingCardsList[0];
           const activeCategoryKeys = Object.keys(state.foundation);
           const existingCategoryAtSlot = activeCategoryKeys[targetSlotIdx];
 
@@ -139,21 +183,25 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           let moveSuccessful = false;
 
           if (!existingCategoryAtSlot) {
-            if (movingCard.type === "category") {
-              updatedFoundation[movingCard.category] = [movingCard];
+            if (leadMovingCard.type === "category") {
+              updatedFoundation[leadMovingCard.category] = [...movingCardsList];
               moveSuccessful = true;
             }
           } else {
-            if (movingCard.category === existingCategoryAtSlot && movingCard.type === "word") {
-              updatedFoundation[existingCategoryAtSlot] = [...updatedFoundation[existingCategoryAtSlot], movingCard];
-              moveSuccessful = true;
+            if (leadMovingCard.category === existingCategoryAtSlot) {
+              if (leadMovingCard.type !== "category") {
+                updatedFoundation[existingCategoryAtSlot] = [...updatedFoundation[existingCategoryAtSlot], ...movingCardsList];
+                moveSuccessful = true;
+              }
             }
           }
 
           if (!moveSuccessful) return { selectedCardInfo: null };
 
-          if (state.selectedCardInfo?.type === "tableau" && sourceCol) {
-            sourceCol.pop();
+          if (state.selectedCardInfo?.type === "tableau" && sourceColIndex !== null) {
+            const sourceCol = newColumns[sourceColIndex];
+            sourceCol.splice(sourceCol.length - movingCardsList.length);
+
             if (sourceCol.length > 0) {
               sourceCol[sourceCol.length - 1] = { ...sourceCol[sourceCol.length - 1], isFaceUp: true };
             }
@@ -161,7 +209,21 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             newWaste.pop();
           }
 
-          const win = checkWinCondition(updatedFoundation, newColumns, state.deck, newWaste);
+          const targetCategory = leadMovingCard.category;
+          const activeStack = updatedFoundation[targetCategory] || [];
+          const anchorCard = activeStack.find((c) => c.type === "category");
+          const totalRequired = anchorCard?.totalInCategory ?? 0;
+
+          let updatedCompletedCategories = [...state.completedCategories];
+          if (activeStack.length === totalRequired + 1) {
+            delete updatedFoundation[targetCategory];
+            updatedCompletedCategories.push(targetCategory);
+          }
+
+          const activeLevel = useGameStore.getState().currentLevel;
+          const totalLevelCategoriesCount = getLevelConfig(activeLevel).categories.length;
+
+          const win = checkWinCondition(updatedCompletedCategories, totalLevelCategoriesCount);
           if (win) {
             useGameStore.getState().completeCurrentLevel(250);
             setTimeout(() => get().initializeLevel(), 100);
@@ -171,33 +233,10 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             columns: newColumns,
             waste: newWaste,
             foundation: updatedFoundation,
+            completedCategories: updatedCompletedCategories,
             selectedCardInfo: null,
             hasWon: win,
           };
-        });
-      },
-      moveWasteToFoundation: () => {
-        set((state) => {
-          if (state.waste.length === 0) return state;
-
-          const newWaste = [...state.waste];
-          const card = newWaste[newWaste.length - 1];
-
-          if (!state.foundation[card.category]) return state;
-
-          const updatedFoundation = {
-            ...state.foundation,
-            [card.category]: [...state.foundation[card.category], card],
-          };
-          newWaste.pop();
-
-          const win = checkWinCondition(updatedFoundation, state.columns, state.deck, newWaste);
-          if (win) {
-            useGameStore.getState().completeCurrentLevel(250);
-            setTimeout(() => get().initializeLevel(), 100);
-          }
-
-          return { waste: newWaste, foundation: updatedFoundation, hasWon: win };
         });
       },
       drawCard: () => {

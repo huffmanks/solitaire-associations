@@ -1,9 +1,35 @@
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { StyleSheet, View } from "react-native";
 
+import { useGameStore } from "@/lib/store/game";
+import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
+import { getLevelConfig } from "@/lib/utils";
 
 export default function Completion() {
-  return <View style={styles.completion} />;
+  const completedCategories = useLevelStore((state) => state.completedCategories);
+  const currentLevel = useGameStore((state) => state.currentLevel);
+
+  const { categories } = getLevelConfig(currentLevel);
+  const totalBoxes = categories.length;
+  const completedCount = completedCategories.length;
+  return (
+    <>
+      {Array.from({ length: totalBoxes }).map((_, index) => {
+        const isCompleted = index < completedCount;
+
+        return (
+          <View key={index} style={styles.completion}>
+            {isCompleted && (
+              <View style={styles.check}>
+                <FontAwesome name="check" size={14} color={theme.colors.foreground} />
+              </View>
+            )}
+          </View>
+        );
+      })}
+    </>
+  );
 }
 
 const styles = StyleSheet.create({
@@ -12,5 +38,12 @@ const styles = StyleSheet.create({
     borderRadius: 4,
     height: 25,
     width: 18,
+  },
+  check: {
+    flex: 1,
+    backgroundColor: theme.colors.accent,
+    alignItems: "center",
+    justifyContent: "center",
+    borderRadius: 4,
   },
 });

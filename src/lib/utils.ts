@@ -96,18 +96,6 @@ export function getLevelConfig(level: number): LevelConfig {
   return LEVEL_CONFIGS[cyclicLevel];
 }
 
-export function checkWinCondition(foundation: Record<string, CardType[]>, columns: CardType[][], deck: CardType[], waste: CardType[]): boolean {
-  const categories = Object.keys(foundation);
-  if (categories.length === 0) return false;
-
-  if (deck.length > 0 || waste.length > 0 || columns.some((col) => col.length > 0)) {
-    return false;
-  }
-
-  return categories.every((cat) => {
-    const stack = foundation[cat];
-    const anchorCard = stack.find((c) => c.type === "category");
-    const totalRequired = anchorCard?.totalInCategory ?? 0;
-    return stack.length === totalRequired + 1;
-  });
+export function checkWinCondition(completedList: string[], totalLevelCategoriesCount: number): boolean {
+  return completedList.length === totalLevelCategoriesCount;
 }
