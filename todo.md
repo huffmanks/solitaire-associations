@@ -1,9 +1,12 @@
-- When moving to foundation it should honor where user puts it.
-- Also when category gets completed it should not shift foundation.
+# todos
 
-- completion check should go in order.
+## ui
 
-- when card is faceup move text to peek.
-- when category card is in foundation and other card(s) on top it should show a badge above to signify what category it is.
+- [ ] when card is faceup move text to peek.
+- [ ] when category card is in foundation and other card(s) on top it should show a badge above to signify what category it is.
+- [ ] add win state and go to next level.
 
-- track moves count.
+## rules
+
+- [ ] there must be at least one category card in the deck and one in a column with depth 0 or 1.
+- [ ] track moves count.

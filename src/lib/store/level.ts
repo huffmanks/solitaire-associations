@@ -17,7 +17,7 @@ const levelZustandStorage: StateStorage = {
 type LevelStoreState = {
   numberOfColumns: number;
   columns: CardType[][];
-  foundation: Record<string, CardType[]>;
+  foundation: (CardType[] | null)[];
   deck: CardType[];
   waste: CardType[];
   selectedCardInfo: SelectedCardInfo | null;
@@ -39,7 +39,7 @@ type LevelStoreActions = {
 const initialLevelStoreState: LevelStoreState = {
   numberOfColumns: 3,
   columns: [],
-  foundation: {},
+  foundation: [],
   deck: [],
   waste: [],
   selectedCardInfo: null,
@@ -57,6 +57,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
         set({
           ...initialGameState,
+          foundation: Array.from({ length: initialGameState.numberOfColumns }, () => null),
           selectedCardInfo: null,
           hasWon: false,
           completedCategories: [],
@@ -144,6 +145,8 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const newColumns = state.columns.map((col) => [...col]);
           const newWaste = [...state.waste];
 
+          const updatedFoundation = state.foundation.map((slot) => (slot ? [...slot] : null));
+
           let movingCardsList: CardType[] = [];
           let sourceColIndex: number | null = null;
 
@@ -176,21 +179,19 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           if (movingCardsList.length === 0) return { selectedCardInfo: null };
 
           const leadMovingCard = movingCardsList[0];
-          const activeCategoryKeys = Object.keys(state.foundation);
-          const existingCategoryAtSlot = activeCategoryKeys[targetSlotIdx];
-
-          let updatedFoundation = { ...state.foundation };
+          const existingStackAtSlot = updatedFoundation[targetSlotIdx];
           let moveSuccessful = false;
 
-          if (!existingCategoryAtSlot) {
+          if (!existingStackAtSlot) {
             if (leadMovingCard.type === "category") {
-              updatedFoundation[leadMovingCard.category] = [...movingCardsList];
+              updatedFoundation[targetSlotIdx] = [...movingCardsList];
               moveSuccessful = true;
             }
           } else {
-            if (leadMovingCard.category === existingCategoryAtSlot) {
+            const slotAnchorCard = existingStackAtSlot.find((c) => c.type === "category");
+            if (slotAnchorCard && leadMovingCard.category === slotAnchorCard.category) {
               if (leadMovingCard.type !== "category") {
-                updatedFoundation[existingCategoryAtSlot] = [...updatedFoundation[existingCategoryAtSlot], ...movingCardsList];
+                updatedFoundation[targetSlotIdx] = [...existingStackAtSlot, ...movingCardsList];
                 moveSuccessful = true;
               }
             }
@@ -209,15 +210,16 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             newWaste.pop();
           }
 
-          const targetCategory = leadMovingCard.category;
-          const activeStack = updatedFoundation[targetCategory] || [];
+          const activeStack = updatedFoundation[targetSlotIdx] || [];
           const anchorCard = activeStack.find((c) => c.type === "category");
           const totalRequired = anchorCard?.totalInCategory ?? 0;
 
           let updatedCompletedCategories = [...state.completedCategories];
           if (activeStack.length === totalRequired + 1) {
-            delete updatedFoundation[targetCategory];
-            updatedCompletedCategories.push(targetCategory);
+            updatedFoundation[targetSlotIdx] = null;
+            if (anchorCard) {
+              updatedCompletedCategories.push(anchorCard.category);
+            }
           }
 
           const activeLevel = useGameStore.getState().currentLevel;

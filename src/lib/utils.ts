@@ -1,7 +1,7 @@
 import { LEVEL_CONFIGS, MAX_CARD_COUNT_PER_COLUMN, MIN_CARD_COUNT_PER_COLUMN, WORD_BANK } from "@/lib/constants";
 import { CardType, LevelConfig } from "@/types";
 
-export const generateInitialColumns = (level: number) => {
+export function generateInitialColumns(level: number) {
   const { columnsCount: numberOfColumns, categories: categoryNames } = getLevelConfig(level);
 
   let allCards: CardType[] = [];
@@ -79,11 +79,11 @@ export const generateInitialColumns = (level: number) => {
   return {
     columns,
     numberOfColumns,
-    foundation: {},
+    foundation: [],
     deck: remainingCards,
     waste: [],
   };
-};
+}
 
 export function getLevelConfig(level: number): LevelConfig {
   if (LEVEL_CONFIGS[level]) {

@@ -11,21 +11,19 @@ import { CardType } from "@/types";
 interface CardProps {
   card: CardType;
   index: number;
+  isTopCard?: boolean;
   onPress: () => void;
 }
 
-export default function Card({ card, index, onPress }: CardProps) {
+export default function Card({ card, index, isTopCard = true, onPress }: CardProps) {
   const [cardHeight, setCardHeight] = useState<number>(0);
 
   const foundation = useLevelStore((state) => state.foundation);
 
-  // TODO for testing
   const selectedCardInfo = useLevelStore((state) => state.selectedCardInfo);
-
   const isSelected = selectedCardInfo?.cardId === card.id;
-  // END TODO
 
-  const stack = foundation[card.category] || null;
+  const stack = Array.isArray(foundation) ? foundation.find((slot) => slot !== null && slot.length > 0 && slot[0].category === card.category) || null : null;
   const currentCount = stack ? stack.length - 1 : 0;
   const totalNeeded = card.totalInCategory || 0;
 
@@ -49,7 +47,7 @@ export default function Card({ card, index, onPress }: CardProps) {
 
   if (card.type === "category") {
     return (
-      <CardLayout variant="category" isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
+      <CardLayout variant="category" isTopCard={isTopCard} isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
         <View style={styles.categoryHeader}>
           <Text style={styles.text}>{`${currentCount}/${totalNeeded}`}</Text>
           <FontAwesome6 name="crown" size={18} color={theme.colors.primary} />
@@ -60,8 +58,8 @@ export default function Card({ card, index, onPress }: CardProps) {
   }
 
   return (
-    <CardLayout variant="visible" isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
-      <Text style={[styles.text, styles.textContent]}>{card.content}</Text>
+    <CardLayout variant="visible" isTopCard={isTopCard} isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
+      <Text style={[styles.text, styles.textContent, !isTopCard && styles.peekTextOffset]}>{card.content}</Text>
     </CardLayout>
   );
 }
@@ -69,14 +67,17 @@ export default function Card({ card, index, onPress }: CardProps) {
 interface BaseLayoutProps {
   variant: "visible" | "hidden" | "category" | "empty";
   isSelected?: boolean;
+  isTopCard?: boolean;
   children?: React.ReactNode;
   containerStyle?: ViewStyle;
   onPress?: () => void;
   onLayout?: (event: LayoutChangeEvent) => void;
 }
 
-function CardLayout({ variant, isSelected, children, containerStyle, onPress, onLayout }: BaseLayoutProps) {
+function CardLayout({ variant, isSelected, isTopCard, children, containerStyle, onPress, onLayout }: BaseLayoutProps) {
   const cardStyles = [styles.card, styles[variant], isSelected && styles.selectedOverride];
+
+  const textWrapperStyles = [styles.textWrapper, !isTopCard && variant !== "hidden" && variant !== "empty" && styles.textWrapperPeekOverride];
 
   function renderPattern() {
     const icons = [];
@@ -98,7 +99,7 @@ function CardLayout({ variant, isSelected, children, containerStyle, onPress, on
           <View style={styles.patternGrid}>{renderPattern()}</View>
         </View>
       )}
-      <View style={styles.textWrapper}>{children}</View>
+      <View style={textWrapperStyles}>{children}</View>
     </View>
   );
 
@@ -158,6 +159,10 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     width: "100%",
   },
+  textWrapperPeekOverride: {
+    justifyContent: "flex-start",
+    paddingTop: 0,
+  },
   visible: {
     backgroundColor: theme.colors.cardFront,
     borderColor: theme.colors.cardFrontBorder,
@@ -186,6 +191,13 @@ const styles = StyleSheet.create({
   },
   categoryTextOffset: {
     paddingTop: 10,
+  },
+  peekTextOffset: {
+    fontSize: 11,
+    lineHeight: 12,
+    fontWeight: "600",
+    textAlign: "center",
+    width: "90%",
   },
   text: {
     color: theme.colors.cardForeground,
