@@ -53,10 +53,11 @@ export default function Board() {
           {columns.map((col, colIdx) => (
             <View key={colIdx} style={styles.column}>
               {col.map((card, cardIdx) => {
+                const isTopCard = cardIdx === col.length - 1;
                 const topCardInColumn = col[col.length - 1];
                 const isPartofActiveChain = card.isFaceUp && topCardInColumn && card.category === topCardInColumn.category;
 
-                return <Card key={card.id} card={card} index={cardIdx} onPress={isPartofActiveChain ? () => handleColumnInteraction(colIdx) : () => {}} />;
+                return <Card key={card.id} card={card} index={cardIdx} isTopCard={isTopCard} onPress={isPartofActiveChain ? () => handleColumnInteraction(colIdx) : () => {}} />;
               })}
 
               {col.length === 0 && (

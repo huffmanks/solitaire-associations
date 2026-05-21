@@ -161,7 +161,7 @@ const styles = StyleSheet.create({
   },
   textWrapperPeekOverride: {
     justifyContent: "flex-start",
-    paddingTop: 0,
+    paddingTop: 4,
   },
   visible: {
     backgroundColor: theme.colors.cardFront,
