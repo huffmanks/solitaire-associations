@@ -1,4 +1,4 @@
-import { LEVEL_CONFIGS, MAX_CARD_COUNT_PER_COLUMN, MIN_CARD_COUNT_PER_COLUMN, WORD_BANK } from "@/lib/constants";
+import { CARD_COUNT_PER_COLUMN, LEVEL_CONFIGS, WORD_BANK } from "@/lib/constants";
 import { CardType, LevelConfig } from "@/types";
 
 export function generateInitialColumns(level: number) {
@@ -40,16 +40,16 @@ export function generateInitialColumns(level: number) {
   for (let i = 0; i < numberOfColumns; i++) {
     const validChoices: number[] = [];
 
-    for (let size = MIN_CARD_COUNT_PER_COLUMN; size <= MAX_CARD_COUNT_PER_COLUMN; size++) {
-      if (size === MIN_CARD_COUNT_PER_COLUMN && hasMinCount) continue;
-      if (size === MAX_CARD_COUNT_PER_COLUMN && hasMaxCount) continue;
+    for (let size = CARD_COUNT_PER_COLUMN.MIN; size <= CARD_COUNT_PER_COLUMN.MAX; size++) {
+      if (size === CARD_COUNT_PER_COLUMN.MIN && hasMinCount) continue;
+      if (size === CARD_COUNT_PER_COLUMN.MAX && hasMaxCount) continue;
       validChoices.push(size);
     }
 
     const chosenSize = validChoices[Math.floor(Math.random() * validChoices.length)];
 
-    if (chosenSize === MIN_CARD_COUNT_PER_COLUMN) hasMinCount = true;
-    if (chosenSize === MAX_CARD_COUNT_PER_COLUMN) hasMaxCount = true;
+    if (chosenSize === CARD_COUNT_PER_COLUMN.MIN) hasMinCount = true;
+    if (chosenSize === CARD_COUNT_PER_COLUMN.MAX) hasMaxCount = true;
 
     columnSizes.push(chosenSize);
   }

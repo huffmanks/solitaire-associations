@@ -1,12 +1,18 @@
 import { StyleSheet, Text, View } from "react-native";
 
+import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
 export default function Moves() {
+  const movesCount = useLevelStore((state) => state.movesCount);
+  const maxMoves = useLevelStore((state) => state.maxMoves);
+
+  const currentMoveCount = maxMoves - movesCount;
+
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Moves</Text>
-      <Text style={styles.count}>173</Text>
+      <Text style={styles.count}>{currentMoveCount}</Text>
     </View>
   );
 }

@@ -7,6 +7,7 @@ import { useLevelStore } from "@/lib/store/level";
 import Card, { EmptyCard } from "@/components/card";
 import Deck from "@/components/deck";
 import Foundation from "@/components/foundation";
+import GameOverModal from "@/components/game-over-modal";
 
 export default function Board() {
   const { columns, selectedCardInfo, setSelectedCardInfo, moveCard, initializeLevel } = useLevelStore(
@@ -69,6 +70,7 @@ export default function Board() {
           ))}
         </View>
       </View>
+      <GameOverModal />
     </View>
   );
 }

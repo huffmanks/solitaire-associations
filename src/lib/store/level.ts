@@ -2,6 +2,7 @@ import { createMMKV } from "react-native-mmkv";
 import { create } from "zustand";
 import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
 
+import { MOVE_BALANCING } from "@/lib/constants";
 import { useGameStore } from "@/lib/store/game";
 import { checkWinCondition, generateInitialColumns, getLevelConfig } from "@/lib/utils";
 import { CardType, SelectedCardInfo } from "@/types";
@@ -23,6 +24,9 @@ type LevelStoreState = {
   selectedCardInfo: SelectedCardInfo | null;
   hasWon: boolean;
   completedCategories: string[];
+  movesCount: number;
+  maxMoves: number;
+  hasLost: boolean;
 };
 
 type LevelStoreActions = {
@@ -45,6 +49,9 @@ const initialLevelStoreState: LevelStoreState = {
   selectedCardInfo: null,
   hasWon: false,
   completedCategories: [],
+  movesCount: 0,
+  maxMoves: 0,
+  hasLost: false,
 };
 
 export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
@@ -55,11 +62,21 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         const activeLevel = useGameStore.getState().currentLevel;
         const initialGameState = generateInitialColumns(activeLevel);
 
+        const totalCardsCount = initialGameState.columns.reduce((sum, col) => sum + col.length, 0);
+        const colCount = initialGameState.numberOfColumns;
+
+        const baseMovesThreshold = totalCardsCount * MOVE_BALANCING.BASE_MOVES_PER_CARD;
+        const columnMultiplierTax = 1 + (colCount - 1) * MOVE_BALANCING.COLUMN_COMPLEXITY_MULTIPLIER;
+        const computedMaxMoves = Math.floor(baseMovesThreshold * columnMultiplierTax);
+
         set({
           ...initialGameState,
           foundation: Array.from({ length: initialGameState.numberOfColumns }, () => null),
           selectedCardInfo: null,
           hasWon: false,
+          hasLost: false,
+          movesCount: 0,
+          maxMoves: computedMaxMoves,
           completedCategories: [],
         });
       },
@@ -137,7 +154,10 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           newColumns[targetColIndex] = [...targetCol, ...movingCardsList];
 
-          return { columns: newColumns, waste: newWaste, selectedCardInfo: null };
+          const nextMovesCount = state.movesCount + 1;
+          const playerHasLost = nextMovesCount >= state.maxMoves;
+
+          return { columns: newColumns, waste: newWaste, selectedCardInfo: null, movesCount: nextMovesCount, hasLost: playerHasLost };
         });
       },
       moveToFoundation: (targetSlotIdx) => {
@@ -231,31 +251,49 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             setTimeout(() => get().initializeLevel(), 100);
           }
 
+          const nextMovesCount = state.movesCount + 1;
+          const playerHasLost = nextMovesCount >= state.maxMoves && !win;
+
           return {
             columns: newColumns,
             waste: newWaste,
             foundation: updatedFoundation,
             completedCategories: updatedCompletedCategories,
             selectedCardInfo: null,
+            movesCount: nextMovesCount,
+            hasLost: playerHasLost,
             hasWon: win,
           };
         });
       },
       drawCard: () => {
         set((state) => {
+          const nextMovesCount = state.movesCount + 1;
+          const playerHasLost = nextMovesCount >= state.maxMoves;
+
           if (state.deck.length === 0) {
             if (state.waste.length === 0) return state;
             return {
               deck: [...state.waste].reverse().map((c) => ({ ...c, isFaceUp: false })),
               waste: [],
               selectedCardInfo: null,
+              movesCount: nextMovesCount,
+              hasLost: playerHasLost,
             };
           }
 
           const newDeck = [...state.deck];
           const card = newDeck.pop();
 
-          return card ? { deck: newDeck, waste: [...state.waste, { ...card, isFaceUp: true }], selectedCardInfo: null } : state;
+          if (!card) return state;
+
+          return {
+            deck: newDeck,
+            waste: [...state.waste, { ...card, isFaceUp: true }],
+            selectedCardInfo: null,
+            movesCount: nextMovesCount,
+            hasLost: playerHasLost,
+          };
         });
       },
 
