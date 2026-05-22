@@ -2,6 +2,8 @@ import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { useState } from "react";
 import { LayoutChangeEvent, Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Gesture, GestureDetector } from "react-native-gesture-handler";
+import Animated, { runOnJS, useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
 
 import { CARD_COLUMN_VISIBLE_PEEK } from "@/lib/constants";
 import { useLevelStore } from "@/lib/store/level";
@@ -12,10 +14,12 @@ interface CardProps {
   card: CardType;
   index: number;
   isTopCard?: boolean;
-  onPress: () => void;
+  onPress?: () => void;
+  onDragStart?: () => void;
+  onDragEnd?: (absoluteX: number, absoluteY: number) => void;
 }
 
-export default function Card({ card, index, isTopCard = true, onPress }: CardProps) {
+export default function Card({ card, index, isTopCard = true, onPress, onDragStart, onDragEnd }: CardProps) {
   const [cardHeight, setCardHeight] = useState<number>(0);
 
   const foundation = useLevelStore((state) => state.foundation);
@@ -41,13 +45,15 @@ export default function Card({ card, index, isTopCard = true, onPress }: CardPro
     }
   }
 
+  const dragHandlers = onDragStart && onDragEnd ? { onDragStart, onDragEnd } : undefined;
+
   if (!card.isFaceUp) {
-    return <CardLayout variant="hidden" isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout} />;
+    return <CardLayout variant="hidden" isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onDrag={dragHandlers} onLayout={handleLayout} />;
   }
 
   if (card.type === "category") {
     return (
-      <CardLayout variant="category" isTopCard={isTopCard} isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
+      <CardLayout variant="category" isTopCard={isTopCard} isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onDrag={dragHandlers} onLayout={handleLayout}>
         <View style={styles.categoryHeader}>
           <Text style={styles.text}>{`${currentCount}/${totalNeeded}`}</Text>
           <FontAwesome6 name="crown" size={18} color={theme.colors.primary} />
@@ -58,10 +64,15 @@ export default function Card({ card, index, isTopCard = true, onPress }: CardPro
   }
 
   return (
-    <CardLayout variant="visible" isTopCard={isTopCard} isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onLayout={handleLayout}>
+    <CardLayout variant="visible" isTopCard={isTopCard} isSelected={isSelected} containerStyle={containerStyle} onPress={onPress} onDrag={dragHandlers} onLayout={handleLayout}>
       <Text style={[styles.text, styles.textContent, !isTopCard && styles.peekTextOffset]}>{card.content}</Text>
     </CardLayout>
   );
+}
+
+interface DragHandlers {
+  onDragStart: () => void;
+  onDragEnd: (absoluteX: number, absoluteY: number) => void;
 }
 
 interface BaseLayoutProps {
@@ -71,10 +82,42 @@ interface BaseLayoutProps {
   children?: React.ReactNode;
   containerStyle?: ViewStyle;
   onPress?: () => void;
+  onDrag?: DragHandlers;
   onLayout?: (event: LayoutChangeEvent) => void;
 }
 
-function CardLayout({ variant, isSelected, isTopCard, children, containerStyle, onPress, onLayout }: BaseLayoutProps) {
+function CardLayout({ variant, isSelected, isTopCard, children, containerStyle, onPress, onDrag, onLayout }: BaseLayoutProps) {
+  const isGestureEnabled = Boolean(onDrag?.onDragStart && onDrag?.onDragEnd);
+  const translateX = useSharedValue(0);
+  const translateY = useSharedValue(0);
+  const isDragging = useSharedValue(false);
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: isDragging.value ? 1.02 : 1 }],
+    zIndex: isDragging.value ? 999 : containerStyle?.zIndex || 0,
+  }));
+
+  const dragGesture = Gesture.Pan()
+    .minDistance(4)
+    .onBegin(() => {
+      if (onDrag?.onDragStart) {
+        runOnJS(onDrag.onDragStart)();
+      }
+      isDragging.value = true;
+    })
+    .onChange((event) => {
+      translateX.value = event.translationX;
+      translateY.value = event.translationY;
+    })
+    .onFinalize((event) => {
+      if (onDrag?.onDragEnd) {
+        runOnJS(onDrag.onDragEnd)(event.absoluteX, event.absoluteY);
+      }
+      translateX.value = withSpring(0);
+      translateY.value = withSpring(0);
+      isDragging.value = false;
+    });
+
   const cardStyles = [styles.card, styles[variant], isSelected && styles.selectedOverride];
 
   const textWrapperStyles = [styles.textWrapper, !isTopCard && variant !== "hidden" && variant !== "empty" && styles.textWrapperPeekOverride];
@@ -103,7 +146,17 @@ function CardLayout({ variant, isSelected, isTopCard, children, containerStyle, 
     </View>
   );
 
-  if (onPress && onPress.toString() !== "() => {}") {
+  if (isGestureEnabled) {
+    return (
+      <GestureDetector gesture={dragGesture}>
+        <Animated.View style={[styles.baseSize, containerStyle, animatedStyle]} onLayout={onLayout}>
+          {content}
+        </Animated.View>
+      </GestureDetector>
+    );
+  }
+
+  if (onPress) {
     return (
       <Pressable style={[styles.baseSize, containerStyle]} onPress={onPress} onLayout={onLayout}>
         {content}

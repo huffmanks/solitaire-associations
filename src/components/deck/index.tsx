@@ -8,7 +8,11 @@ import { DeckCard, EmptyCard } from "@/components/card";
 import Moves from "@/components/deck/moves";
 import Waste from "@/components/deck/waste";
 
-export default function Deck() {
+interface DeckProps {
+  onCardDragEnd: (absoluteX: number, absoluteY: number) => void;
+}
+
+export default function Deck({ onCardDragEnd }: DeckProps) {
   const deck = useLevelStore((state) => state.deck);
   const drawCard = useLevelStore((state) => state.drawCard);
 
@@ -19,7 +23,7 @@ export default function Deck() {
       </View>
       <View style={styles.right}>
         <View style={styles.slotWrapper}>
-          <Waste />
+          <Waste onDragEnd={onCardDragEnd} />
         </View>
 
         <View style={styles.slotWrapper}>

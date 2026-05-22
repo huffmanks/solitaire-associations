@@ -1,19 +1,17 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { StyleSheet, Text, View } from "react-native";
-import { useShallow } from "zustand/shallow";
 
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
 import Card, { EmptyCard } from "@/components/card";
 
-export default function Foundation() {
-  const { foundation, moveToFoundation } = useLevelStore(
-    useShallow((state) => ({
-      foundation: state.foundation,
-      moveToFoundation: state.moveToFoundation,
-    })),
-  );
+interface FoundationProps {
+  slotRefs: React.MutableRefObject<Array<React.ElementRef<typeof View> | null>>;
+}
+
+export default function Foundation({ slotRefs }: FoundationProps) {
+  const foundation = useLevelStore((state) => state.foundation);
 
   return (
     <View style={styles.foundationRow}>
@@ -23,7 +21,12 @@ export default function Foundation() {
           const hasStackedWords = stack && stack.length > 1;
 
           return (
-            <View key={i} style={styles.slot}>
+            <View
+              key={i}
+              style={styles.slot}
+              ref={(ref) => {
+                slotRefs.current[i] = ref;
+              }}>
               {topCard ? (
                 <View style={styles.cardContainer}>
                   {hasStackedWords && (
@@ -33,10 +36,10 @@ export default function Foundation() {
                       </Text>
                     </View>
                   )}
-                  <Card index={0} card={topCard} onPress={() => moveToFoundation(i)} />
+                  <Card index={0} card={topCard} />
                 </View>
               ) : (
-                <EmptyCard onPress={() => moveToFoundation(i)}>
+                <EmptyCard>
                   <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
                 </EmptyCard>
               )}

@@ -32,7 +32,6 @@ type LevelStoreState = {
 type LevelStoreActions = {
   initializeLevel: () => void;
   setSelectedCardInfo: (info: SelectedCardInfo | null) => void;
-  revealCard: (colIndex: number, cardIndex: number) => void;
   moveCard: (targetColIndex: number) => void;
   moveToFoundation: (colIndex: number) => void;
   drawCard: () => void;
@@ -81,63 +80,53 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         });
       },
       setSelectedCardInfo: (info) => set({ selectedCardInfo: info }),
-      revealCard: (colIndex, cardIndex) => {
-        set((state) => {
-          const newColumns = [...state.columns];
-          const column = [...(newColumns[colIndex] || [])];
-          const card = column[cardIndex];
-
-          if (!card || cardIndex !== column.length - 1 || card.isFaceUp) return state;
-
-          column[cardIndex] = { ...card, isFaceUp: true };
-          newColumns[colIndex] = column;
-          return { columns: newColumns };
-        });
-      },
       moveCard: (targetColIndex) => {
         set((state) => {
           const newColumns = state.columns.map((col) => [...col]);
           const newWaste = [...state.waste];
 
-          let movingCardsList: CardType[] = [];
-          let sourceColIndex: number | null = null;
+          const getSameCategoryGroup = (sourceCol: CardType[], touchedIndex: number) => {
+            const category = sourceCol[touchedIndex]?.category;
+            let chainStartIndex = touchedIndex;
 
-          if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
-            sourceColIndex = state.selectedCardInfo.colIndex;
-            const sourceCol = newColumns[sourceColIndex];
-
-            if (sourceCol.length > 0) {
-              const topCard = sourceCol[sourceCol.length - 1];
-              const chainCategory = topCard.category;
-
-              let chainStartIndex = sourceCol.length - 1;
-              while (chainStartIndex > 0 && sourceCol[chainStartIndex - 1].isFaceUp && sourceCol[chainStartIndex - 1].category === chainCategory) {
-                chainStartIndex--;
-              }
-
-              let rawGroup = sourceCol.slice(chainStartIndex);
-
-              movingCardsList = rawGroup.sort((a, b) => {
-                if (a.type === "category") return -1;
-                if (b.type === "category") return 1;
-                return 0;
-              });
+            while (chainStartIndex > 0 && sourceCol[chainStartIndex - 1].isFaceUp && sourceCol[chainStartIndex - 1].category === category) {
+              chainStartIndex--;
             }
-          } else if (state.selectedCardInfo?.type === "waste") {
-            const topWaste = newWaste[newWaste.length - 1];
-            if (topWaste) movingCardsList = [topWaste];
+
+            return sourceCol.slice(chainStartIndex).sort((a, b) => {
+              if (a.type === "category") return -1;
+              if (b.type === "category") return 1;
+              return 0;
+            });
+          };
+
+          function extractMovingCards() {
+            let movingCardsList: CardType[] = [];
+            let sourceColIndex: number | null = null;
+
+            if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
+              sourceColIndex = state.selectedCardInfo.colIndex;
+              const sourceCol = newColumns[sourceColIndex];
+
+              if (sourceCol.length > 0) {
+                const startIndex = state.selectedCardInfo.cardIndex !== undefined ? state.selectedCardInfo.cardIndex : sourceCol.length - 1;
+                movingCardsList = getSameCategoryGroup(sourceCol, startIndex);
+              }
+            } else if (state.selectedCardInfo?.type === "waste") {
+              const topWaste = newWaste[newWaste.length - 1];
+              if (topWaste) movingCardsList = [topWaste];
+            }
+
+            return { movingCardsList, sourceColIndex };
           }
+
+          const { movingCardsList, sourceColIndex } = extractMovingCards();
 
           if (movingCardsList.length === 0) return { selectedCardInfo: null };
 
           const leadMovingCard = movingCardsList[0];
           const targetCol = newColumns[targetColIndex] || [];
           const topTargetCard = targetCol[targetCol.length - 1];
-
-          if (topTargetCard && topTargetCard.type === "category") {
-            return { selectedCardInfo: null };
-          }
-
           const canMove = targetCol.length === 0 || topTargetCard?.category === leadMovingCard.category;
           if (!canMove) return { selectedCardInfo: null };
 
@@ -167,53 +156,60 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           const updatedFoundation = state.foundation.map((slot) => (slot ? [...slot] : null));
 
-          let movingCardsList: CardType[] = [];
-          let sourceColIndex: number | null = null;
+          function getSameCategoryGroup(sourceCol: CardType[], touchedIndex: number) {
+            const category = sourceCol[touchedIndex]?.category;
+            let chainStartIndex = touchedIndex;
 
-          if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
-            sourceColIndex = state.selectedCardInfo.colIndex;
-            const sourceCol = newColumns[sourceColIndex];
-
-            if (sourceCol.length > 0) {
-              const topCard = sourceCol[sourceCol.length - 1];
-              const chainCategory = topCard.category;
-
-              let chainStartIndex = sourceCol.length - 1;
-              while (chainStartIndex > 0 && sourceCol[chainStartIndex - 1].isFaceUp && sourceCol[chainStartIndex - 1].category === chainCategory) {
-                chainStartIndex--;
-              }
-
-              let rawGroup = sourceCol.slice(chainStartIndex);
-
-              movingCardsList = rawGroup.sort((a, b) => {
-                if (a.type === "category") return -1;
-                if (b.type === "category") return 1;
-                return 0;
-              });
+            while (chainStartIndex > 0 && sourceCol[chainStartIndex - 1].isFaceUp && sourceCol[chainStartIndex - 1].category === category) {
+              chainStartIndex--;
             }
-          } else if (state.selectedCardInfo?.type === "waste") {
-            const topWaste = newWaste[newWaste.length - 1];
-            if (topWaste) movingCardsList = [topWaste];
+
+            return sourceCol.slice(chainStartIndex).sort((a, b) => {
+              if (a.type === "category") return -1;
+              if (b.type === "category") return 1;
+              return 0;
+            });
           }
+
+          function extractMovingCards() {
+            let movingCardsList: CardType[] = [];
+            let sourceColIndex: number | null = null;
+
+            if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
+              sourceColIndex = state.selectedCardInfo.colIndex;
+              const sourceCol = newColumns[sourceColIndex];
+
+              if (sourceCol.length > 0) {
+                const startIndex = state.selectedCardInfo.cardIndex !== undefined ? state.selectedCardInfo.cardIndex : sourceCol.length - 1;
+                movingCardsList = getSameCategoryGroup(sourceCol, startIndex);
+              }
+            } else if (state.selectedCardInfo?.type === "waste") {
+              const topWaste = newWaste[newWaste.length - 1];
+              if (topWaste) movingCardsList = [topWaste];
+            }
+
+            return { movingCardsList, sourceColIndex };
+          }
+
+          const { movingCardsList, sourceColIndex } = extractMovingCards();
 
           if (movingCardsList.length === 0) return { selectedCardInfo: null };
 
+          const anchorMovingCard = movingCardsList.find((c) => c.type === "category");
           const leadMovingCard = movingCardsList[0];
           const existingStackAtSlot = updatedFoundation[targetSlotIdx];
           let moveSuccessful = false;
 
           if (!existingStackAtSlot) {
-            if (leadMovingCard.type === "category") {
+            if (anchorMovingCard) {
               updatedFoundation[targetSlotIdx] = [...movingCardsList];
               moveSuccessful = true;
             }
           } else {
             const slotAnchorCard = existingStackAtSlot.find((c) => c.type === "category");
-            if (slotAnchorCard && leadMovingCard.category === slotAnchorCard.category) {
-              if (leadMovingCard.type !== "category") {
-                updatedFoundation[targetSlotIdx] = [...existingStackAtSlot, ...movingCardsList];
-                moveSuccessful = true;
-              }
+            if (slotAnchorCard && leadMovingCard.category === slotAnchorCard.category && leadMovingCard.type !== "category") {
+              updatedFoundation[targetSlotIdx] = [...existingStackAtSlot, ...movingCardsList];
+              moveSuccessful = true;
             }
           }
 
@@ -231,14 +227,14 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           }
 
           const activeStack = updatedFoundation[targetSlotIdx] || [];
-          const anchorCard = activeStack.find((c) => c.type === "category");
-          const totalRequired = anchorCard?.totalInCategory ?? 0;
+          const anchorStackCard = activeStack.find((c) => c.type === "category");
+          const totalRequired = anchorStackCard?.totalInCategory ?? 0;
 
           let updatedCompletedCategories = [...state.completedCategories];
           if (activeStack.length === totalRequired + 1) {
             updatedFoundation[targetSlotIdx] = null;
-            if (anchorCard) {
-              updatedCompletedCategories.push(anchorCard.category);
+            if (anchorStackCard) {
+              updatedCompletedCategories.push(anchorStackCard.category);
             }
           }
 

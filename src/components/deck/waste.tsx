@@ -7,7 +7,11 @@ import { theme } from "@/lib/theme";
 
 import Card, { EmptyCard } from "@/components/card";
 
-export default function Waste() {
+interface WasteProps {
+  onDragEnd: (absoluteX: number, absoluteY: number) => void;
+}
+
+export default function Waste({ onDragEnd }: WasteProps) {
   const { waste, setSelectedCardInfo } = useLevelStore(
     useShallow((state) => ({
       waste: state.waste,
@@ -16,12 +20,6 @@ export default function Waste() {
   );
 
   const topWasteCard = waste[waste.length - 1];
-
-  function handleWastePress() {
-    if (topWasteCard) {
-      setSelectedCardInfo({ cardId: topWasteCard.id, type: "waste" });
-    }
-  }
 
   return (
     <View style={styles.container}>
@@ -32,7 +30,7 @@ export default function Waste() {
           </View>
         </EmptyCard>
       ) : (
-        <Card index={0} card={topWasteCard} onPress={handleWastePress} />
+        <Card index={0} card={topWasteCard} onDragStart={() => setSelectedCardInfo({ cardId: topWasteCard.id, type: "waste" })} onDragEnd={onDragEnd} />
       )}
     </View>
   );

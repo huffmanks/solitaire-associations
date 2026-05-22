@@ -11,6 +11,7 @@ export type SelectedCardInfo = {
   cardId: string;
   type: "tableau" | "waste";
   colIndex?: number;
+  cardIndex?: number;
 };
 
 export type LevelConfig = {
