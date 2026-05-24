@@ -16,5 +16,12 @@ export type SelectedCardInfo = {
 
 export type LevelConfig = {
   columnsCount: number;
-  categories: string[];
+  categories: Array<string>;
+};
+
+export type CardVariants = "visible" | "hidden" | "category" | "empty";
+
+export type DropTargetHit = {
+  type: "tableau" | "foundation";
+  index: number;
 };

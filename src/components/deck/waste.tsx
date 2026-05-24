@@ -5,10 +5,12 @@ import { useShallow } from "zustand/shallow";
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
-import Card, { EmptyCard } from "@/components/card";
+import Card from "@/components/card";
+import type { OnDragEnd } from "@/components/card/draggable-card-wrapper";
+import EmptyCard from "@/components/card/empty-card";
 
 interface WasteProps {
-  onDragEnd: (absoluteX: number, absoluteY: number) => void;
+  onDragEnd: OnDragEnd;
 }
 
 export default function Waste({ onDragEnd }: WasteProps) {
@@ -30,7 +32,7 @@ export default function Waste({ onDragEnd }: WasteProps) {
           </View>
         </EmptyCard>
       ) : (
-        <Card index={0} card={topWasteCard} onDragStart={() => setSelectedCardInfo({ cardId: topWasteCard.id, type: "waste" })} onDragEnd={onDragEnd} />
+        <Card card={topWasteCard} onDragStart={() => setSelectedCardInfo({ cardId: topWasteCard.id, type: "waste" })} onDragEnd={onDragEnd} />
       )}
     </View>
   );

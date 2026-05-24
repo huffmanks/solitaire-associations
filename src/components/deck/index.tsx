@@ -4,17 +4,17 @@ import { StyleSheet, Text, View } from "react-native";
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
-import { DeckCard, EmptyCard } from "@/components/card";
+import DeckCard from "@/components/card/deck-card";
+import type { OnDragEnd } from "@/components/card/draggable-card-wrapper";
 import Moves from "@/components/deck/moves";
 import Waste from "@/components/deck/waste";
 
 interface DeckProps {
-  onCardDragEnd: (absoluteX: number, absoluteY: number) => void;
+  onCardDragEnd: OnDragEnd;
 }
 
 export default function Deck({ onCardDragEnd }: DeckProps) {
   const deck = useLevelStore((state) => state.deck);
-  const drawCard = useLevelStore((state) => state.drawCard);
 
   return (
     <View style={styles.container}>
@@ -27,17 +27,15 @@ export default function Deck({ onCardDragEnd }: DeckProps) {
         </View>
 
         <View style={styles.slotWrapper}>
-          {deck.length > 0 ? (
-            <DeckCard>
+          <DeckCard isHidden={deck.length > 0}>
+            {deck.length > 0 ? (
               <Text style={styles.deckCount}>{deck.length}</Text>
-            </DeckCard>
-          ) : (
-            <EmptyCard onPress={drawCard}>
+            ) : (
               <View style={styles.recycleCenter}>
                 <FontAwesome6 name="rotate-left" size={20} color={theme.colors.accent} />
               </View>
-            </EmptyCard>
-          )}
+            )}
+          </DeckCard>
         </View>
       </View>
     </View>

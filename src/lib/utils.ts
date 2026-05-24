@@ -4,7 +4,7 @@ import { CardType, LevelConfig } from "@/types";
 export function generateInitialColumns(level: number) {
   const { columnsCount: numberOfColumns, categories: categoryNames } = getLevelConfig(level);
 
-  let allCards: CardType[] = [];
+  let allCards: Array<CardType> = [];
 
   categoryNames.forEach((cat) => {
     const words = WORD_BANK[cat] || [];
@@ -33,12 +33,12 @@ export function generateInitialColumns(level: number) {
 
   allCards = allCards.sort(() => Math.random() - 0.5);
 
-  const columnSizes: number[] = [];
+  const columnSizes: Array<number> = [];
   let hasMinCount = false;
   let hasMaxCount = false;
 
   for (let i = 0; i < numberOfColumns; i++) {
-    const validChoices: number[] = [];
+    const validChoices: Array<number> = [];
 
     for (let size = CARD_COUNT_PER_COLUMN.MIN; size <= CARD_COUNT_PER_COLUMN.MAX; size++) {
       if (size === CARD_COUNT_PER_COLUMN.MIN && hasMinCount) continue;
@@ -54,7 +54,7 @@ export function generateInitialColumns(level: number) {
     columnSizes.push(chosenSize);
   }
 
-  const columns: CardType[][] = Array.from({ length: numberOfColumns }, () => []);
+  const columns: Array<Array<CardType>> = Array.from({ length: numberOfColumns }, () => []);
 
   let poolIndex = 0;
   for (let colIdx = 0; colIdx < numberOfColumns; colIdx++) {
@@ -96,6 +96,10 @@ export function getLevelConfig(level: number): LevelConfig {
   return LEVEL_CONFIGS[cyclicLevel];
 }
 
-export function checkWinCondition(completedList: string[], totalLevelCategoriesCount: number): boolean {
+export function checkWinCondition(completedList: Array<string>, totalLevelCategoriesCount: number): boolean {
   return completedList.length === totalLevelCategoriesCount;
+}
+
+export function isPointInside(rect: { x: number; y: number; width: number; height: number }, x: number, y: number) {
+  return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
 }

@@ -1,35 +1,23 @@
-import { ComponentRef, useEffect, useRef } from "react";
-import { StyleSheet, View } from "react-native";
+import { ComponentRef, useEffect, useRef, useState } from "react";
+import { LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { useShallow } from "zustand/shallow";
 
 import { useLevelStore } from "@/lib/store/level";
+import { isPointInside } from "@/lib/utils";
+import { DropTargetHit } from "@/types";
 
-import Card, { EmptyCard } from "@/components/card";
+import EmptyCard from "@/components/card/empty-card";
 import Deck from "@/components/deck";
 import Foundation from "@/components/foundation";
-import GameOverModal from "@/components/game-over-modal";
-
-type DropTargetHit = {
-  type: "tableau" | "foundation";
-  index: number;
-};
-
-function measureView(ref: ComponentRef<typeof View> | null) {
-  return new Promise<{ x: number; y: number; width: number; height: number } | null>((resolve) => {
-    if (!ref || typeof ref.measureInWindow !== "function") {
-      resolve(null);
-      return;
-    }
-
-    ref.measureInWindow((x, y, width, height) => resolve({ x, y, width, height }));
-  });
-}
-
-function isPointInside(rect: { x: number; y: number; width: number; height: number }, x: number, y: number) {
-  return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
-}
+import GameOverModal from "@/components/modals/game-over";
+import TableauColumn from "@/components/tableau-column";
 
 export default function Board() {
+  const [measuredCardHeight, setMeasuredCardHeight] = useState<number>(0);
+
+  const tableauRefs = useRef<Array<ComponentRef<typeof View> | null>>([]);
+  const foundationRefs = useRef<Array<ComponentRef<typeof View> | null>>([]);
+
   const { columns, setSelectedCardInfo, moveCard, moveToFoundation, initializeLevel } = useLevelStore(
     useShallow((state) => ({
       columns: state.columns,
@@ -40,12 +28,16 @@ export default function Board() {
     })),
   );
 
-  const tableauRefs = useRef<Array<ComponentRef<typeof View> | null>>([]);
-  const foundationRefs = useRef<Array<ComponentRef<typeof View> | null>>([]);
-
   useEffect(() => {
     initializeLevel();
   }, []);
+
+  function handleFirstCardLayout(event: LayoutChangeEvent) {
+    const { height } = event.nativeEvent.layout;
+    if (height && measuredCardHeight === 0) {
+      setMeasuredCardHeight(height);
+    }
+  }
 
   async function findDropTarget(absoluteX: number, absoluteY: number): Promise<DropTargetHit | null> {
     for (let i = 0; i < foundationRefs.current.length; i++) {
@@ -79,7 +71,6 @@ export default function Board() {
 
     moveCard(hitTarget.index);
   }
-
   return (
     <View style={styles.container}>
       <Deck onCardDragEnd={handleDragEnd} />
@@ -87,48 +78,27 @@ export default function Board() {
 
       <View style={styles.board}>
         <View style={styles.tableau}>
-          {columns.map((col, colIdx) => (
+          {columns.map((column, colIndex) => (
             <View
-              key={colIdx}
+              key={colIndex}
               style={styles.column}
               ref={(ref) => {
-                tableauRefs.current[colIdx] = ref;
+                tableauRefs.current[colIndex] = ref;
               }}>
-              {col.map((card, cardIdx) => {
-                const isTopCard = cardIdx === col.length - 1;
-                const topCardInColumn = col[col.length - 1];
-                const isContiguousActiveChain = (() => {
-                  if (!card.isFaceUp || !topCardInColumn || card.category !== topCardInColumn.category) {
-                    return false;
-                  }
+              {column.map((card, cardIndex) => (
+                <TableauColumn
+                  key={card.id}
+                  card={card}
+                  column={column}
+                  cardIndex={cardIndex}
+                  colIndex={colIndex}
+                  measuredCardHeight={measuredCardHeight}
+                  handleDragEnd={handleDragEnd}
+                  handleFirstCardLayout={handleFirstCardLayout}
+                />
+              ))}
 
-                  for (let i = cardIdx; i < col.length; i++) {
-                    const current = col[i];
-                    if (!current.isFaceUp || current.category !== topCardInColumn.category) {
-                      return false;
-                    }
-                  }
-
-                  return true;
-                })();
-
-                return (
-                  <Card
-                    key={card.id}
-                    card={card}
-                    index={cardIdx}
-                    isTopCard={isTopCard}
-                    onDragStart={isContiguousActiveChain ? () => setSelectedCardInfo({ cardId: card.id, type: "tableau", colIndex: colIdx, cardIndex: cardIdx }) : undefined}
-                    onDragEnd={isContiguousActiveChain ? handleDragEnd : undefined}
-                  />
-                );
-              })}
-
-              {col.length === 0 && (
-                <EmptyCard>
-                  <View />
-                </EmptyCard>
-              )}
+              {column.length === 0 && <EmptyCard />}
             </View>
           ))}
         </View>
@@ -136,6 +106,17 @@ export default function Board() {
       <GameOverModal />
     </View>
   );
+}
+
+function measureView(ref: ComponentRef<typeof View> | null) {
+  return new Promise<{ x: number; y: number; width: number; height: number } | null>((resolve) => {
+    if (!ref || typeof ref.measureInWindow !== "function") {
+      resolve(null);
+      return;
+    }
+
+    ref.measureInWindow((x, y, width, height) => resolve({ x, y, width, height }));
+  });
 }
 
 const styles = StyleSheet.create({

@@ -12,7 +12,7 @@ export const MOVE_BALANCING = {
   COLUMN_COMPLEXITY_MULTIPLIER: 0.25,
 };
 
-export const WORD_BANK: Record<string, string[]> = {
+export const WORD_BANK: Record<string, Array<string>> = {
   Animals: ["Sheep", "Pig", "Goat", "Horse", "Monkey", "Bear"],
   Cinema: ["Western", "Drama", "Comedy", "Horror", "Popcorn", "Ticket"],
   Calendar: ["Day", "Week", "Month", "Year"],

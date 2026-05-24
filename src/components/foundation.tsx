@@ -1,13 +1,15 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { ComponentRef, RefObject } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
-import Card, { EmptyCard } from "@/components/card";
+import Card from "@/components/card";
+import EmptyCard from "@/components/card/empty-card";
 
 interface FoundationProps {
-  slotRefs: React.MutableRefObject<Array<React.ElementRef<typeof View> | null>>;
+  slotRefs: RefObject<Array<ComponentRef<typeof View> | null>>;
 }
 
 export default function Foundation({ slotRefs }: FoundationProps) {
@@ -36,7 +38,7 @@ export default function Foundation({ slotRefs }: FoundationProps) {
                       </Text>
                     </View>
                   )}
-                  <Card index={0} card={topCard} />
+                  <Card card={topCard} />
                 </View>
               ) : (
                 <EmptyCard>
