@@ -8,6 +8,9 @@ import { CardVariants } from "@/types";
 import DraggableCardWrapper, { type OnDragEnd } from "@/components/card/draggable-card-wrapper";
 
 interface CardWrapperProps {
+  columnIndex?: number;
+  cardIndex?: number;
+  stackStartIndex?: number;
   variant: CardVariants;
   isSelected?: boolean;
   isTopCard?: boolean;
@@ -19,7 +22,20 @@ interface CardWrapperProps {
   onLayout?: (event: LayoutChangeEvent) => void;
 }
 
-export default function CardWrapper({ variant, isSelected, isTopCard, children, containerStyle, onPress, onDragStart, onDragEnd, onLayout }: CardWrapperProps) {
+export default function CardWrapper({
+  columnIndex,
+  cardIndex,
+  stackStartIndex,
+  variant,
+  isSelected,
+  isTopCard,
+  children,
+  containerStyle,
+  onPress,
+  onDragStart,
+  onDragEnd,
+  onLayout,
+}: CardWrapperProps) {
   const isGestureEnabled = Boolean(onDragStart && onDragEnd);
 
   const cardStyles = [styles.card, styles[variant], isSelected && styles.selectedOverride];
@@ -40,7 +56,14 @@ export default function CardWrapper({ variant, isSelected, isTopCard, children, 
   if (isGestureEnabled) {
     return (
       <View style={[styles.baseSize, containerStyle]} onLayout={onLayout}>
-        <DraggableCardWrapper containerStyle={containerStyle} style={{ flex: 1 }} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DraggableCardWrapper
+          columnIndex={columnIndex}
+          cardIndex={cardIndex}
+          stackStartIndex={stackStartIndex}
+          containerStyle={containerStyle}
+          style={{ flex: 1 }}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}>
           {content}
         </DraggableCardWrapper>
       </View>

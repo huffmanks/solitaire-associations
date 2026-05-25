@@ -21,14 +21,14 @@ export default function Board() {
   const foundationRefs = useRef<Array<ComponentRef<typeof View> | null>>([]);
 
   const currentLevel = useGameStore((state) => state.currentLevel);
-  const { columns, setSelectedCardInfo, moveCard, moveToFoundation, initializeLevel, numberOfColumns } = useLevelStore(
+  const { columns, numberOfColumns, setSelectedCardInfo, moveCard, moveToFoundation, initializeLevel } = useLevelStore(
     useShallow((state) => ({
       columns: state.columns,
+      numberOfColumns: state.numberOfColumns,
       setSelectedCardInfo: state.setSelectedCardInfo,
       moveCard: state.moveCard,
       moveToFoundation: state.moveToFoundation,
       initializeLevel: state.initializeLevel,
-      numberOfColumns: state.numberOfColumns,
     })),
   );
 
@@ -78,7 +78,7 @@ export default function Board() {
       return;
     }
 
-    moveCard({ targetColIndex: hitTarget.index });
+    moveCard({ targetColumnIndex: hitTarget.index });
   }
   return (
     <View style={styles.container}>
@@ -87,12 +87,12 @@ export default function Board() {
 
       <View style={styles.board}>
         <View style={[styles.tableau, { gap: currentColumnGap }]}>
-          {columns.map((column, colIndex) => (
+          {columns.map((column, columnIndex) => (
             <View
-              key={colIndex}
+              key={columnIndex}
               style={{ width: measuredCardWidth }}
               ref={(ref) => {
-                tableauRefs.current[colIndex] = ref;
+                tableauRefs.current[columnIndex] = ref;
               }}>
               {column.map((card, cardIndex) => (
                 <TableauColumn
@@ -100,7 +100,7 @@ export default function Board() {
                   card={card}
                   column={column}
                   cardIndex={cardIndex}
-                  colIndex={colIndex}
+                  columnIndex={columnIndex}
                   measuredCardHeight={measuredCardHeight}
                   handleDragEnd={handleDragEnd}
                   handleFirstCardLayout={handleFirstCardLayout}

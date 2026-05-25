@@ -26,7 +26,7 @@ export default function GameOverModal() {
           <Text style={styles.title}>Out of Moves!</Text>
           <Text style={styles.subtitle}>You’ve reached your maximum move limit for this level. Don’t worry, you can try again!</Text>
 
-          <Pressable style={styles.button} onPress={() => initializeLevel(currentLevel)}>
+          <Pressable style={styles.button} onPress={() => initializeLevel({ currentLevel })}>
             <FontAwesome6 name="rotate-right" size={16} color={theme.colors.foreground} style={styles.buttonIcon} />
             <Text style={styles.buttonText}>Try Again</Text>
           </Pressable>

@@ -22,18 +22,33 @@ export default function Waste({ onDragEnd }: WasteProps) {
   );
 
   const topWasteCard = waste[waste.length - 1];
+  const underWasteCard = waste.length > 1 ? waste[waste.length - 2] : null;
+
+  if (!topWasteCard) {
+    return (
+      <View style={styles.container}>
+        <EmptyCard>
+          <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
+        </EmptyCard>
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
-      {!topWasteCard ? (
-        <EmptyCard>
-          <View>
+      <View style={styles.backgroundLayer}>
+        {underWasteCard ? (
+          <Card card={underWasteCard} />
+        ) : (
+          <EmptyCard>
             <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
-          </View>
-        </EmptyCard>
-      ) : (
+          </EmptyCard>
+        )}
+      </View>
+
+      <View style={StyleSheet.absoluteFill} key={topWasteCard.id}>
         <Card card={topWasteCard} onDragStart={() => setSelectedCardInfo({ info: { cardId: topWasteCard.id, type: "waste" } })} onDragEnd={onDragEnd} />
-      )}
+      </View>
     </View>
   );
 }
@@ -41,5 +56,10 @@ export default function Waste({ onDragEnd }: WasteProps) {
 const styles = StyleSheet.create({
   container: {
     width: "100%",
+    position: "relative",
+  },
+  backgroundLayer: {
+    width: "100%",
+    height: "100%",
   },
 });

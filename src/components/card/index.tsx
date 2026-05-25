@@ -9,6 +9,9 @@ import CardWrapper from "@/components/card/card-wrapper";
 import type { OnDragEnd } from "@/components/card/draggable-card-wrapper";
 
 interface CardProps {
+  columnIndex?: number;
+  cardIndex?: number;
+  stackStartIndex?: number;
   card: CardType;
   containerStyle?: ViewStyle;
   isTopCard?: boolean;
@@ -17,7 +20,7 @@ interface CardProps {
   onLayout?: (event: LayoutChangeEvent) => void;
 }
 
-export default function Card({ card, containerStyle, isTopCard = true, onDragStart, onDragEnd, onLayout }: CardProps) {
+export default function Card({ columnIndex, cardIndex, stackStartIndex, card, containerStyle, isTopCard = true, onDragStart, onDragEnd, onLayout }: CardProps) {
   const foundation = useLevelStore((state) => state.foundation);
   const selectedCardInfo = useLevelStore((state) => state.selectedCardInfo);
 
@@ -27,12 +30,24 @@ export default function Card({ card, containerStyle, isTopCard = true, onDragSta
   const totalNeeded = card.totalInCategory || 0;
 
   if (!card.isFaceUp) {
-    return <CardWrapper variant="hidden" isSelected={isSelected} containerStyle={containerStyle} onLayout={onLayout} />;
+    return (
+      <CardWrapper columnIndex={columnIndex} cardIndex={cardIndex} stackStartIndex={stackStartIndex} variant="hidden" isSelected={isSelected} containerStyle={containerStyle} onLayout={onLayout} />
+    );
   }
 
   if (card.type === "category") {
     return (
-      <CardWrapper variant="category" isTopCard={isTopCard} isSelected={isSelected} containerStyle={containerStyle} onDragStart={onDragStart} onDragEnd={onDragEnd} onLayout={onLayout}>
+      <CardWrapper
+        columnIndex={columnIndex}
+        cardIndex={cardIndex}
+        stackStartIndex={stackStartIndex}
+        variant="category"
+        isTopCard={isTopCard}
+        isSelected={isSelected}
+        containerStyle={containerStyle}
+        onDragStart={onDragStart}
+        onDragEnd={onDragEnd}
+        onLayout={onLayout}>
         <View style={styles.categoryHeader}>
           <Text style={styles.text}>{`${currentCount}/${totalNeeded}`}</Text>
           <FontAwesome6 name="crown" size={18} color={theme.colors.primary} />
@@ -43,7 +58,17 @@ export default function Card({ card, containerStyle, isTopCard = true, onDragSta
   }
 
   return (
-    <CardWrapper variant="visible" isTopCard={isTopCard} isSelected={isSelected} containerStyle={containerStyle} onDragStart={onDragStart} onDragEnd={onDragEnd} onLayout={onLayout}>
+    <CardWrapper
+      columnIndex={columnIndex}
+      cardIndex={cardIndex}
+      stackStartIndex={stackStartIndex}
+      variant="visible"
+      isTopCard={isTopCard}
+      isSelected={isSelected}
+      containerStyle={containerStyle}
+      onDragStart={onDragStart}
+      onDragEnd={onDragEnd}
+      onLayout={onLayout}>
       <Text style={[styles.text, styles.textContent, !isTopCard && styles.peekTextOffset]}>{card.content}</Text>
     </CardWrapper>
   );
