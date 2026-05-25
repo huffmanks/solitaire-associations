@@ -1,12 +1,12 @@
-import { ComponentRef, useEffect, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { Dimensions, LayoutChangeEvent, StyleSheet, View } from "react-native";
 import { useShallow } from "zustand/shallow";
 
 import { BOARD_LAYOUT } from "@/lib/constants";
 import { useGameStore } from "@/lib/store/game";
 import { useLevelStore } from "@/lib/store/level";
-import { isPointInside } from "@/lib/utils";
-import { DropTargetHit } from "@/types";
+import { resolveDropTarget } from "@/lib/utils";
+import { LayoutRect } from "@/types";
 
 import EmptyCard from "@/components/card/empty-card";
 import Deck from "@/components/deck";
@@ -17,13 +17,14 @@ import TableauColumn from "@/components/tableau-column";
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
 export default function Board() {
-  const tableauRefs = useRef<Array<ComponentRef<typeof View> | null>>([]);
-  const foundationRefs = useRef<Array<ComponentRef<typeof View> | null>>([]);
+  const foundationLayouts = useRef<Array<LayoutRect | null>>([]);
+  const tableauLayouts = useRef<Array<LayoutRect | null>>([]);
 
   const currentLevel = useGameStore((state) => state.currentLevel);
-  const { columns, numberOfColumns, setSelectedCardInfo, moveCard, moveToFoundation, initializeLevel } = useLevelStore(
+  const { columns, foundation, numberOfColumns, setSelectedCardInfo, moveCard, moveToFoundation, initializeLevel } = useLevelStore(
     useShallow((state) => ({
       columns: state.columns,
+      foundation: state.foundation,
       numberOfColumns: state.numberOfColumns,
       setSelectedCardInfo: state.setSelectedCardInfo,
       moveCard: state.moveCard,
@@ -45,29 +46,29 @@ export default function Board() {
   const measuredCardWidth = Math.floor((usableWidth - totalGapsWidth) / activeGridColumns);
   const measuredCardHeight = Math.floor(measuredCardWidth * (3 / 2));
 
+  const cardSize = {
+    width: measuredCardWidth,
+    height: Math.floor(measuredCardWidth * (3 / 2)),
+  };
+
   // TODO remove
   function handleFirstCardLayout(event: LayoutChangeEvent) {}
 
-  async function findDropTarget(absoluteX: number, absoluteY: number): Promise<DropTargetHit | null> {
-    for (let i = 0; i < foundationRefs.current.length; i++) {
-      const rect = await measureView(foundationRefs.current[i]);
-      if (rect && isPointInside(rect, absoluteX, absoluteY)) {
-        return { type: "foundation", index: i };
-      }
-    }
+  const saveLayout = (index: number, type: "foundation" | "tableau") => (event: any) => {
+    const targetArray = type === "foundation" ? foundationLayouts.current : tableauLayouts.current;
 
-    for (let i = 0; i < tableauRefs.current.length; i++) {
-      const rect = await measureView(tableauRefs.current[i]);
-      if (rect && isPointInside(rect, absoluteX, absoluteY)) {
-        return { type: "tableau", index: i };
-      }
-    }
+    if (targetArray[index]) return;
 
-    return null;
-  }
+    event.target.measureInWindow((x: number, y: number, width: number, height: number) => {
+      if (width > 0 && height > 0) {
+        targetArray[index] = { x, y, width, height };
+      }
+    });
+  };
 
   async function handleDragEnd(absoluteX: number, absoluteY: number) {
-    const hitTarget = await findDropTarget(absoluteX, absoluteY);
+    const hitTarget = resolveDropTarget(absoluteX, absoluteY, foundationLayouts.current, tableauLayouts.current);
+
     if (!hitTarget) {
       setSelectedCardInfo({ info: null });
       return;
@@ -83,17 +84,19 @@ export default function Board() {
   return (
     <View style={styles.container}>
       <Deck cardWidth={measuredCardWidth} onCardDragEnd={handleDragEnd} />
-      <Foundation slotRefs={foundationRefs} cardWidth={measuredCardWidth} />
+
+      <View style={styles.foundationRow}>
+        {foundation.map((stack, i) => (
+          <View key={i} style={cardSize} onLayout={saveLayout(i, "foundation")}>
+            <Foundation stack={stack} />
+          </View>
+        ))}
+      </View>
 
       <View style={styles.board}>
         <View style={[styles.tableau, { gap: currentColumnGap }]}>
           {columns.map((column, columnIndex) => (
-            <View
-              key={columnIndex}
-              style={{ width: measuredCardWidth }}
-              ref={(ref) => {
-                tableauRefs.current[columnIndex] = ref;
-              }}>
+            <View key={columnIndex} style={{ width: measuredCardWidth }} onLayout={saveLayout(columnIndex, "tableau")}>
               {column.map((card, cardIndex) => (
                 <TableauColumn
                   key={card.id}
@@ -117,17 +120,6 @@ export default function Board() {
   );
 }
 
-function measureView(ref: ComponentRef<typeof View> | null) {
-  return new Promise<{ x: number; y: number; width: number; height: number } | null>((resolve) => {
-    if (!ref || typeof ref.measureInWindow !== "function") {
-      resolve(null);
-      return;
-    }
-
-    ref.measureInWindow((x, y, width, height) => resolve({ x, y, width, height }));
-  });
-}
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -141,5 +133,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     width: "100%",
+  },
+  foundationRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    marginBlockStart: 15,
+    marginBlockEnd: 30,
+    marginInline: 15,
   },
 });

@@ -1,5 +1,5 @@
-import { CARD_COUNT_PER_COLUMN, LEVEL_CONFIGS, WORD_BANK } from "@/lib/constants";
-import { CardType, LevelConfig } from "@/types";
+import { CARD_COUNT_PER_COLUMN, DRAG_SNAP_GRACE, LEVEL_CONFIGS, WORD_BANK } from "@/lib/constants";
+import { CardType, DropTargetHit, LayoutRect, LevelConfig } from "@/types";
 
 export function generateInitialColumns({ currentLevel }: { currentLevel: number }) {
   const { columnsCount: numberOfColumns, categories: categoryNames } = getLevelConfig({ currentLevel });
@@ -100,6 +100,75 @@ export function checkWinCondition({ completedCategories, totalLevelCategoriesCou
   return completedCategories.length === totalLevelCategoriesCount;
 }
 
-export function isPointInside(rect: { x: number; y: number; width: number; height: number }, x: number, y: number) {
-  return x >= rect.x && x <= rect.x + rect.width && y >= rect.y && y <= rect.y + rect.height;
+export function isPointInside(
+  rect: {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+  },
+  pointX: number,
+  pointY: number,
+  padding = 0,
+) {
+  return pointX >= rect.x - padding && pointX <= rect.x + rect.width + padding && pointY >= rect.y - padding && pointY <= rect.y + rect.height + padding;
+}
+
+export function resolveDropTarget(absoluteX: number, absoluteY: number, foundations: Array<LayoutRect | null>, tableaus: Array<LayoutRect | null>): DropTargetHit | null {
+  const validTableaus = tableaus.filter((t): t is LayoutRect => t !== null);
+  const tableauTopBoundary = validTableaus.length > 0 ? validTableaus[0].y : 200;
+
+  // Foundation slots
+  if (absoluteY < tableauTopBoundary + DRAG_SNAP_GRACE.TABLEAU_BOUNDARY_TOP) {
+    let bestFoundation: DropTargetHit | null = null;
+    let closestFoundationDist = Infinity;
+    for (let i = 0; i < foundations.length; i++) {
+      const rect = foundations[i];
+      if (!rect) continue;
+
+      const minX = rect.x - DRAG_SNAP_GRACE.FOUNDATION_PADDING_HORIZONTAL;
+      const maxX = rect.x + rect.width + DRAG_SNAP_GRACE.FOUNDATION_PADDING_HORIZONTAL;
+      const minY = rect.y - DRAG_SNAP_GRACE.FOUNDATION_PADDING_TOP;
+      const maxY = rect.y + rect.height + DRAG_SNAP_GRACE.FOUNDATION_PADDING_BOTTOM;
+
+      if (absoluteX >= minX && absoluteX <= maxX && absoluteY >= minY && absoluteY <= maxY) {
+        const centerX = rect.x + rect.width / 2;
+        const centerY = rect.y + rect.height / 2;
+        const distance = Math.hypot(absoluteX - centerX, absoluteY - centerY);
+
+        if (distance < closestFoundationDist) {
+          closestFoundationDist = distance;
+          bestFoundation = { type: "foundation", index: i };
+        }
+      }
+    }
+    return bestFoundation;
+  }
+
+  let bestTableau: DropTargetHit | null = null;
+  let closestTableauDist = Infinity;
+
+  // Tableau columns
+  for (let i = 0; i < tableaus.length; i++) {
+    const rect = tableaus[i];
+    if (!rect) continue;
+
+    const minX = rect.x - DRAG_SNAP_GRACE.TABLEAU_PADDING_HORIZONTAL;
+    const maxX = rect.x + rect.width + DRAG_SNAP_GRACE.TABLEAU_PADDING_HORIZONTAL;
+    const minY = rect.y;
+    const maxY = rect.y + rect.height + DRAG_SNAP_GRACE.TABLEAU_PADDING_BOTTOM;
+
+    if (absoluteX >= minX && absoluteX <= maxX && absoluteY >= minY && absoluteY <= maxY) {
+      const centerX = rect.x + rect.width / 2;
+      const centerY = rect.y + rect.height / 2;
+      const distance = Math.hypot(absoluteX - centerX, absoluteY - centerY);
+
+      if (distance < closestTableauDist) {
+        closestTableauDist = distance;
+        bestTableau = { type: "tableau", index: i };
+      }
+    }
+  }
+
+  return bestTableau;
 }

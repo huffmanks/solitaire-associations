@@ -25,3 +25,10 @@ export type DropTargetHit = {
   type: "tableau" | "foundation";
   index: number;
 };
+
+export type LayoutRect = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};

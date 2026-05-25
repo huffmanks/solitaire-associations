@@ -1,71 +1,43 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { ComponentRef, RefObject } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
-import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
+import { CardType } from "@/types";
 
 import Card from "@/components/card";
 import EmptyCard from "@/components/card/empty-card";
 
 interface FoundationProps {
-  slotRefs: RefObject<Array<ComponentRef<typeof View> | null>>;
-  cardWidth: number;
+  stack: Array<CardType> | null;
 }
 
-export default function Foundation({ slotRefs, cardWidth }: FoundationProps) {
-  const foundation = useLevelStore((state) => state.foundation);
-
-  const cardSize = {
-    width: cardWidth,
-    height: Math.floor(cardWidth * (3 / 2)),
-  };
+export default function Foundation({ stack }: FoundationProps) {
+  const topCard = stack && stack.length > 0 ? stack[stack.length - 1] : null;
+  const hasStackedWords = stack && stack.length > 1;
 
   return (
-    <View style={styles.foundationRow}>
-      {Array.isArray(foundation) &&
-        foundation.map((stack, i) => {
-          const topCard = stack && stack.length > 0 ? stack[stack.length - 1] : null;
-          const hasStackedWords = stack && stack.length > 1;
-
-          return (
-            <View
-              key={i}
-              style={cardSize}
-              ref={(ref) => {
-                slotRefs.current[i] = ref;
-              }}>
-              {topCard ? (
-                <View style={styles.cardContainer}>
-                  {hasStackedWords && (
-                    <View style={styles.badgeTab}>
-                      <Text style={styles.badgeText} numberOfLines={1}>
-                        {topCard.category.toUpperCase()}
-                      </Text>
-                    </View>
-                  )}
-                  <Card card={topCard} />
-                </View>
-              ) : (
-                <EmptyCard>
-                  <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
-                </EmptyCard>
-              )}
+    <View style={{ flex: 1 }}>
+      {topCard ? (
+        <View style={styles.cardContainer}>
+          {hasStackedWords && (
+            <View style={styles.badgeTab}>
+              <Text style={styles.badgeText} numberOfLines={1}>
+                {topCard.category.toUpperCase()}
+              </Text>
             </View>
-          );
-        })}
+          )}
+          <Card card={topCard} />
+        </View>
+      ) : (
+        <EmptyCard>
+          <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
+        </EmptyCard>
+      )}
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  foundationRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBlockStart: 20,
-    marginBlockEnd: 20,
-    marginInline: 15,
-  },
   cardContainer: {
     flex: 1,
     position: "relative",

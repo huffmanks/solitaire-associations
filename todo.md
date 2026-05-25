@@ -11,7 +11,3 @@
 ## rules
 
 - [ ] there must be at least one category card in the deck and one in a column with depth 0 or 1.
-
-## issues
-
-- [ ] don't allow cards to be stacked on category card when in column.

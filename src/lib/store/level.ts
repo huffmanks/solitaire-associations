@@ -127,7 +127,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const targetColumn = newColumns[targetColumnIndex] || [];
           const topTargetCard = targetColumn[targetColumn.length - 1];
 
-          const canMove = targetColumn.length === 0 || topTargetCard?.category === leadMovingCard.category;
+          const canMove = targetColumn.length === 0 || (topTargetCard?.category === leadMovingCard.category && topTargetCard?.type !== "category");
           if (!canMove) return { selectedCardInfo: null };
 
           if (state.selectedCardInfo?.type === "tableau" && sourceColumnIndex !== null) {
