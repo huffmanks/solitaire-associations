@@ -40,7 +40,7 @@ export default function CardWrapper({ variant, isSelected, isTopCard, children, 
   if (isGestureEnabled) {
     return (
       <View style={[styles.baseSize, containerStyle]} onLayout={onLayout}>
-        <DraggableCardWrapper containerStyle={containerStyle} style={cardStyles} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DraggableCardWrapper containerStyle={containerStyle} style={{ flex: 1 }} onDragStart={onDragStart} onDragEnd={onDragEnd}>
           {content}
         </DraggableCardWrapper>
       </View>

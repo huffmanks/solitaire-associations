@@ -1,8 +1,8 @@
 import { CARD_COUNT_PER_COLUMN, LEVEL_CONFIGS, WORD_BANK } from "@/lib/constants";
 import { CardType, LevelConfig } from "@/types";
 
-export function generateInitialColumns(level: number) {
-  const { columnsCount: numberOfColumns, categories: categoryNames } = getLevelConfig(level);
+export function generateInitialColumns({ currentLevel }: { currentLevel: number }) {
+  const { columnsCount: numberOfColumns, categories: categoryNames } = getLevelConfig({ currentLevel });
 
   let allCards: Array<CardType> = [];
 
@@ -85,19 +85,19 @@ export function generateInitialColumns(level: number) {
   };
 }
 
-export function getLevelConfig(level: number): LevelConfig {
-  if (LEVEL_CONFIGS[level]) {
-    return LEVEL_CONFIGS[level];
+export function getLevelConfig({ currentLevel }: { currentLevel: number }): LevelConfig {
+  if (LEVEL_CONFIGS[currentLevel]) {
+    return LEVEL_CONFIGS[currentLevel];
   }
 
   const allKeys = Object.keys(LEVEL_CONFIGS);
-  const cyclicLevel = ((level - 1) % allKeys.length) + 1;
+  const cyclicLevel = ((currentLevel - 1) % allKeys.length) + 1;
 
   return LEVEL_CONFIGS[cyclicLevel];
 }
 
-export function checkWinCondition(completedList: Array<string>, totalLevelCategoriesCount: number): boolean {
-  return completedList.length === totalLevelCategoriesCount;
+export function checkWinCondition({ completedCategories, totalLevelCategoriesCount }: { completedCategories: Array<string>; totalLevelCategoriesCount: number }): boolean {
+  return completedCategories.length === totalLevelCategoriesCount;
 }
 
 export function isPointInside(rect: { x: number; y: number; width: number; height: number }, x: number, y: number) {

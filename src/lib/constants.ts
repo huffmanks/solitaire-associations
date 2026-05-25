@@ -5,6 +5,20 @@ export const CARD_COUNT_PER_COLUMN = {
   MAX: 5,
 };
 
+export const BOARD_LAYOUT = {
+  MAX_WIDTH: 480,
+  COLUMN_GAP_MAP: {
+    3: 20,
+    4: 10,
+    5: 10,
+  } as Record<number, number>,
+  MARGIN_INLINE_MAP: {
+    3: 60,
+    4: 40,
+    5: 30,
+  } as Record<number, number>,
+};
+
 export const CARD_COLUMN_VISIBLE_PEEK = 24;
 
 export const MOVE_BALANCING = {

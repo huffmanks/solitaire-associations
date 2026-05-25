@@ -29,10 +29,10 @@ export default function TableauColumn({ card, column, colIndex, cardIndex, measu
 
   const containerStyle: ViewStyle = {
     marginTop: dynamicMarginTop,
-    zIndex: cardIndex,
   };
+
   function handleDragStart() {
-    setSelectedCardInfo({ cardId: card.id, type: "tableau", colIndex, cardIndex });
+    setSelectedCardInfo({ info: { cardId: card.id, type: "tableau", colIndex, cardIndex } });
   }
 
   // TODO

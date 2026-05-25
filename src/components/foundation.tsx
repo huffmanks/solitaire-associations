@@ -10,10 +10,16 @@ import EmptyCard from "@/components/card/empty-card";
 
 interface FoundationProps {
   slotRefs: RefObject<Array<ComponentRef<typeof View> | null>>;
+  cardWidth: number;
 }
 
-export default function Foundation({ slotRefs }: FoundationProps) {
+export default function Foundation({ slotRefs, cardWidth }: FoundationProps) {
   const foundation = useLevelStore((state) => state.foundation);
+
+  const cardSize = {
+    width: cardWidth,
+    height: Math.floor(cardWidth * (3 / 2)),
+  };
 
   return (
     <View style={styles.foundationRow}>
@@ -25,7 +31,7 @@ export default function Foundation({ slotRefs }: FoundationProps) {
           return (
             <View
               key={i}
-              style={styles.slot}
+              style={cardSize}
               ref={(ref) => {
                 slotRefs.current[i] = ref;
               }}>
@@ -55,14 +61,10 @@ export default function Foundation({ slotRefs }: FoundationProps) {
 const styles = StyleSheet.create({
   foundationRow: {
     flexDirection: "row",
-    gap: 10,
+    justifyContent: "space-between",
     marginBlockStart: 20,
-    marginBlockEnd: 15,
-    marginInline: 5,
-  },
-  slot: {
-    flex: 1,
-    aspectRatio: 2 / 3,
+    marginBlockEnd: 20,
+    marginInline: 15,
   },
   cardContainer: {
     flex: 1,

@@ -20,7 +20,8 @@ export default function DraggableCardWrapper({ containerStyle, style, children, 
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ translateX: translateX.value }, { translateY: translateY.value }, { scale: isDragging.value ? 1.02 : 1 }],
-    zIndex: isDragging.value ? 999 : containerStyle?.zIndex || 0,
+    zIndex: isDragging.value ? 9999 : (containerStyle?.zIndex ?? 0),
+    elevation: isDragging.value ? 9999 : 0,
   }));
 
   const dragGesture = Gesture.Pan()
@@ -40,8 +41,12 @@ export default function DraggableCardWrapper({ containerStyle, style, children, 
         scheduleOnRN(onDragEnd, event.absoluteX, event.absoluteY);
       }
       translateX.value = withSpring(0);
-      translateY.value = withSpring(0);
-      isDragging.value = false;
+
+      translateY.value = withSpring(0, {}, (isFinished) => {
+        if (isFinished) {
+          isDragging.value = false;
+        }
+      });
     });
 
   return (

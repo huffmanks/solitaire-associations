@@ -10,7 +10,7 @@ export default function Completion() {
   const completedCategories = useLevelStore((state) => state.completedCategories);
   const currentLevel = useGameStore((state) => state.currentLevel);
 
-  const { categories } = getLevelConfig(currentLevel);
+  const { categories } = getLevelConfig({ currentLevel });
   const totalBoxes = categories.length;
   const completedCount = completedCategories.length;
   return (

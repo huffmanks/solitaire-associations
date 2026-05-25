@@ -1,14 +1,14 @@
 import { createMMKV } from "react-native-mmkv";
 import { create } from "zustand";
-import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 const gameStorage = createMMKV({ id: "game" });
 
-const gameZustandStorage: StateStorage = {
+const gameZustandStorage = createJSONStorage(() => ({
   setItem: (key, value) => gameStorage.set(key, value),
   getItem: (key) => gameStorage.getString(key) ?? null,
   removeItem: (key) => gameStorage.remove(key),
-};
+}));
 
 type GameStoreState = {
   currentLevel: number;
@@ -42,12 +42,12 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
     }),
     {
       name: "game-store",
-      storage: createJSONStorage(() => gameZustandStorage),
+      storage: gameZustandStorage,
     },
   ),
 );
 
-export function resetPersistedStorage() {
+export function resetGameStorage() {
   useGameStore.persist.clearStorage();
   useGameStore.getState().reset();
   gameStorage.clearAll();

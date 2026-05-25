@@ -1,19 +1,18 @@
 import { createMMKV } from "react-native-mmkv";
 import { create } from "zustand";
-import { StateStorage, createJSONStorage, persist } from "zustand/middleware";
+import { createJSONStorage, persist } from "zustand/middleware";
 
 import { MOVE_BALANCING } from "@/lib/constants";
-import { useGameStore } from "@/lib/store/game";
 import { checkWinCondition, generateInitialColumns, getLevelConfig } from "@/lib/utils";
 import { CardType, SelectedCardInfo } from "@/types";
 
 const levelStorage = createMMKV({ id: "level" });
 
-const levelZustandStorage: StateStorage = {
+const levelZustandStorage = createJSONStorage(() => ({
   setItem: (key, value) => levelStorage.set(key, value),
   getItem: (key) => levelStorage.getString(key) ?? null,
   removeItem: (key) => levelStorage.remove(key),
-};
+}));
 
 type LevelStoreState = {
   numberOfColumns: number;
@@ -30,10 +29,10 @@ type LevelStoreState = {
 };
 
 type LevelStoreActions = {
-  initializeLevel: () => void;
-  setSelectedCardInfo: (info: SelectedCardInfo | null) => void;
-  moveCard: (targetColIndex: number) => void;
-  moveToFoundation: (colIndex: number) => void;
+  initializeLevel: ({ currentLevel }: { currentLevel: number }) => void;
+  setSelectedCardInfo: ({ info }: { info: SelectedCardInfo | null }) => void;
+  moveCard: ({ targetColIndex }: { targetColIndex: number }) => void;
+  moveToFoundation: ({ targetFoundationIndex, currentLevel }: { targetFoundationIndex: number; currentLevel: number }) => void;
   drawCard: () => void;
 
   reset: () => void;
@@ -57,9 +56,8 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
   persist(
     (set, get) => ({
       ...initialLevelStoreState,
-      initializeLevel: () => {
-        const activeLevel = useGameStore.getState().currentLevel;
-        const initialGameState = generateInitialColumns(activeLevel);
+      initializeLevel: ({ currentLevel }) => {
+        const initialGameState = generateInitialColumns({ currentLevel });
 
         const totalCardsCount = initialGameState.columns.reduce((sum, col) => sum + col.length, 0);
         const colCount = initialGameState.numberOfColumns;
@@ -79,186 +77,13 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           completedCategories: [],
         });
       },
-      setSelectedCardInfo: (info) => set({ selectedCardInfo: info }),
-      // moveCard: (targetColIndex) => {
-      //   set((state) => {
-      //     const newColumns = state.columns.map((col) => [...col]);
-      //     const newWaste = [...state.waste];
-
-      //     let movingCardsList: Array<CardType> = [];
-      //     let sourceColIndex: number | null = null;
-
-      //     if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
-      //       sourceColIndex = state.selectedCardInfo.colIndex;
-      //       const sourceCol = newColumns[sourceColIndex];
-
-      //       if (sourceCol.length > 0) {
-      //         const topCard = sourceCol[sourceCol.length - 1];
-      //         const chainCategory = topCard.category;
-
-      //         let chainStartIndex = sourceCol.length - 1;
-      //         while (chainStartIndex > 0 && sourceCol[chainStartIndex - 1].isFaceUp && sourceCol[chainStartIndex - 1].category === chainCategory) {
-      //           chainStartIndex--;
-      //         }
-
-      //         let rawGroup = sourceCol.slice(chainStartIndex);
-
-      //         movingCardsList = rawGroup.sort((a, b) => {
-      //           if (a.type === "category") return -1;
-      //           if (b.type === "category") return 1;
-      //           return 0;
-      //         });
-      //       }
-      //     } else if (state.selectedCardInfo?.type === "waste") {
-      //       const topWaste = newWaste[newWaste.length - 1];
-      //       if (topWaste) movingCardsList = [topWaste];
-      //     }
-
-      //     if (movingCardsList.length === 0) return { selectedCardInfo: null };
-
-      //     const leadMovingCard = movingCardsList[0];
-      //     const targetCol = newColumns[targetColIndex] || [];
-      //     const topTargetCard = targetCol[targetCol.length - 1];
-
-      //     if (topTargetCard && topTargetCard.type === "category") {
-      //       return { selectedCardInfo: null };
-      //     }
-
-      //     const canMove = targetCol.length === 0 || topTargetCard?.category === leadMovingCard.category;
-      //     if (!canMove) return { selectedCardInfo: null };
-
-      //     if (state.selectedCardInfo?.type === "tableau" && sourceColIndex !== null) {
-      //       const sourceCol = newColumns[sourceColIndex];
-      //       sourceCol.splice(sourceCol.length - movingCardsList.length);
-
-      //       if (sourceCol.length > 0) {
-      //         sourceCol[sourceCol.length - 1] = { ...sourceCol[sourceCol.length - 1], isFaceUp: true };
-      //       }
-      //     } else if (state.selectedCardInfo?.type === "waste") {
-      //       newWaste.pop();
-      //     }
-
-      //     newColumns[targetColIndex] = [...targetCol, ...movingCardsList];
-
-      //     const nextMovesCount = state.movesCount + 1;
-      //     const playerHasLost = nextMovesCount >= state.maxMoves;
-
-      //     return { columns: newColumns, waste: newWaste, selectedCardInfo: null, movesCount: nextMovesCount, hasLost: playerHasLost };
-      //   });
-      // },
-      // moveToFoundation: (targetSlotIdx) => {
-      //   set((state) => {
-      //     const newColumns = state.columns.map((col) => [...col]);
-      //     const newWaste = [...state.waste];
-
-      //     const updatedFoundation = state.foundation.map((slot) => (slot ? [...slot] : null));
-
-      //     let movingCardsList: Array<CardType> = [];
-      //     let sourceColIndex: number | null = null;
-
-      //     if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.colIndex !== undefined) {
-      //       sourceColIndex = state.selectedCardInfo.colIndex;
-      //       const sourceCol = newColumns[sourceColIndex];
-
-      //       if (sourceCol.length > 0) {
-      //         const topCard = sourceCol[sourceCol.length - 1];
-      //         const chainCategory = topCard.category;
-
-      //         let chainStartIndex = sourceCol.length - 1;
-      //         while (chainStartIndex > 0 && sourceCol[chainStartIndex - 1].isFaceUp && sourceCol[chainStartIndex - 1].category === chainCategory) {
-      //           chainStartIndex--;
-      //         }
-
-      //         let rawGroup = sourceCol.slice(chainStartIndex);
-
-      //         movingCardsList = rawGroup.sort((a, b) => {
-      //           if (a.type === "category") return -1;
-      //           if (b.type === "category") return 1;
-      //           return 0;
-      //         });
-      //       }
-      //     } else if (state.selectedCardInfo?.type === "waste") {
-      //       const topWaste = newWaste[newWaste.length - 1];
-      //       if (topWaste) movingCardsList = [topWaste];
-      //     }
-
-      //     if (movingCardsList.length === 0) return { selectedCardInfo: null };
-
-      //     const leadMovingCard = movingCardsList[0];
-      //     const existingStackAtSlot = updatedFoundation[targetSlotIdx];
-      //     let moveSuccessful = false;
-
-      //     if (!existingStackAtSlot) {
-      //       if (leadMovingCard.type === "category") {
-      //         updatedFoundation[targetSlotIdx] = [...movingCardsList];
-      //         moveSuccessful = true;
-      //       }
-      //     } else {
-      //       const slotAnchorCard = existingStackAtSlot.find((c) => c.type === "category");
-      //       if (slotAnchorCard && leadMovingCard.category === slotAnchorCard.category) {
-      //         if (leadMovingCard.type !== "category") {
-      //           updatedFoundation[targetSlotIdx] = [...existingStackAtSlot, ...movingCardsList];
-      //           moveSuccessful = true;
-      //         }
-      //       }
-      //     }
-
-      //     if (!moveSuccessful) return { selectedCardInfo: null };
-
-      //     if (state.selectedCardInfo?.type === "tableau" && sourceColIndex !== null) {
-      //       const sourceCol = newColumns[sourceColIndex];
-      //       sourceCol.splice(sourceCol.length - movingCardsList.length);
-
-      //       if (sourceCol.length > 0) {
-      //         sourceCol[sourceCol.length - 1] = { ...sourceCol[sourceCol.length - 1], isFaceUp: true };
-      //       }
-      //     } else if (state.selectedCardInfo?.type === "waste") {
-      //       newWaste.pop();
-      //     }
-
-      //     const activeStack = updatedFoundation[targetSlotIdx] || [];
-      //     const anchorCard = activeStack.find((c) => c.type === "category");
-      //     const totalRequired = anchorCard?.totalInCategory ?? 0;
-
-      //     let updatedCompletedCategories = [...state.completedCategories];
-      //     if (activeStack.length === totalRequired + 1) {
-      //       updatedFoundation[targetSlotIdx] = null;
-      //       if (anchorCard) {
-      //         updatedCompletedCategories.push(anchorCard.category);
-      //       }
-      //     }
-
-      //     const activeLevel = useGameStore.getState().currentLevel;
-      //     const totalLevelCategoriesCount = getLevelConfig(activeLevel).categories.length;
-
-      //     const win = checkWinCondition(updatedCompletedCategories, totalLevelCategoriesCount);
-      //     if (win) {
-      //       useGameStore.getState().completeCurrentLevel(250);
-      //       setTimeout(() => get().initializeLevel(), 100);
-      //     }
-
-      //     const nextMovesCount = state.movesCount + 1;
-      //     const playerHasLost = nextMovesCount >= state.maxMoves && !win;
-
-      //     return {
-      //       columns: newColumns,
-      //       waste: newWaste,
-      //       foundation: updatedFoundation,
-      //       completedCategories: updatedCompletedCategories,
-      //       selectedCardInfo: null,
-      //       movesCount: nextMovesCount,
-      //       hasLost: playerHasLost,
-      //       hasWon: win,
-      //     };
-      //   });
-      // },
-
-      moveCard: (targetColIndex) => {
+      setSelectedCardInfo: ({ info }) => set({ selectedCardInfo: info }),
+      moveCard: ({ targetColIndex }) => {
         set((state) => {
           const newColumns = state.columns.map((col) => [...col]);
           const newWaste = [...state.waste];
 
-          const getSameCategoryGroup = (sourceCol: CardType[], touchedIndex: number) => {
+          function getSameCategoryGroup(sourceCol: CardType[], touchedIndex: number) {
             const category = sourceCol[touchedIndex]?.category;
             let chainStartIndex = touchedIndex;
 
@@ -271,7 +96,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
               if (b.type === "category") return 1;
               return 0;
             });
-          };
+          }
 
           function extractMovingCards() {
             let movingCardsList: CardType[] = [];
@@ -296,10 +121,12 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const { movingCardsList, sourceColIndex } = extractMovingCards();
 
           if (movingCardsList.length === 0) return { selectedCardInfo: null };
+          if (sourceColIndex === targetColIndex) return { selectedCardInfo: null };
 
           const leadMovingCard = movingCardsList[0];
           const targetCol = newColumns[targetColIndex] || [];
           const topTargetCard = targetCol[targetCol.length - 1];
+
           const canMove = targetCol.length === 0 || topTargetCard?.category === leadMovingCard.category;
           if (!canMove) return { selectedCardInfo: null };
 
@@ -322,7 +149,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           return { columns: newColumns, waste: newWaste, selectedCardInfo: null, movesCount: nextMovesCount, hasLost: playerHasLost };
         });
       },
-      moveToFoundation: (targetSlotIdx) => {
+      moveToFoundation: ({ targetFoundationIndex, currentLevel }) => {
         set((state) => {
           const newColumns = state.columns.map((col) => [...col]);
           const newWaste = [...state.waste];
@@ -370,18 +197,18 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           const anchorMovingCard = movingCardsList.find((c) => c.type === "category");
           const leadMovingCard = movingCardsList[0];
-          const existingStackAtSlot = updatedFoundation[targetSlotIdx];
+          const existingStackAtSlot = updatedFoundation[targetFoundationIndex];
           let moveSuccessful = false;
 
           if (!existingStackAtSlot) {
             if (anchorMovingCard) {
-              updatedFoundation[targetSlotIdx] = [...movingCardsList];
+              updatedFoundation[targetFoundationIndex] = [...movingCardsList];
               moveSuccessful = true;
             }
           } else {
             const slotAnchorCard = existingStackAtSlot.find((c) => c.type === "category");
             if (slotAnchorCard && leadMovingCard.category === slotAnchorCard.category && leadMovingCard.type !== "category") {
-              updatedFoundation[targetSlotIdx] = [...existingStackAtSlot, ...movingCardsList];
+              updatedFoundation[targetFoundationIndex] = [...existingStackAtSlot, ...movingCardsList];
               moveSuccessful = true;
             }
           }
@@ -399,26 +226,21 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             newWaste.pop();
           }
 
-          const activeStack = updatedFoundation[targetSlotIdx] || [];
+          const activeStack = updatedFoundation[targetFoundationIndex] || [];
           const anchorStackCard = activeStack.find((c) => c.type === "category");
           const totalRequired = anchorStackCard?.totalInCategory ?? 0;
 
           let updatedCompletedCategories = [...state.completedCategories];
           if (activeStack.length === totalRequired + 1) {
-            updatedFoundation[targetSlotIdx] = null;
+            updatedFoundation[targetFoundationIndex] = null;
             if (anchorStackCard) {
               updatedCompletedCategories.push(anchorStackCard.category);
             }
           }
 
-          const activeLevel = useGameStore.getState().currentLevel;
-          const totalLevelCategoriesCount = getLevelConfig(activeLevel).categories.length;
+          const totalLevelCategoriesCount = getLevelConfig({ currentLevel }).categories.length;
 
-          const win = checkWinCondition(updatedCompletedCategories, totalLevelCategoriesCount);
-          if (win) {
-            useGameStore.getState().completeCurrentLevel(250);
-            setTimeout(() => get().initializeLevel(), 100);
-          }
+          const win = checkWinCondition({ completedCategories: updatedCompletedCategories, totalLevelCategoriesCount });
 
           const nextMovesCount = state.movesCount + 1;
           const playerHasLost = nextMovesCount >= state.maxMoves && !win;
@@ -470,12 +292,12 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
     }),
     {
       name: "level-store",
-      storage: createJSONStorage(() => levelZustandStorage),
+      storage: levelZustandStorage,
     },
   ),
 );
 
-export function resetPersistedStorage() {
+export function resetLevelStorage() {
   useLevelStore.persist.clearStorage();
   useLevelStore.getState().reset();
   levelStorage.clearAll();

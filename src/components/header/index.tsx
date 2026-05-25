@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     width: "100%",
     marginBlockStart: 10,
-    paddingInlineEnd: 5,
   },
   left: {
     flexDirection: "row",

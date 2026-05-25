@@ -20,7 +20,6 @@ export default function Moves() {
 const styles = StyleSheet.create({
   container: {
     backgroundColor: theme.colors.accent,
-    marginInlineStart: 5,
     padding: 15,
     borderRadius: 10,
     aspectRatio: 1 / 1,
@@ -30,9 +29,12 @@ const styles = StyleSheet.create({
   },
   text: {
     color: theme.colors.muted,
+    fontSize: 18,
+    fontWeight: 500,
   },
   count: {
     color: theme.colors.muted,
-    fontSize: 30,
+    fontSize: 36,
+    fontWeight: 700,
   },
 });

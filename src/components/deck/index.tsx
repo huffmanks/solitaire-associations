@@ -10,11 +10,17 @@ import Moves from "@/components/deck/moves";
 import Waste from "@/components/deck/waste";
 
 interface DeckProps {
+  cardWidth: number;
   onCardDragEnd: OnDragEnd;
 }
 
-export default function Deck({ onCardDragEnd }: DeckProps) {
+export default function Deck({ cardWidth, onCardDragEnd }: DeckProps) {
   const deck = useLevelStore((state) => state.deck);
+
+  const cardSize = {
+    width: cardWidth,
+    height: Math.floor(cardWidth * (3 / 2)),
+  };
 
   return (
     <View style={styles.container}>
@@ -22,11 +28,11 @@ export default function Deck({ onCardDragEnd }: DeckProps) {
         <Moves />
       </View>
       <View style={styles.right}>
-        <View style={styles.slotWrapper}>
+        <View style={cardSize}>
           <Waste onDragEnd={onCardDragEnd} />
         </View>
 
-        <View style={styles.slotWrapper}>
+        <View style={cardSize}>
           <DeckCard isHidden={deck.length > 0}>
             {deck.length > 0 ? (
               <Text style={styles.deckCount}>{deck.length}</Text>
@@ -48,20 +54,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBlockStart: 15,
-    marginBlockEnd: 20,
+    marginBlockEnd: 10,
+    marginInline: 15,
   },
   right: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-    marginInlineEnd: 5,
   },
   movesWrapper: {
     width: 120,
-  },
-  slotWrapper: {
-    width: 80,
   },
   deckCount: {
     color: theme.colors.foreground,

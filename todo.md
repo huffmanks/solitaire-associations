@@ -9,4 +9,3 @@
 ## rules
 
 - [ ] there must be at least one category card in the deck and one in a column with depth 0 or 1.
-- [ ] track moves count.

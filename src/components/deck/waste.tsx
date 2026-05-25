@@ -32,7 +32,7 @@ export default function Waste({ onDragEnd }: WasteProps) {
           </View>
         </EmptyCard>
       ) : (
-        <Card card={topWasteCard} onDragStart={() => setSelectedCardInfo({ cardId: topWasteCard.id, type: "waste" })} onDragEnd={onDragEnd} />
+        <Card card={topWasteCard} onDragStart={() => setSelectedCardInfo({ info: { cardId: topWasteCard.id, type: "waste" } })} onDragEnd={onDragEnd} />
       )}
     </View>
   );
