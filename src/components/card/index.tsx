@@ -21,15 +21,13 @@ interface CardProps {
 
 export default function Card({ columnIndex, cardIndex, stackStartIndex, card, containerStyle, isTopCard = true, onDragStart, onDragEnd }: CardProps) {
   const foundation = useLevelStore((state) => state.foundation);
-  const selectedCardInfo = useLevelStore((state) => state.selectedCardInfo);
 
-  const isSelected = selectedCardInfo?.cardId === card.id;
   const stack = Array.isArray(foundation) ? foundation.find((slot) => slot !== null && slot.length > 0 && slot[0].category === card.category) || null : null;
   const currentCount = stack ? stack.length - 1 : 0;
   const totalNeeded = card.totalInCategory || 0;
 
   if (!card.isFaceUp) {
-    return <CardWrapper columnIndex={columnIndex} cardIndex={cardIndex} stackStartIndex={stackStartIndex} variant="hidden" isSelected={isSelected} containerStyle={containerStyle} />;
+    return <CardWrapper columnIndex={columnIndex} cardIndex={cardIndex} stackStartIndex={stackStartIndex} variant="hidden" containerStyle={containerStyle} />;
   }
 
   if (card.type === "category") {
@@ -40,15 +38,18 @@ export default function Card({ columnIndex, cardIndex, stackStartIndex, card, co
         stackStartIndex={stackStartIndex}
         variant="category"
         isTopCard={isTopCard}
-        isSelected={isSelected}
         containerStyle={containerStyle}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}>
         <View style={styles.categoryHeader}>
-          <Text style={styles.text}>{`${currentCount}/${totalNeeded}`}</Text>
+          <View style={styles.categoryTextCountWrapper}>
+            <Text style={styles.categoryTextCount}>{currentCount}</Text>
+            <Text style={styles.categoryTextCount}>/</Text>
+            <Text style={styles.categoryTextCount}>{totalNeeded}</Text>
+          </View>
           <FontAwesome6 name="crown" size={18} color={theme.colors.goldDark} />
         </View>
-        <Text style={[styles.text, styles.textContent, styles.categoryTextOffset]}>{card.content}</Text>
+        <Text style={[styles.baseTextContent, styles.categoryTextContent, styles.categoryTextOffset]}>{card.content}</Text>
       </CardWrapper>
     );
   }
@@ -60,11 +61,10 @@ export default function Card({ columnIndex, cardIndex, stackStartIndex, card, co
       stackStartIndex={stackStartIndex}
       variant="visible"
       isTopCard={isTopCard}
-      isSelected={isSelected}
       containerStyle={containerStyle}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}>
-      <Text style={[styles.text, styles.textContent, !isTopCard && styles.peekTextOffset]}>{card.content}</Text>
+      <Text style={[styles.baseTextContent, styles.textContent, !isTopCard && styles.peekTextOffset]}>{card.content}</Text>
     </CardWrapper>
   );
 }
@@ -86,17 +86,28 @@ const styles = StyleSheet.create({
   peekTextOffset: {
     fontSize: 11,
     lineHeight: 12,
-    fontWeight: "600",
+    fontWeight: 600,
     textAlign: "center",
     width: "90%",
   },
-  text: {
-    color: theme.colors.cardForeground,
-    fontWeight: "700",
+  categoryTextCountWrapper: {
+    flexDirection: "row",
+    gap: 2,
+  },
+  categoryTextCount: {
+    color: theme.colors.foreground,
+    fontWeight: 700,
     fontSize: 12,
   },
-  textContent: {
+  baseTextContent: {
+    fontWeight: 900,
     fontSize: 14,
     textAlign: "center",
+  },
+  categoryTextContent: {
+    color: theme.colors.foreground,
+  },
+  textContent: {
+    color: theme.colors.cardForeground,
   },
 });

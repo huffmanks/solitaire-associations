@@ -18,6 +18,7 @@ export const theme = {
     blueLight: "hsl(200, 100%, 50%)",
     blueButtonRim: "hsl(217, 92%, 90%)",
 
+    goldDarker: "hsl(48, 100%, 42%)",
     goldDark: "hsl(48, 100%, 50%)",
     goldLight: "hsl(57, 100%, 54%)",
 

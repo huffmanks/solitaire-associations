@@ -12,7 +12,6 @@ interface CardWrapperProps {
   cardIndex?: number;
   stackStartIndex?: number;
   variant: CardVariants;
-  isSelected?: boolean;
   isTopCard?: boolean;
   children?: React.ReactNode;
   containerStyle?: ViewStyle;
@@ -21,10 +20,10 @@ interface CardWrapperProps {
   onDragEnd?: OnCardDragEnd;
 }
 
-export default function CardWrapper({ columnIndex, cardIndex, stackStartIndex, variant, isSelected, isTopCard, children, containerStyle, onPress, onDragStart, onDragEnd }: CardWrapperProps) {
+export default function CardWrapper({ columnIndex, cardIndex, stackStartIndex, variant, isTopCard, children, containerStyle, onPress, onDragStart, onDragEnd }: CardWrapperProps) {
   const isGestureEnabled = Boolean(onDragStart && onDragEnd);
 
-  const cardStyles = [styles.card, styles[variant], isSelected && styles.selectedOverride];
+  const cardStyles = [styles.card, styles[variant]];
 
   const textWrapperStyles = [styles.textWrapper, !isTopCard && variant !== "hidden" && variant !== "empty" && variant !== "waste" && styles.textWrapperPeekOverride];
 
@@ -103,9 +102,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     overflow: "hidden",
   },
-  selectedOverride: {
-    borderColor: "red",
-  },
   textWrapper: {
     flex: 1,
     alignItems: "center",
@@ -125,7 +121,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.foreground,
   },
   category: {
-    backgroundColor: theme.colors.cardFront,
+    backgroundColor: theme.colors.goldDarker,
     borderColor: theme.colors.goldDark,
   },
   empty: {
