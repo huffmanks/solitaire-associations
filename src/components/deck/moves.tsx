@@ -58,24 +58,24 @@ export default function Moves({ cardSize }: MovesProps) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.muted,
+    backgroundColor: theme.colors.greenDark,
     padding: 5,
     borderRadius: 10,
     alignItems: "center",
     justifyContent: "center",
     borderWidth: 3,
-    borderColor: theme.colors.greenBorder,
+    borderColor: theme.colors.muted,
   },
   textWrapper: {
     alignItems: "center",
     justifyContent: "center",
   },
   heading: {
-    color: theme.colors.foreground,
+    color: theme.colors.greenButtonRim,
     fontWeight: 700,
   },
   count: {
-    color: theme.colors.foreground,
+    color: theme.colors.greenButtonRim,
     fontWeight: 900,
   },
 });

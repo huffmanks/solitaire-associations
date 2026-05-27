@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Dimensions, LayoutChangeEvent, StyleSheet, View } from "react-native";
+import { Dimensions, StyleSheet, View } from "react-native";
 import { useShallow } from "zustand/shallow";
 
 import { BOARD_LAYOUT } from "@/lib/constants";
@@ -34,8 +34,10 @@ export default function Board() {
   );
 
   useEffect(() => {
+    foundationLayouts.current = Array(numberOfColumns).fill(null);
+    tableauLayouts.current = Array(numberOfColumns).fill(null);
     initializeLevel({ currentLevel });
-  }, []);
+  }, [numberOfColumns]);
 
   const activeGridColumns = numberOfColumns || 3;
   const currentPadding = BOARD_LAYOUT.MARGIN_INLINE_MAP[activeGridColumns];
@@ -51,13 +53,8 @@ export default function Board() {
     height: Math.floor(measuredCardWidth * (3 / 2)),
   };
 
-  // TODO remove
-  function handleFirstCardLayout(event: LayoutChangeEvent) {}
-
   const saveLayout = (index: number, type: "foundation" | "tableau") => (event: any) => {
     const targetArray = type === "foundation" ? foundationLayouts.current : tableauLayouts.current;
-
-    if (targetArray[index]) return;
 
     event.target.measureInWindow((x: number, y: number, width: number, height: number) => {
       if (width > 0 && height > 0) {
@@ -66,24 +63,26 @@ export default function Board() {
     });
   };
 
-  async function handleDragEnd(absoluteX: number, absoluteY: number) {
+  function handleDragEnd(absoluteX: number, absoluteY: number) {
     const hitTarget = resolveDropTarget(absoluteX, absoluteY, foundationLayouts.current, tableauLayouts.current);
 
     if (!hitTarget) {
       setSelectedCardInfo({ info: null });
-      return;
+      return false;
     }
 
     if (hitTarget.type === "foundation") {
-      moveToFoundation({ targetFoundationIndex: hitTarget.index, currentLevel });
-      return;
+      const success = moveToFoundation({ targetFoundationIndex: hitTarget.index, currentLevel });
+      return success;
     }
 
-    moveCard({ targetColumnIndex: hitTarget.index });
+    const success = moveCard({ targetColumnIndex: hitTarget.index });
+    return success;
   }
+
   return (
     <View style={styles.container}>
-      <Deck cardWidth={measuredCardWidth} onCardDragEnd={handleDragEnd} />
+      <Deck cardWidth={measuredCardWidth} handleDragEnd={handleDragEnd} />
 
       <View style={styles.foundationRow}>
         {foundation.map((stack, i) => (
@@ -98,16 +97,7 @@ export default function Board() {
           {columns.map((column, columnIndex) => (
             <View key={columnIndex} style={{ width: measuredCardWidth }} onLayout={saveLayout(columnIndex, "tableau")}>
               {column.map((card, cardIndex) => (
-                <TableauColumn
-                  key={card.id}
-                  card={card}
-                  column={column}
-                  cardIndex={cardIndex}
-                  columnIndex={columnIndex}
-                  measuredCardHeight={measuredCardHeight}
-                  handleDragEnd={handleDragEnd}
-                  handleFirstCardLayout={handleFirstCardLayout}
-                />
+                <TableauColumn key={card.id} card={card} column={column} cardIndex={cardIndex} columnIndex={columnIndex} measuredCardHeight={measuredCardHeight} handleDragEnd={handleDragEnd} />
               ))}
 
               {column.length === 0 && <EmptyCard />}

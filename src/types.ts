@@ -19,7 +19,7 @@ export type LevelConfig = {
   categories: Array<string>;
 };
 
-export type CardVariants = "visible" | "hidden" | "category" | "empty";
+export type CardVariants = "visible" | "hidden" | "category" | "empty" | "waste";
 
 export type DropTargetHit = {
   type: "tableau" | "foundation";

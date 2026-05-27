@@ -1,11 +1,11 @@
 import { StyleProp, ViewStyle } from "react-native";
 import { Gesture, GestureDetector } from "react-native-gesture-handler";
-import Animated, { useAnimatedStyle, useSharedValue, withSpring } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
 import { sharedActiveColIndex, sharedActiveDragType, sharedDragSessionId, sharedDragStartIndex, sharedTranslateX, sharedTranslateY } from "@/lib/shared-drag";
 
-export type OnDragEnd = (absoluteX: number, absoluteY: number) => void;
+export type OnCardDragEnd = (absoluteX: number, absoluteY: number) => boolean;
 
 interface DraggableCardWrapperProps {
   columnIndex?: number;
@@ -15,17 +15,42 @@ interface DraggableCardWrapperProps {
   containerStyle?: ViewStyle;
   children: React.ReactNode;
   onDragStart?: () => void;
-  onDragEnd?: OnDragEnd;
+  onDragEnd?: OnCardDragEnd;
 }
 
 export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStartIndex, containerStyle, style, children, onDragStart, onDragEnd }: DraggableCardWrapperProps) {
   const isDraggingMe = useSharedValue(false);
   const wasDraggedByMe = useSharedValue(false);
+  const shakeOffset = useSharedValue(0);
+
+  function triggerErrorShake() {
+    shakeOffset.value = withDelay(
+      100,
+      withSequence(
+        withTiming(-4, { duration: 25 }),
+        withTiming(4, { duration: 25 }),
+        withTiming(-3, { duration: 25 }),
+        withTiming(3, { duration: 25 }),
+        withTiming(-1.5, { duration: 25 }),
+        withTiming(1.5, { duration: 25 }),
+        withTiming(0, { duration: 25 }),
+      ),
+    );
+  }
+
+  function handleOnDragEndBridge(x: number, y: number) {
+    if (onDragEnd) {
+      const isValidMove = onDragEnd(x, y);
+      if (isValidMove === false) {
+        triggerErrorShake();
+      }
+    }
+  }
 
   const animatedStyle = useAnimatedStyle(() => {
     if (isDraggingMe.value) {
       return {
-        transform: [{ translateX: sharedTranslateX.value }, { translateY: sharedTranslateY.value }, { scale: 1.02 }],
+        transform: [{ translateX: sharedTranslateX.value + shakeOffset.value }, { translateY: sharedTranslateY.value }, { scale: 1.02 }],
         zIndex: 9999 + (cardIndex ?? 0),
         elevation: 9999 + (cardIndex ?? 0),
       };
@@ -36,7 +61,7 @@ export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStar
 
       if (isInActiveStack) {
         return {
-          transform: [{ translateX: sharedTranslateX.value }, { translateY: sharedTranslateY.value }, { scale: isDraggingMe.value ? 1.02 : 1 }],
+          transform: [{ translateX: sharedTranslateX.value + shakeOffset.value }, { translateY: sharedTranslateY.value }, { scale: isDraggingMe.value ? 1.02 : 1 }],
           zIndex: 9999 + cardIndex,
           elevation: 9999 + cardIndex,
         };
@@ -45,14 +70,14 @@ export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStar
 
     if (cardIndex === undefined && wasDraggedByMe.value && (sharedTranslateX.value !== 0 || sharedTranslateY.value !== 0)) {
       return {
-        transform: [{ translateX: sharedTranslateX.value }, { translateY: sharedTranslateY.value }, { scale: 1 }],
+        transform: [{ translateX: sharedTranslateX.value + shakeOffset.value }, { translateY: sharedTranslateY.value }, { scale: 1 }],
         zIndex: 9999,
         elevation: 9999,
       };
     }
 
     return {
-      transform: [{ translateX: 0 }, { translateY: 0 }, { scale: 1 }],
+      transform: [{ translateX: shakeOffset.value }, { translateY: 0 }, { scale: 1 }],
       zIndex: containerStyle?.zIndex ?? 0,
       elevation: 0,
     };
@@ -85,7 +110,7 @@ export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStar
     })
     .onFinalize((event) => {
       if (onDragEnd) {
-        scheduleOnRN(onDragEnd, event.absoluteX, event.absoluteY);
+        scheduleOnRN(handleOnDragEndBridge, event.absoluteX, event.absoluteY);
       }
 
       isDraggingMe.value = false;

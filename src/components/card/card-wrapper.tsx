@@ -1,11 +1,11 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { memo } from "react";
-import { LayoutChangeEvent, Pressable, StyleSheet, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 
 import { theme } from "@/lib/theme";
 import { CardVariants } from "@/types";
 
-import DraggableCardWrapper, { type OnDragEnd } from "@/components/card/draggable-card-wrapper";
+import DraggableCardWrapper, { type OnCardDragEnd } from "@/components/card/draggable-card-wrapper";
 
 interface CardWrapperProps {
   columnIndex?: number;
@@ -18,29 +18,15 @@ interface CardWrapperProps {
   containerStyle?: ViewStyle;
   onPress?: () => void;
   onDragStart?: () => void;
-  onDragEnd?: OnDragEnd;
-  onLayout?: (event: LayoutChangeEvent) => void;
+  onDragEnd?: OnCardDragEnd;
 }
 
-export default function CardWrapper({
-  columnIndex,
-  cardIndex,
-  stackStartIndex,
-  variant,
-  isSelected,
-  isTopCard,
-  children,
-  containerStyle,
-  onPress,
-  onDragStart,
-  onDragEnd,
-  onLayout,
-}: CardWrapperProps) {
+export default function CardWrapper({ columnIndex, cardIndex, stackStartIndex, variant, isSelected, isTopCard, children, containerStyle, onPress, onDragStart, onDragEnd }: CardWrapperProps) {
   const isGestureEnabled = Boolean(onDragStart && onDragEnd);
 
   const cardStyles = [styles.card, styles[variant], isSelected && styles.selectedOverride];
 
-  const textWrapperStyles = [styles.textWrapper, !isTopCard && variant !== "hidden" && variant !== "empty" && styles.textWrapperPeekOverride];
+  const textWrapperStyles = [styles.textWrapper, !isTopCard && variant !== "hidden" && variant !== "empty" && variant !== "waste" && styles.textWrapperPeekOverride];
 
   const content = (
     <View style={cardStyles}>
@@ -55,7 +41,7 @@ export default function CardWrapper({
 
   if (isGestureEnabled) {
     return (
-      <View style={[styles.baseSize, containerStyle]} onLayout={onLayout}>
+      <View style={[styles.baseSize, containerStyle]}>
         <DraggableCardWrapper
           columnIndex={columnIndex}
           cardIndex={cardIndex}
@@ -72,17 +58,13 @@ export default function CardWrapper({
 
   if (onPress) {
     return (
-      <Pressable style={[styles.baseSize, containerStyle]} onPress={onPress} onLayout={onLayout}>
+      <Pressable style={[styles.baseSize, containerStyle]} onPress={onPress}>
         {content}
       </Pressable>
     );
   }
 
-  return (
-    <View style={[styles.baseSize, containerStyle]} onLayout={onLayout}>
-      {content}
-    </View>
-  );
+  return <View style={[styles.baseSize, containerStyle]}>{content}</View>;
 }
 
 const StaticPattern = memo(function StaticPattern() {
@@ -149,6 +131,10 @@ const styles = StyleSheet.create({
   empty: {
     backgroundColor: theme.colors.muted,
     borderColor: theme.colors.greenBorder,
+  },
+  waste: {
+    backgroundColor: theme.colors.greenDark,
+    borderColor: theme.colors.muted,
   },
   deck: {},
   patternContainer: {

@@ -5,16 +5,16 @@ import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
 import DeckCard from "@/components/card/deck-card";
-import type { OnDragEnd } from "@/components/card/draggable-card-wrapper";
+import type { OnCardDragEnd } from "@/components/card/draggable-card-wrapper";
 import Moves from "@/components/deck/moves";
 import Waste from "@/components/deck/waste";
 
 interface DeckProps {
   cardWidth: number;
-  onCardDragEnd: OnDragEnd;
+  handleDragEnd: OnCardDragEnd;
 }
 
-export default function Deck({ cardWidth, onCardDragEnd }: DeckProps) {
+export default function Deck({ cardWidth, handleDragEnd }: DeckProps) {
   const deck = useLevelStore((state) => state.deck);
 
   const cardSize = {
@@ -27,22 +27,21 @@ export default function Deck({ cardWidth, onCardDragEnd }: DeckProps) {
       <View>
         <Moves cardSize={cardSize} />
       </View>
-      <View style={styles.right}>
-        <View style={cardSize}>
-          <Waste onDragEnd={onCardDragEnd} />
-        </View>
 
-        <View style={cardSize}>
-          <DeckCard isHidden={deck.length > 0}>
-            {deck.length > 0 ? (
-              <Text style={styles.deckCount}>{deck.length}</Text>
-            ) : (
-              <View style={styles.recycleCenter}>
-                <FontAwesome6 name="rotate-left" size={20} color={theme.colors.greenLight} />
-              </View>
-            )}
-          </DeckCard>
-        </View>
+      <View style={cardSize}>
+        <Waste handleDragEnd={handleDragEnd} />
+      </View>
+
+      <View style={cardSize}>
+        <DeckCard isHidden={deck.length > 0}>
+          {deck.length > 0 ? (
+            <Text style={styles.deckCount}>{deck.length}</Text>
+          ) : (
+            <View style={styles.recycleCenter}>
+              <FontAwesome6 name="rotate-left" size={20} color={theme.colors.greenLight} />
+            </View>
+          )}
+        </DeckCard>
       </View>
     </View>
   );
@@ -56,12 +55,6 @@ const styles = StyleSheet.create({
     marginBlockStart: 15,
     marginBlockEnd: 10,
     marginInline: 15,
-  },
-  right: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 10,
   },
   deckCount: {
     color: theme.colors.foreground,

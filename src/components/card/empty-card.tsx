@@ -1,5 +1,12 @@
+import { CardVariants } from "@/types";
+
 import CardWrapper from "@/components/card/card-wrapper";
 
-export default function EmptyCard({ children }: { children?: React.ReactNode }) {
-  return <CardWrapper variant="empty">{children}</CardWrapper>;
+interface EmptyCardProps {
+  variant?: CardVariants;
+  children?: React.ReactNode;
+}
+
+export default function EmptyCard({ variant = "empty", children }: EmptyCardProps) {
+  return <CardWrapper variant={variant}>{children}</CardWrapper>;
 }

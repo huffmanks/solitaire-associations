@@ -6,17 +6,18 @@ import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
 import Card from "@/components/card";
-import type { OnDragEnd } from "@/components/card/draggable-card-wrapper";
+import type { OnCardDragEnd } from "@/components/card/draggable-card-wrapper";
 import EmptyCard from "@/components/card/empty-card";
 
 interface WasteProps {
-  onDragEnd: OnDragEnd;
+  handleDragEnd: OnCardDragEnd;
 }
 
-export default function Waste({ onDragEnd }: WasteProps) {
-  const { waste, setSelectedCardInfo } = useLevelStore(
+export default function Waste({ handleDragEnd }: WasteProps) {
+  const { waste, numberOfColumns, setSelectedCardInfo } = useLevelStore(
     useShallow((state) => ({
       waste: state.waste,
+      numberOfColumns: state.numberOfColumns,
       setSelectedCardInfo: state.setSelectedCardInfo,
     })),
   );
@@ -24,30 +25,34 @@ export default function Waste({ onDragEnd }: WasteProps) {
   const topWasteCard = waste[waste.length - 1];
   const underWasteCard = waste.length > 1 ? waste[waste.length - 2] : null;
 
+  const containerStyles = {
+    marginInlineStart: numberOfColumns === 5 ? 39 : undefined,
+  };
+
   if (!topWasteCard) {
     return (
-      <View style={styles.container}>
-        <EmptyCard>
-          <FontAwesome6 name="layer-group" size={20} color={theme.colors.greenLight} />
+      <View style={[styles.container, containerStyles]}>
+        <EmptyCard variant="waste">
+          <FontAwesome6 name="layer-group" size={20} color={theme.colors.muted} />
         </EmptyCard>
       </View>
     );
   }
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, containerStyles]}>
       <View style={styles.backgroundLayer}>
         {underWasteCard ? (
           <Card card={underWasteCard} />
         ) : (
-          <EmptyCard>
-            <FontAwesome6 name="crown" size={20} color={theme.colors.greenLight} />
+          <EmptyCard variant="waste">
+            <FontAwesome6 name="layer-group" size={20} color={theme.colors.muted} />
           </EmptyCard>
         )}
       </View>
 
       <View style={StyleSheet.absoluteFill} key={topWasteCard.id}>
-        <Card card={topWasteCard} onDragStart={() => setSelectedCardInfo({ info: { cardId: topWasteCard.id, type: "waste" } })} onDragEnd={onDragEnd} />
+        <Card card={topWasteCard} onDragStart={() => setSelectedCardInfo({ info: { cardId: topWasteCard.id, type: "waste" } })} onDragEnd={handleDragEnd} />
       </View>
     </View>
   );

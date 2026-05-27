@@ -40,8 +40,8 @@ type LevelStoreState = {
 type LevelStoreActions = {
   initializeLevel: ({ currentLevel }: { currentLevel: number }) => void;
   setSelectedCardInfo: ({ info }: { info: SelectedCardInfo | null }) => void;
-  moveCard: ({ targetColumnIndex }: { targetColumnIndex: number }) => void;
-  moveToFoundation: ({ targetFoundationIndex, currentLevel }: { targetFoundationIndex: number; currentLevel: number }) => void;
+  moveCard: ({ targetColumnIndex }: { targetColumnIndex: number }) => boolean;
+  moveToFoundation: ({ targetFoundationIndex, currentLevel }: { targetFoundationIndex: number; currentLevel: number }) => boolean;
   drawCard: () => void;
   undoLastMove: () => void;
 
@@ -99,6 +99,8 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
       },
       setSelectedCardInfo: ({ info }) => set({ selectedCardInfo: info }),
       moveCard: ({ targetColumnIndex }) => {
+        let wasSuccessful = false;
+
         set((state) => {
           const newColumns = state.columns.map((col) => [...col]);
           const newWaste = [...state.waste];
@@ -141,7 +143,10 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const { movingCardsList, sourceColumnIndex } = extractMovingCards();
 
           if (movingCardsList.length === 0) return { selectedCardInfo: null };
-          if (sourceColumnIndex === targetColumnIndex) return { selectedCardInfo: null };
+          if (sourceColumnIndex === targetColumnIndex) {
+            wasSuccessful = true;
+            return { selectedCardInfo: null };
+          }
 
           const leadMovingCard = movingCardsList[0];
           const targetColumn = newColumns[targetColumnIndex] || [];
@@ -150,6 +155,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const canMove = targetColumn.length === 0 || (topTargetCard?.category === leadMovingCard.category && topTargetCard?.type !== "category");
           if (!canMove) return { selectedCardInfo: null };
 
+          wasSuccessful = true;
           const snapshot = createSnapshot(state);
 
           if (state.selectedCardInfo?.type === "tableau" && sourceColumnIndex !== null) {
@@ -170,8 +176,12 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           return { columns: newColumns, waste: newWaste, selectedCardInfo: null, movesCount: nextMovesCount, hasLost: playerHasLost, history: [...state.history, snapshot] };
         });
+
+        return wasSuccessful;
       },
       moveToFoundation: ({ targetFoundationIndex, currentLevel }) => {
+        let wasSuccessful = false;
+
         set((state) => {
           const newColumns = state.columns.map((col) => [...col]);
           const newWaste = [...state.waste];
@@ -220,22 +230,21 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const anchorMovingCard = movingCardsList.find((c) => c.type === "category");
           const leadMovingCard = movingCardsList[0];
           const existingStackAtSlot = updatedFoundation[targetFoundationIndex];
-          let moveSuccessful = false;
 
           if (!existingStackAtSlot) {
             if (anchorMovingCard) {
               updatedFoundation[targetFoundationIndex] = [...movingCardsList];
-              moveSuccessful = true;
+              wasSuccessful = true;
             }
           } else {
             const slotAnchorCard = existingStackAtSlot.find((c) => c.type === "category");
             if (slotAnchorCard && leadMovingCard.category === slotAnchorCard.category && leadMovingCard.type !== "category") {
               updatedFoundation[targetFoundationIndex] = [...existingStackAtSlot, ...movingCardsList];
-              moveSuccessful = true;
+              wasSuccessful = true;
             }
           }
 
-          if (!moveSuccessful) return { selectedCardInfo: null };
+          if (!wasSuccessful) return { selectedCardInfo: null };
 
           const snapshot = createSnapshot(state);
 
@@ -281,6 +290,8 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             history: [...state.history, snapshot],
           };
         });
+
+        return wasSuccessful;
       },
       drawCard: () => {
         set((state) => {

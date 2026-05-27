@@ -1,4 +1,4 @@
-import { LayoutChangeEvent, ViewStyle } from "react-native";
+import { ViewStyle } from "react-native";
 
 import { CARD_COLUMN_VISIBLE_PEEK } from "@/lib/constants";
 
@@ -6,7 +6,7 @@ import { useLevelStore } from "@/lib/store/level";
 import { CardType } from "@/types";
 
 import Card from "@/components/card";
-import type { OnDragEnd } from "@/components/card/draggable-card-wrapper";
+import type { OnCardDragEnd } from "@/components/card/draggable-card-wrapper";
 
 interface TableauColumnProps {
   card: CardType;
@@ -14,11 +14,10 @@ interface TableauColumnProps {
   columnIndex: number;
   cardIndex: number;
   measuredCardHeight: number;
-  handleDragEnd: OnDragEnd;
-  handleFirstCardLayout: (event: LayoutChangeEvent) => void;
+  handleDragEnd: OnCardDragEnd;
 }
 
-export default function TableauColumn({ card, column, columnIndex, cardIndex, measuredCardHeight, handleDragEnd, handleFirstCardLayout }: TableauColumnProps) {
+export default function TableauColumn({ card, column, columnIndex, cardIndex, measuredCardHeight, handleDragEnd }: TableauColumnProps) {
   const setSelectedCardInfo = useLevelStore((state) => state.setSelectedCardInfo);
 
   const isTopCard = cardIndex === column.length - 1;
@@ -55,7 +54,6 @@ export default function TableauColumn({ card, column, columnIndex, cardIndex, me
       card={card}
       isTopCard={isTopCard}
       containerStyle={containerStyle}
-      onLayout={columnIndex === 0 && cardIndex === 0 ? handleFirstCardLayout : undefined}
       onDragStart={isContiguousActiveChain ? handleDragStart : undefined}
       onDragEnd={isContiguousActiveChain ? handleDragEnd : undefined}
     />
