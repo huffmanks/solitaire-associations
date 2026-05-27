@@ -4,11 +4,15 @@ import Completion from "@/components/header/completion";
 import GoldCount from "@/components/header/gold-count";
 import MenuButton from "@/components/header/menu-button";
 
-export default function Header() {
+interface HeaderProps {
+  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
+
+export default function Header({ setIsMenuOpen }: HeaderProps) {
   return (
     <View style={styles.container}>
       <View style={styles.left}>
-        <MenuButton />
+        <MenuButton setIsMenuOpen={setIsMenuOpen} />
         <GoldCount />
       </View>
       <View style={styles.right}>

@@ -24,8 +24,8 @@ export default function Deck({ cardWidth, onCardDragEnd }: DeckProps) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.movesWrapper}>
-        <Moves />
+      <View>
+        <Moves cardSize={cardSize} />
       </View>
       <View style={styles.right}>
         <View style={cardSize}>
@@ -38,7 +38,7 @@ export default function Deck({ cardWidth, onCardDragEnd }: DeckProps) {
               <Text style={styles.deckCount}>{deck.length}</Text>
             ) : (
               <View style={styles.recycleCenter}>
-                <FontAwesome6 name="rotate-left" size={20} color={theme.colors.accent} />
+                <FontAwesome6 name="rotate-left" size={20} color={theme.colors.greenLight} />
               </View>
             )}
           </DeckCard>
@@ -62,9 +62,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
     gap: 10,
-  },
-  movesWrapper: {
-    width: 120,
   },
   deckCount: {
     color: theme.colors.foreground,

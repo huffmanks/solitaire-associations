@@ -1,17 +1,15 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { useRouter } from "expo-router";
 import { useRef } from "react";
 import { Animated, Pressable, StyleSheet } from "react-native";
 
 import { theme } from "@/lib/theme";
 
-export default function MenuButton() {
-  const scaleValue = useRef(new Animated.Value(1)).current;
-  const router = useRouter();
+interface MenuButtonProps {
+  setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
-  function handlePress() {
-    router.navigate("/");
-  }
+export default function MenuButton({ setIsMenuOpen }: MenuButtonProps) {
+  const scaleValue = useRef(new Animated.Value(1)).current;
 
   function onPressIn() {
     Animated.spring(scaleValue, {
@@ -28,7 +26,7 @@ export default function MenuButton() {
   }
 
   return (
-    <Pressable onPress={handlePress} onPressIn={onPressIn} onPressOut={onPressOut}>
+    <Pressable onPress={() => setIsMenuOpen(true)} onPressIn={onPressIn} onPressOut={onPressOut}>
       <Animated.View style={[styles.menu, { transform: [{ scale: scaleValue }] }]}>
         <Ionicons name="menu" size={30} style={styles.icon} />
       </Animated.View>

@@ -91,7 +91,7 @@ const StaticPattern = memo(function StaticPattern() {
 
   const singleRow = [];
   for (let c = 0; c < cols; c++) {
-    singleRow.push(<MaterialCommunityIcons key={`c-${c}`} name="cards-diamond" size={32} color={theme.colors.cardBackIcon} style={styles.patternIcon} />);
+    singleRow.push(<MaterialCommunityIcons key={`c-${c}`} name="cards-diamond" size={32} color={theme.colors.blueDark} style={styles.patternIcon} />);
   }
 
   const grid = [];
@@ -139,16 +139,16 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.cardFrontBorder,
   },
   hidden: {
-    backgroundColor: theme.colors.cardBack,
+    backgroundColor: theme.colors.blueLight,
     borderColor: theme.colors.foreground,
   },
   category: {
     backgroundColor: theme.colors.cardFront,
-    borderColor: theme.colors.primary,
+    borderColor: theme.colors.goldDark,
   },
   empty: {
     backgroundColor: theme.colors.muted,
-    borderColor: theme.colors.border,
+    borderColor: theme.colors.greenBorder,
   },
   deck: {},
   patternContainer: {

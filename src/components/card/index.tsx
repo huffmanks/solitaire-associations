@@ -50,7 +50,7 @@ export default function Card({ columnIndex, cardIndex, stackStartIndex, card, co
         onLayout={onLayout}>
         <View style={styles.categoryHeader}>
           <Text style={styles.text}>{`${currentCount}/${totalNeeded}`}</Text>
-          <FontAwesome6 name="crown" size={18} color={theme.colors.primary} />
+          <FontAwesome6 name="crown" size={18} color={theme.colors.goldDark} />
         </View>
         <Text style={[styles.text, styles.textContent, styles.categoryTextOffset]}>{card.content}</Text>
       </CardWrapper>

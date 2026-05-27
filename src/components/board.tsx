@@ -8,10 +8,10 @@ import { useLevelStore } from "@/lib/store/level";
 import { resolveDropTarget } from "@/lib/utils";
 import { LayoutRect } from "@/types";
 
+import ActionBar from "@/components/action-bar";
 import EmptyCard from "@/components/card/empty-card";
 import Deck from "@/components/deck";
 import Foundation from "@/components/foundation";
-import GameOverModal from "@/components/modals/game-over";
 import TableauColumn from "@/components/tableau-column";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
@@ -115,7 +115,7 @@ export default function Board() {
           ))}
         </View>
       </View>
-      <GameOverModal />
+      <ActionBar />
     </View>
   );
 }

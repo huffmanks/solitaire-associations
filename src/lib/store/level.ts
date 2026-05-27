@@ -14,6 +14,14 @@ const levelZustandStorage = createJSONStorage(() => ({
   removeItem: (key) => levelStorage.remove(key),
 }));
 
+type HistorySnapshot = {
+  columns: Array<Array<CardType>>;
+  foundation: Array<Array<CardType> | null>;
+  deck: Array<CardType>;
+  waste: Array<CardType>;
+  completedCategories: Array<string>;
+};
+
 type LevelStoreState = {
   numberOfColumns: number;
   columns: Array<Array<CardType>>;
@@ -26,6 +34,7 @@ type LevelStoreState = {
   movesCount: number;
   maxMoves: number;
   hasLost: boolean;
+  history: Array<HistorySnapshot>;
 };
 
 type LevelStoreActions = {
@@ -34,6 +43,7 @@ type LevelStoreActions = {
   moveCard: ({ targetColumnIndex }: { targetColumnIndex: number }) => void;
   moveToFoundation: ({ targetFoundationIndex, currentLevel }: { targetFoundationIndex: number; currentLevel: number }) => void;
   drawCard: () => void;
+  undoLastMove: () => void;
 
   reset: () => void;
 };
@@ -50,7 +60,16 @@ const initialLevelStoreState: LevelStoreState = {
   movesCount: 0,
   maxMoves: 0,
   hasLost: false,
+  history: [],
 };
+
+const createSnapshot = (state: LevelStoreState): HistorySnapshot => ({
+  columns: state.columns.map((col) => col.map((card) => ({ ...card }))),
+  foundation: state.foundation.map((slot) => (slot ? slot.map((card) => ({ ...card })) : null)),
+  deck: state.deck.map((card) => ({ ...card })),
+  waste: state.waste.map((card) => ({ ...card })),
+  completedCategories: [...state.completedCategories],
+});
 
 export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
   persist(
@@ -75,6 +94,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           movesCount: 0,
           maxMoves: computedMaxMoves,
           completedCategories: [],
+          history: [],
         });
       },
       setSelectedCardInfo: ({ info }) => set({ selectedCardInfo: info }),
@@ -130,6 +150,8 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const canMove = targetColumn.length === 0 || (topTargetCard?.category === leadMovingCard.category && topTargetCard?.type !== "category");
           if (!canMove) return { selectedCardInfo: null };
 
+          const snapshot = createSnapshot(state);
+
           if (state.selectedCardInfo?.type === "tableau" && sourceColumnIndex !== null) {
             const sourceColumn = newColumns[sourceColumnIndex];
             sourceColumn.splice(sourceColumn.length - movingCardsList.length);
@@ -146,7 +168,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const nextMovesCount = state.movesCount + 1;
           const playerHasLost = nextMovesCount >= state.maxMoves;
 
-          return { columns: newColumns, waste: newWaste, selectedCardInfo: null, movesCount: nextMovesCount, hasLost: playerHasLost };
+          return { columns: newColumns, waste: newWaste, selectedCardInfo: null, movesCount: nextMovesCount, hasLost: playerHasLost, history: [...state.history, snapshot] };
         });
       },
       moveToFoundation: ({ targetFoundationIndex, currentLevel }) => {
@@ -215,6 +237,8 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           if (!moveSuccessful) return { selectedCardInfo: null };
 
+          const snapshot = createSnapshot(state);
+
           if (state.selectedCardInfo?.type === "tableau" && sourceColumnIndex !== null) {
             const sourceColumn = newColumns[sourceColumnIndex];
             sourceColumn.splice(sourceColumn.length - movingCardsList.length);
@@ -254,6 +278,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             movesCount: nextMovesCount,
             hasLost: playerHasLost,
             hasWon: win,
+            history: [...state.history, snapshot],
           };
         });
       },
@@ -264,12 +289,16 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           if (state.deck.length === 0) {
             if (state.waste.length === 0) return state;
+
+            const snapshot = createSnapshot(state);
+
             return {
               deck: [...state.waste].reverse().map((c) => ({ ...c, isFaceUp: false })),
               waste: [],
               selectedCardInfo: null,
               movesCount: nextMovesCount,
               hasLost: playerHasLost,
+              history: [...state.history, snapshot],
             };
           }
 
@@ -278,12 +307,37 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
 
           if (!card) return state;
 
+          const snapshot = createSnapshot(state);
+
           return {
             deck: newDeck,
             waste: [...state.waste, { ...card, isFaceUp: true }],
             selectedCardInfo: null,
             movesCount: nextMovesCount,
             hasLost: playerHasLost,
+            history: [...state.history, snapshot],
+          };
+        });
+      },
+      undoLastMove: () => {
+        set((state) => {
+          if (state.history.length === 0) return state;
+
+          const previousHistory = [...state.history];
+          const lastSnapshot = previousHistory.pop();
+
+          if (!lastSnapshot) return state;
+
+          const nextMovesCount = state.movesCount + 1;
+          const playerHasLost = nextMovesCount >= state.maxMoves;
+
+          return {
+            ...lastSnapshot,
+            movesCount: nextMovesCount,
+            hasLost: playerHasLost,
+            hasWon: false,
+            selectedCardInfo: null,
+            history: previousHistory,
           };
         });
       },

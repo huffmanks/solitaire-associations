@@ -36,14 +36,14 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     gap: 10,
     width: "100%",
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.greenDark,
   },
   text: {
     color: theme.colors.foreground,
     fontSize: 30,
   },
   link: {
-    color: theme.colors.primary,
+    color: theme.colors.goldDark,
     fontSize: 20,
     fontWeight: 700,
   },

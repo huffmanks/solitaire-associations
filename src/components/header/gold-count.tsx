@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   gold: {
     width: 31,
     height: 31,
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.goldDark,
     borderRadius: "50%",
     position: "absolute",
     top: 0,

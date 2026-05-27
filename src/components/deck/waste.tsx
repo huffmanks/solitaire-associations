@@ -28,7 +28,7 @@ export default function Waste({ onDragEnd }: WasteProps) {
     return (
       <View style={styles.container}>
         <EmptyCard>
-          <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
+          <FontAwesome6 name="layer-group" size={20} color={theme.colors.greenLight} />
         </EmptyCard>
       </View>
     );
@@ -41,7 +41,7 @@ export default function Waste({ onDragEnd }: WasteProps) {
           <Card card={underWasteCard} />
         ) : (
           <EmptyCard>
-            <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
+            <FontAwesome6 name="crown" size={20} color={theme.colors.greenLight} />
           </EmptyCard>
         )}
       </View>

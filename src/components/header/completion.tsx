@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
   },
   check: {
     flex: 1,
-    backgroundColor: theme.colors.accent,
+    backgroundColor: theme.colors.greenLight,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 4,

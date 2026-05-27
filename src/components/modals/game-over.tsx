@@ -1,10 +1,13 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 import { useShallow } from "zustand/shallow";
 
 import { useGameStore } from "@/lib/store/game";
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
+
+import ModalLayout from "@/components/modals/modal-layout";
+import Button3d from "@/components/ui/button-3d";
 
 export default function GameOverModal() {
   const currentLevel = useGameStore((state) => state.currentLevel);
@@ -16,52 +19,30 @@ export default function GameOverModal() {
   );
 
   return (
-    <Modal visible={hasLost} transparent animationType="fade" statusBarTranslucent>
-      <View style={styles.overlay}>
-        <View style={styles.modalContainer}>
-          <View style={styles.iconCircle}>
-            <FontAwesome6 name="heart-crack" size={36} color={"red"} />
-          </View>
-
-          <Text style={styles.title}>Out of Moves!</Text>
-          <Text style={styles.subtitle}>You’ve reached your maximum move limit for this level. Don’t worry, you can try again!</Text>
-
-          <Pressable style={styles.button} onPress={() => initializeLevel({ currentLevel })}>
-            <FontAwesome6 name="rotate-right" size={16} color={theme.colors.foreground} style={styles.buttonIcon} />
-            <Text style={styles.buttonText}>Try Again</Text>
-          </Pressable>
-        </View>
+    <ModalLayout isVisible={hasLost}>
+      <View style={styles.iconCircle}>
+        <FontAwesome6 name="heart-crack" size={36} color={theme.colors.redButtonRim} />
       </View>
-    </Modal>
+
+      <Text style={styles.title}>Out of Moves!</Text>
+      <Text style={styles.subtitle}>You’ve reached your maximum move limit for this level. Don’t worry, you can try again!</Text>
+
+      <Button3d isFullWidth backgroundColor={theme.colors.greenLight} borderColor={theme.colors.greenButtonRim} onPress={() => initializeLevel({ currentLevel })}>
+        <View style={styles.buttonWrapper}>
+          <FontAwesome6 name="rotate-right" size={16} color={theme.colors.foreground} />
+          <Text style={styles.buttonText}>Try Again</Text>
+        </View>
+      </Button3d>
+    </ModalLayout>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.7)", // TODO change to theme color Dimmed background overlay
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 20,
-  },
-  modalContainer: {
-    width: "100%",
-    maxWidth: 340,
-    backgroundColor: theme.colors.cardFront,
-    borderRadius: 20,
-    padding: 25,
-    alignItems: "center",
-    elevation: 5,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 4,
-  },
   iconCircle: {
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: theme.colors.muted,
+    backgroundColor: theme.colors.red,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 15,
@@ -69,7 +50,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: "900",
-    color: theme.colors.cardForeground,
+    color: theme.colors.greenDark,
     marginBottom: 10,
     textAlign: "center",
   },
@@ -81,18 +62,11 @@ const styles = StyleSheet.create({
     marginBottom: 25,
     paddingHorizontal: 10,
   },
-  button: {
+  buttonWrapper: {
     flexDirection: "row",
-    backgroundColor: theme.colors.background,
-    paddingVertical: 14,
-    paddingHorizontal: 30,
-    borderRadius: 12,
     alignItems: "center",
     justifyContent: "center",
-    width: "100%",
-  },
-  buttonIcon: {
-    marginRight: 8,
+    gap: 8,
   },
   buttonText: {
     color: theme.colors.foreground,

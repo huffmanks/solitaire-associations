@@ -30,7 +30,7 @@ export default function Foundation({ stack }: FoundationProps) {
         </View>
       ) : (
         <EmptyCard>
-          <FontAwesome6 name="crown" size={20} color={theme.colors.accent} />
+          <FontAwesome6 name="crown" size={20} color={theme.colors.greenLight} />
         </EmptyCard>
       )}
     </View>
@@ -47,7 +47,7 @@ const styles = StyleSheet.create({
     top: 0,
     left: 0,
     right: 0,
-    backgroundColor: theme.colors.primary,
+    backgroundColor: theme.colors.goldDark,
     paddingVertical: 2,
     paddingHorizontal: 4,
     borderTopLeftRadius: 10,
