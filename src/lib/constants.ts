@@ -36,6 +36,22 @@ export const MOVE_BALANCING = {
   DECK_CYCLE_MULTIPLIER: 2,
 };
 
+export const SCORING = {
+  EFFICIENCY_BONUS_MULTIPLIER: 3,
+  PERFORMANCE: {
+    HIGH_EFFICIENCY_THRESHOLD: 0.4,
+    HIGH_EFFICIENCY_MULTIPLIER: 2.0,
+    MEDIUM_EFFICIENCY_THRESHOLD: 0.7,
+    MEDIUM_EFFICIENCY_MULTIPLIER: 1.5,
+    BASE_MULTIPLIER: 1.0,
+  },
+  UNDO_PENALTY: {
+    BASE_MITIGATION: 1.2,
+    PENALTY_PER_MISMATCH: 0.05,
+    MIN_MITIGATION_FLOOR: 0.8,
+  },
+};
+
 export const WORD_BANK: Record<string, Array<string>> = {
   Animals: ["Sheep", "Pig", "Goat", "Horse", "Monkey", "Bear"],
   Cinema: ["Western", "Drama", "Comedy", "Horror", "Popcorn", "Ticket"],
@@ -43,18 +59,18 @@ export const WORD_BANK: Record<string, Array<string>> = {
   Burger: ["Beef", "Bun", "Sauce", "Cheese"],
   Book: ["Page", "Paper", "Cover"],
   Landmass: ["Asia", "Africa", "Europe"],
-  One: ["10", "11", "12"],
-  Two: ["20", "21", "22"],
+  One: ["10", "11"],
+  Two: ["20", "21"],
   Three: ["30", "31", "32"],
 };
 
 export const LEVEL_CONFIGS: Record<number, LevelConfig> = {
   1: {
     columnsCount: 3,
-    categories: ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
+    categories: ["One", "Two"],
   },
   2: {
     columnsCount: 3,
-    categories: ["One", "Two", "Three"],
+    categories: ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
   },
 };

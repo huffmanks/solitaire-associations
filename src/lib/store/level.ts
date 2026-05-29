@@ -3,8 +3,9 @@ import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { MOVE_BALANCING } from "@/lib/constants";
-import { checkWinCondition, generateInitialColumns, getLevelConfig } from "@/lib/utils";
-import { CardType, SelectedCardInfo } from "@/types";
+import { completeTurn, createSnapshot, extractMovingCards, validateAndApplyFoundationMove, validateAndApplyTableauMove } from "@/lib/store/helpers";
+import { generateInitialColumns } from "@/lib/utils";
+import { LevelStoreActions, LevelStoreState } from "@/types";
 
 const levelStorage = createMMKV({ id: "level" });
 
@@ -13,40 +14,6 @@ const levelZustandStorage = createJSONStorage(() => ({
   getItem: (key) => levelStorage.getString(key) ?? null,
   removeItem: (key) => levelStorage.remove(key),
 }));
-
-type HistorySnapshot = {
-  columns: Array<Array<CardType>>;
-  foundation: Array<Array<CardType> | null>;
-  deck: Array<CardType>;
-  waste: Array<CardType>;
-  completedCategories: Array<string>;
-};
-
-type LevelStoreState = {
-  numberOfColumns: number;
-  columns: Array<Array<CardType>>;
-  foundation: Array<Array<CardType> | null>;
-  deck: Array<CardType>;
-  waste: Array<CardType>;
-  selectedCardInfo: SelectedCardInfo | null;
-  completedCategories: Array<string>;
-  movesCount: number;
-  maxMoves: number;
-  hasWon: boolean;
-  hasLost: boolean;
-  history: Array<HistorySnapshot>;
-};
-
-type LevelStoreActions = {
-  initializeLevel: ({ currentLevel }: { currentLevel: number }) => void;
-  setSelectedCardInfo: ({ info }: { info: SelectedCardInfo | null }) => void;
-  moveCard: ({ targetColumnIndex }: { targetColumnIndex: number }) => boolean;
-  moveToFoundation: ({ targetFoundationIndex, currentLevel }: { targetFoundationIndex: number; currentLevel: number }) => boolean;
-  drawCard: () => void;
-  undoLastMove: () => void;
-
-  reset: () => void;
-};
 
 const initialLevelStoreState: LevelStoreState = {
   numberOfColumns: 3,
@@ -58,18 +25,11 @@ const initialLevelStoreState: LevelStoreState = {
   completedCategories: [],
   movesCount: 0,
   maxMoves: 0,
+  score: 0,
   hasWon: false,
   hasLost: false,
   history: [],
 };
-
-const createSnapshot = (state: LevelStoreState): HistorySnapshot => ({
-  columns: state.columns.map((col) => col.map((card) => ({ ...card }))),
-  foundation: state.foundation.map((slot) => (slot ? slot.map((card) => ({ ...card })) : null)),
-  deck: state.deck.map((card) => ({ ...card })),
-  waste: state.waste.map((card) => ({ ...card })),
-  completedCategories: [...state.completedCategories],
-});
 
 export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
   persist(
@@ -77,7 +37,6 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
       ...initialLevelStoreState,
       initializeLevel: ({ currentLevel }) => {
         const initialGameState = generateInitialColumns({ currentLevel });
-
         const totalCardsCount = initialGameState.columns.reduce((sum, col) => sum + col.length, 0);
         const deckCardsCount = initialGameState.deck?.length || 0;
         const colCount = initialGameState.numberOfColumns;
@@ -99,205 +58,60 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         });
       },
       setSelectedCardInfo: ({ info }) => set({ selectedCardInfo: info }),
-      moveCard: ({ targetColumnIndex }) => {
+      executeCardMove: ({ target, currentLevel }) => {
         let wasSuccessful = false;
 
         set((state) => {
-          const newColumns = state.columns.map((col) => [...col]);
-          const newWaste = [...state.waste];
+          const workingColumns = state.columns.map((col) => [...col]);
+          const workingWaste = [...state.waste];
 
-          function getSameCategoryGroup(sourceColumn: CardType[], touchedIndex: number) {
-            const category = sourceColumn[touchedIndex]?.category;
-            let chainStartIndex = touchedIndex;
-
-            while (chainStartIndex > 0 && sourceColumn[chainStartIndex - 1].isFaceUp && sourceColumn[chainStartIndex - 1].category === category) {
-              chainStartIndex--;
-            }
-
-            const slice = sourceColumn.slice(chainStartIndex);
-            const categoryCard = slice.find((c) => c.type === "category");
-            const wordCards = slice.filter((c) => c.type !== "category");
-
-            if (categoryCard) {
-              return [...wordCards, categoryCard];
-            }
-
-            return wordCards;
-          }
-
-          function extractMovingCards() {
-            let movingCardsList: CardType[] = [];
-            let sourceColumnIndex: number | null = null;
-
-            if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.columnIndex !== undefined) {
-              sourceColumnIndex = state.selectedCardInfo.columnIndex;
-              const sourceColumn = newColumns[sourceColumnIndex];
-
-              if (sourceColumn.length > 0) {
-                const startIndex = state.selectedCardInfo.cardIndex !== undefined ? state.selectedCardInfo.cardIndex : sourceColumn.length - 1;
-                movingCardsList = getSameCategoryGroup(sourceColumn, startIndex);
-              }
-            } else if (state.selectedCardInfo?.type === "waste") {
-              const topWaste = newWaste[newWaste.length - 1];
-              if (topWaste) movingCardsList = [topWaste];
-            }
-
-            return { movingCardsList, sourceColumnIndex };
-          }
-
-          const { movingCardsList, sourceColumnIndex } = extractMovingCards();
+          const { movingCardsList, sourceColumnIndex } = extractMovingCards(state, workingColumns, workingWaste, target.type);
 
           if (movingCardsList.length === 0) return { selectedCardInfo: null };
-          if (sourceColumnIndex === targetColumnIndex) {
+
+          if (target.type === "tableau" && sourceColumnIndex === target.index) {
             wasSuccessful = true;
             return { selectedCardInfo: null };
           }
 
-          const leadMovingCard = movingCardsList[0];
-          const targetColumn = newColumns[targetColumnIndex] || [];
-          const topTargetCard = targetColumn[targetColumn.length - 1];
+          const resolution =
+            target.type === "tableau"
+              ? validateAndApplyTableauMove(workingColumns, target.index, movingCardsList)
+              : validateAndApplyFoundationMove(state.foundation, target.index, movingCardsList, state.completedCategories);
 
-          const canMove = targetColumn.length === 0 || (topTargetCard?.category === leadMovingCard.category && topTargetCard?.type !== "category");
-          if (!canMove) return { selectedCardInfo: null };
-
+          if (!resolution) return { selectedCardInfo: null };
           wasSuccessful = true;
+
           const snapshot = createSnapshot(state);
 
           if (state.selectedCardInfo?.type === "tableau" && sourceColumnIndex !== null) {
-            const sourceColumn = newColumns[sourceColumnIndex];
+            const sourceColumn = workingColumns[sourceColumnIndex];
             sourceColumn.splice(sourceColumn.length - movingCardsList.length);
 
             if (sourceColumn.length > 0) {
               sourceColumn[sourceColumn.length - 1] = { ...sourceColumn[sourceColumn.length - 1], isFaceUp: true };
             }
           } else if (state.selectedCardInfo?.type === "waste") {
-            newWaste.pop();
+            workingWaste.pop();
           }
 
-          newColumns[targetColumnIndex] = [...targetColumn, ...movingCardsList];
+          const dynamicColumns = resolution.nextColumns || workingColumns;
+          const dynamicFoundation = resolution.nextFoundation || state.foundation;
+          const dynamicCompleted = resolution.nextCompletedCategories || state.completedCategories;
 
-          const nextMovesCount = state.movesCount + 1;
-          const playerHasLost = nextMovesCount >= state.maxMoves;
-
-          return { columns: newColumns, waste: newWaste, selectedCardInfo: null, movesCount: nextMovesCount, hasLost: playerHasLost, history: [...state.history, snapshot] };
-        });
-
-        return wasSuccessful;
-      },
-      moveToFoundation: ({ targetFoundationIndex, currentLevel }) => {
-        let wasSuccessful = false;
-
-        set((state) => {
-          const newColumns = state.columns.map((col) => [...col]);
-          const newWaste = [...state.waste];
-
-          const updatedFoundation = state.foundation.map((slot) => (slot ? [...slot] : null));
-
-          function getSameCategoryGroup(sourceColumn: CardType[], touchedIndex: number) {
-            const category = sourceColumn[touchedIndex]?.category;
-            let chainStartIndex = touchedIndex;
-
-            while (chainStartIndex > 0 && sourceColumn[chainStartIndex - 1].isFaceUp && sourceColumn[chainStartIndex - 1].category === category) {
-              chainStartIndex--;
-            }
-
-            const slice = sourceColumn.slice(chainStartIndex);
-            const categoryCard = slice.find((c) => c.type === "category");
-            const wordCards = slice.filter((c) => c.type !== "category");
-
-            if (categoryCard) {
-              return [categoryCard, ...wordCards];
-            }
-
-            return wordCards;
-          }
-
-          function extractMovingCards() {
-            let movingCardsList: CardType[] = [];
-            let sourceColumnIndex: number | null = null;
-
-            if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.columnIndex !== undefined) {
-              sourceColumnIndex = state.selectedCardInfo.columnIndex;
-              const sourceColumn = newColumns[sourceColumnIndex];
-
-              if (sourceColumn.length > 0) {
-                const startIndex = state.selectedCardInfo.cardIndex !== undefined ? state.selectedCardInfo.cardIndex : sourceColumn.length - 1;
-                movingCardsList = getSameCategoryGroup(sourceColumn, startIndex);
-              }
-            } else if (state.selectedCardInfo?.type === "waste") {
-              const topWaste = newWaste[newWaste.length - 1];
-              if (topWaste) movingCardsList = [topWaste];
-            }
-
-            return { movingCardsList, sourceColumnIndex };
-          }
-
-          const { movingCardsList, sourceColumnIndex } = extractMovingCards();
-
-          if (movingCardsList.length === 0) return { selectedCardInfo: null };
-
-          const anchorMovingCard = movingCardsList.find((c) => c.type === "category");
-          const leadMovingCard = movingCardsList[0];
-          const existingStackAtSlot = updatedFoundation[targetFoundationIndex];
-
-          if (!existingStackAtSlot) {
-            if (anchorMovingCard) {
-              updatedFoundation[targetFoundationIndex] = [...movingCardsList];
-              wasSuccessful = true;
-            }
-          } else {
-            const slotAnchorCard = existingStackAtSlot.find((c) => c.type === "category");
-            if (slotAnchorCard && leadMovingCard.category === slotAnchorCard.category && leadMovingCard.type !== "category") {
-              updatedFoundation[targetFoundationIndex] = [...existingStackAtSlot, ...movingCardsList];
-              wasSuccessful = true;
-            }
-          }
-
-          if (!wasSuccessful) return { selectedCardInfo: null };
-
-          const snapshot = createSnapshot(state);
-
-          if (state.selectedCardInfo?.type === "tableau" && sourceColumnIndex !== null) {
-            const sourceColumn = newColumns[sourceColumnIndex];
-            sourceColumn.splice(sourceColumn.length - movingCardsList.length);
-
-            if (sourceColumn.length > 0) {
-              sourceColumn[sourceColumn.length - 1] = { ...sourceColumn[sourceColumn.length - 1], isFaceUp: true };
-            }
-          } else if (state.selectedCardInfo?.type === "waste") {
-            newWaste.pop();
-          }
-
-          const activeStack = updatedFoundation[targetFoundationIndex] || [];
-          const anchorStackCard = activeStack.find((c) => c.type === "category");
-          const totalRequired = anchorStackCard?.totalInCategory ?? 0;
-
-          let updatedCompletedCategories = [...state.completedCategories];
-          if (activeStack.length === totalRequired + 1) {
-            updatedFoundation[targetFoundationIndex] = null;
-            if (anchorStackCard) {
-              updatedCompletedCategories.push(anchorStackCard.category);
-            }
-          }
-
-          const totalLevelCategoriesCount = getLevelConfig({ currentLevel }).categories.length;
-
-          const win = checkWinCondition({ completedCategories: updatedCompletedCategories, totalLevelCategoriesCount });
-
-          const nextMovesCount = state.movesCount + 1;
-          const playerHasLost = nextMovesCount >= state.maxMoves && !win;
-
-          return {
-            columns: newColumns,
-            waste: newWaste,
-            foundation: updatedFoundation,
-            completedCategories: updatedCompletedCategories,
-            selectedCardInfo: null,
-            movesCount: nextMovesCount,
-            hasLost: playerHasLost,
-            hasWon: win,
-            history: [...state.history, snapshot],
-          };
+          return completeTurn(
+            state,
+            {
+              columns: dynamicColumns,
+              waste: workingWaste,
+              foundation: dynamicFoundation,
+              completedCategories: dynamicCompleted,
+              selectedCardInfo: null,
+              movesCount: state.movesCount + 1,
+              history: [...state.history, snapshot],
+            },
+            currentLevel,
+          );
         });
 
         return wasSuccessful;

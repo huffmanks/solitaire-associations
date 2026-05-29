@@ -21,13 +21,13 @@ export default function MenuModal({ isMenuOpen, setIsMenuOpen }: MenuModalProps)
   const initializeLevel = useLevelStore((state) => state.initializeLevel);
 
   function handleGoHome() {
-    router.navigate("/");
     setIsMenuOpen(false);
+    router.navigate("/");
   }
 
   function handleRestart() {
-    initializeLevel({ currentLevel });
     setIsMenuOpen(false);
+    initializeLevel({ currentLevel });
   }
 
   return (

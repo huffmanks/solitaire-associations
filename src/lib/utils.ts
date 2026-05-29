@@ -1,5 +1,16 @@
 import { CARD_COUNT_PER_COLUMN, DRAG_SNAP_GRACE, LEVEL_CONFIGS, WORD_BANK } from "@/lib/constants";
-import { CardType, DropTargetHit, LayoutRect, LevelConfig } from "@/types";
+import { CardType, LayoutRect, LevelConfig, MoveCardTarget } from "@/types";
+
+export function getLevelConfig({ currentLevel }: { currentLevel: number }): LevelConfig {
+  if (LEVEL_CONFIGS[currentLevel]) {
+    return LEVEL_CONFIGS[currentLevel];
+  }
+
+  const allKeys = Object.keys(LEVEL_CONFIGS);
+  const cyclicLevel = ((currentLevel - 1) % allKeys.length) + 1;
+
+  return LEVEL_CONFIGS[cyclicLevel];
+}
 
 export function generateInitialColumns({ currentLevel }: { currentLevel: number }) {
   const { columnsCount: numberOfColumns, categories: categoryNames } = getLevelConfig({ currentLevel });
@@ -85,21 +96,6 @@ export function generateInitialColumns({ currentLevel }: { currentLevel: number 
   };
 }
 
-export function getLevelConfig({ currentLevel }: { currentLevel: number }): LevelConfig {
-  if (LEVEL_CONFIGS[currentLevel]) {
-    return LEVEL_CONFIGS[currentLevel];
-  }
-
-  const allKeys = Object.keys(LEVEL_CONFIGS);
-  const cyclicLevel = ((currentLevel - 1) % allKeys.length) + 1;
-
-  return LEVEL_CONFIGS[cyclicLevel];
-}
-
-export function checkWinCondition({ completedCategories, totalLevelCategoriesCount }: { completedCategories: Array<string>; totalLevelCategoriesCount: number }): boolean {
-  return completedCategories.length === totalLevelCategoriesCount;
-}
-
 export function isPointInside(
   rect: {
     x: number;
@@ -114,13 +110,13 @@ export function isPointInside(
   return pointX >= rect.x - padding && pointX <= rect.x + rect.width + padding && pointY >= rect.y - padding && pointY <= rect.y + rect.height + padding;
 }
 
-export function resolveDropTarget(absoluteX: number, absoluteY: number, foundations: Array<LayoutRect | null>, tableaus: Array<LayoutRect | null>): DropTargetHit | null {
+export function resolveDropTarget(absoluteX: number, absoluteY: number, foundations: Array<LayoutRect | null>, tableaus: Array<LayoutRect | null>): MoveCardTarget | null {
   const validTableaus = tableaus.filter((t): t is LayoutRect => t !== null);
   const tableauTopBoundary = validTableaus.length > 0 ? validTableaus[0].y : 200;
 
   // Foundation slots
   if (absoluteY < tableauTopBoundary + DRAG_SNAP_GRACE.TABLEAU_BOUNDARY_TOP) {
-    let bestFoundation: DropTargetHit | null = null;
+    let bestFoundation: MoveCardTarget | null = null;
     let closestFoundationDist = Infinity;
     for (let i = 0; i < foundations.length; i++) {
       const rect = foundations[i];
@@ -145,7 +141,7 @@ export function resolveDropTarget(absoluteX: number, absoluteY: number, foundati
     return bestFoundation;
   }
 
-  let bestTableau: DropTargetHit | null = null;
+  let bestTableau: MoveCardTarget | null = null;
   let closestTableauDist = Infinity;
 
   // Tableau columns

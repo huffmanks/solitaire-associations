@@ -8,6 +8,7 @@ import Board from "@/components/board";
 import Header from "@/components/header";
 import GameOverModal from "@/components/modals/game-over";
 import MenuModal from "@/components/modals/menu";
+import WonLevelModal from "@/components/modals/won-level";
 
 export default function Game() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -18,8 +19,9 @@ export default function Game() {
         <Header setIsMenuOpen={setIsMenuOpen} />
         <Board />
 
-        <GameOverModal />
         <MenuModal isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+        <GameOverModal />
+        <WonLevelModal setIsMenuOpen={setIsMenuOpen} />
       </View>
     </SafeAreaView>
   );

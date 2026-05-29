@@ -21,14 +21,13 @@ export default function Board() {
   const tableauLayouts = useRef<Array<LayoutRect | null>>([]);
 
   const currentLevel = useGameStore((state) => state.currentLevel);
-  const { columns, foundation, numberOfColumns, setSelectedCardInfo, moveCard, moveToFoundation, initializeLevel } = useLevelStore(
+  const { columns, foundation, numberOfColumns, setSelectedCardInfo, executeCardMove, initializeLevel } = useLevelStore(
     useShallow((state) => ({
       columns: state.columns,
       foundation: state.foundation,
       numberOfColumns: state.numberOfColumns,
       setSelectedCardInfo: state.setSelectedCardInfo,
-      moveCard: state.moveCard,
-      moveToFoundation: state.moveToFoundation,
+      executeCardMove: state.executeCardMove,
       initializeLevel: state.initializeLevel,
     })),
   );
@@ -71,13 +70,13 @@ export default function Board() {
       return false;
     }
 
-    if (hitTarget.type === "foundation") {
-      const success = moveToFoundation({ targetFoundationIndex: hitTarget.index, currentLevel });
-      return success;
-    }
-
-    const success = moveCard({ targetColumnIndex: hitTarget.index });
-    return success;
+    return executeCardMove({
+      currentLevel,
+      target: {
+        type: hitTarget.type,
+        index: hitTarget.index,
+      },
+    });
   }
 
   return (

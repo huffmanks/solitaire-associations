@@ -9,3 +9,7 @@
 - [ ] animate card on undoLastMove.
 - [ ] in foundation add total count to top card.
 - [ ] fix category card colors.
+
+## fix
+
+- [ ] the drag/drop zone.
