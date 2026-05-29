@@ -3,7 +3,7 @@ import { Gesture, GestureDetector } from "react-native-gesture-handler";
 import Animated, { useAnimatedStyle, useSharedValue, withDelay, withSequence, withSpring, withTiming } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
-import { sharedActiveColIndex, sharedActiveDragType, sharedDragSessionId, sharedDragStartIndex, sharedTranslateX, sharedTranslateY } from "@/lib/shared-drag";
+import { sharedActiveColIndex, sharedDragStartIndex, sharedTranslateX, sharedTranslateY } from "@/lib/shared-drag";
 
 export type OnCardDragEnd = (absoluteX: number, absoluteY: number) => boolean;
 
@@ -12,15 +12,14 @@ interface DraggableCardWrapperProps {
   cardIndex?: number;
   stackStartIndex?: number;
   style: StyleProp<ViewStyle>;
-  containerStyle?: ViewStyle;
   children: React.ReactNode;
   onDragStart?: () => void;
   onDragEnd?: OnCardDragEnd;
 }
 
-export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStartIndex, containerStyle, style, children, onDragStart, onDragEnd }: DraggableCardWrapperProps) {
-  const isDraggingMe = useSharedValue(false);
-  const wasDraggedByMe = useSharedValue(false);
+export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStartIndex, style, children, onDragStart, onDragEnd }: DraggableCardWrapperProps) {
+  const isDragging = useSharedValue(false);
+  const scale = useSharedValue(1);
   const shakeOffset = useSharedValue(0);
 
   function triggerErrorShake() {
@@ -48,63 +47,40 @@ export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStar
   }
 
   const animatedStyle = useAnimatedStyle(() => {
-    if (isDraggingMe.value) {
+    const isInDraggedStack =
+      columnIndex !== undefined && cardIndex !== undefined && sharedActiveColIndex.value === columnIndex && sharedDragStartIndex.value !== -1 && cardIndex >= sharedDragStartIndex.value;
+
+    if (isDragging.value || isInDraggedStack) {
       return {
-        transform: [{ translateX: sharedTranslateX.value + shakeOffset.value }, { translateY: sharedTranslateY.value }, { scale: 1.02 }],
-        zIndex: 9999 + (cardIndex ?? 0),
-        elevation: 9999 + (cardIndex ?? 0),
-      };
-    }
-
-    if (cardIndex !== undefined && columnIndex !== undefined) {
-      const isInActiveStack = sharedActiveColIndex.value === columnIndex && sharedDragStartIndex.value !== -1 && cardIndex >= sharedDragStartIndex.value;
-
-      if (isInActiveStack) {
-        return {
-          transform: [{ translateX: sharedTranslateX.value + shakeOffset.value }, { translateY: sharedTranslateY.value }, { scale: isDraggingMe.value ? 1.02 : 1 }],
-          zIndex: 9999 + cardIndex,
-          elevation: 9999 + cardIndex,
-        };
-      }
-    }
-
-    if (cardIndex === undefined && wasDraggedByMe.value && (sharedTranslateX.value !== 0 || sharedTranslateY.value !== 0)) {
-      return {
-        transform: [{ translateX: sharedTranslateX.value + shakeOffset.value }, { translateY: sharedTranslateY.value }, { scale: 1 }],
-        zIndex: 9999,
-        elevation: 9999,
+        transform: [{ translateX: sharedTranslateX.value + shakeOffset.value }, { translateY: sharedTranslateY.value }, { scale: scale.value }],
+        zIndex: 99999 + (cardIndex ?? 0),
+        elevation: 99999 + (cardIndex ?? 0),
       };
     }
 
     return {
       transform: [{ translateX: shakeOffset.value }, { translateY: 0 }, { scale: 1 }],
-      zIndex: containerStyle?.zIndex ?? 0,
+      zIndex: 1,
       elevation: 0,
     };
   });
 
   const dragGesture = Gesture.Pan()
-    .minDistance(4)
+    .minDistance(2)
     .onBegin(() => {
-      sharedDragSessionId.value += 1;
-      wasDraggedByMe.value = true;
+      isDragging.value = true;
+      scale.value = withSpring(1.03);
 
       if (columnIndex !== undefined && stackStartIndex !== undefined) {
         sharedActiveColIndex.value = columnIndex;
         sharedDragStartIndex.value = stackStartIndex;
-        sharedActiveDragType.value = "tableau";
-      } else {
-        sharedActiveColIndex.value = -1;
-        sharedDragStartIndex.value = -1;
-        sharedActiveDragType.value = "waste";
       }
 
       if (onDragStart) {
         scheduleOnRN(onDragStart);
       }
-      isDraggingMe.value = true;
     })
-    .onChange((event) => {
+    .onUpdate((event) => {
       sharedTranslateX.value = event.translationX;
       sharedTranslateY.value = event.translationY;
     })
@@ -113,21 +89,23 @@ export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStar
         scheduleOnRN(handleOnDragEndBridge, event.absoluteX, event.absoluteY);
       }
 
-      isDraggingMe.value = false;
-      sharedActiveDragType.value = "none";
-
-      const currentSession = sharedDragSessionId.value;
-
-      sharedTranslateX.value = withSpring(0);
-      sharedTranslateY.value = withSpring(0, {}, (isFinished) => {
-        if (isFinished) {
-          wasDraggedByMe.value = false;
-          if (sharedDragSessionId.value === currentSession) {
-            sharedActiveColIndex.value = -1;
-            sharedDragStartIndex.value = -1;
-          }
-        }
+      sharedTranslateX.value = withSpring(0, {
+        damping: 22,
+        stiffness: 260,
+        mass: 0.7,
+        overshootClamping: true,
       });
+      sharedTranslateY.value = withSpring(0, {
+        damping: 22,
+        stiffness: 260,
+        mass: 0.7,
+        overshootClamping: true,
+      });
+
+      scale.value = withSpring(1);
+      sharedActiveColIndex.value = -1;
+      sharedDragStartIndex.value = -1;
+      isDragging.value = false;
     });
 
   return (

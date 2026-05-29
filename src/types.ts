@@ -26,6 +26,11 @@ export type MoveCardTarget = {
   index: number;
 };
 
+export type TargetCandidate = {
+  target: MoveCardTarget;
+  score: number;
+};
+
 export type LayoutRect = {
   x: number;
   y: number;

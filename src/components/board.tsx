@@ -20,6 +20,9 @@ export default function Board() {
   const foundationLayouts = useRef<Array<LayoutRect | null>>([]);
   const tableauLayouts = useRef<Array<LayoutRect | null>>([]);
 
+  const foundationRefs = useRef<(View | null)[]>([]);
+  const tableauRefs = useRef<(View | null)[]>([]);
+
   const currentLevel = useGameStore((state) => state.currentLevel);
   const { columns, foundation, numberOfColumns, setSelectedCardInfo, executeCardMove, initializeLevel } = useLevelStore(
     useShallow((state) => ({
@@ -33,10 +36,42 @@ export default function Board() {
   );
 
   useEffect(() => {
-    foundationLayouts.current = Array(numberOfColumns).fill(null);
-    tableauLayouts.current = Array(numberOfColumns).fill(null);
     initializeLevel({ currentLevel });
   }, [numberOfColumns]);
+
+  function measureLayouts() {
+    requestAnimationFrame(() => {
+      foundationRefs.current.forEach((ref, i) => {
+        if (!ref) return;
+
+        ref.measure((x, y, width, height, pageX, pageY) => {
+          foundationLayouts.current[i] = {
+            x: pageX,
+            y: pageY,
+            width,
+            height,
+          };
+        });
+      });
+
+      tableauRefs.current.forEach((ref, i) => {
+        if (!ref) return;
+
+        ref.measure((x, y, width, height, pageX, pageY) => {
+          tableauLayouts.current[i] = {
+            x: pageX,
+            y: pageY,
+            width,
+            height,
+          };
+        });
+      });
+    });
+  }
+
+  useEffect(() => {
+    measureLayouts();
+  }, [columns, foundation]);
 
   const activeGridColumns = numberOfColumns || 3;
   const currentPadding = BOARD_LAYOUT.MARGIN_INLINE_MAP[activeGridColumns];
@@ -52,18 +87,9 @@ export default function Board() {
     height: Math.floor(measuredCardWidth * (3 / 2)),
   };
 
-  const saveLayout = (index: number, type: "foundation" | "tableau") => (event: any) => {
-    const targetArray = type === "foundation" ? foundationLayouts.current : tableauLayouts.current;
-
-    event.target.measureInWindow((x: number, y: number, width: number, height: number) => {
-      if (width > 0 && height > 0) {
-        targetArray[index] = { x, y, width, height };
-      }
-    });
-  };
-
   function handleDragEnd(absoluteX: number, absoluteY: number) {
-    const hitTarget = resolveDropTarget(absoluteX, absoluteY, foundationLayouts.current, tableauLayouts.current);
+    const adjustedY = absoluteY - measuredCardHeight * 0.35;
+    const hitTarget = resolveDropTarget(absoluteX, adjustedY, foundationLayouts.current, tableauLayouts.current);
 
     if (!hitTarget) {
       setSelectedCardInfo({ info: null });
@@ -85,7 +111,12 @@ export default function Board() {
 
       <View style={styles.foundationRow}>
         {foundation.map((stack, i) => (
-          <View key={i} style={cardSize} onLayout={saveLayout(i, "foundation")}>
+          <View
+            key={i}
+            style={cardSize}
+            ref={(ref) => {
+              foundationRefs.current[i] = ref;
+            }}>
             <Foundation stack={stack} />
           </View>
         ))}
@@ -94,7 +125,12 @@ export default function Board() {
       <View style={styles.board}>
         <View style={[styles.tableau, { gap: currentColumnGap }]}>
           {columns.map((column, columnIndex) => (
-            <View key={columnIndex} style={{ width: measuredCardWidth }} onLayout={saveLayout(columnIndex, "tableau")}>
+            <View
+              key={columnIndex}
+              style={{ width: measuredCardWidth }}
+              ref={(ref: View | null) => {
+                tableauRefs.current[columnIndex] = ref;
+              }}>
               <View style={StyleSheet.absoluteFill}>
                 <EmptyCard />
               </View>

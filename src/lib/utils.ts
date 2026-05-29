@@ -1,5 +1,5 @@
-import { CARD_COUNT_PER_COLUMN, DRAG_SNAP_GRACE, LEVEL_CONFIGS, WORD_BANK } from "@/lib/constants";
-import { CardType, LayoutRect, LevelConfig, MoveCardTarget } from "@/types";
+import { CARD_COUNT_PER_COLUMN, LEVEL_CONFIGS, WORD_BANK } from "@/lib/constants";
+import { CardType, LayoutRect, LevelConfig, MoveCardTarget, TargetCandidate } from "@/types";
 
 export function getLevelConfig({ currentLevel }: { currentLevel: number }): LevelConfig {
   if (LEVEL_CONFIGS[currentLevel]) {
@@ -109,62 +109,63 @@ export function isPointInside(
 ) {
   return pointX >= rect.x - padding && pointX <= rect.x + rect.width + padding && pointY >= rect.y - padding && pointY <= rect.y + rect.height + padding;
 }
+function scoreTarget(rect: LayoutRect, x: number, y: number, type: "foundation" | "tableau") {
+  const centerX = rect.x + rect.width / 2;
+  const centerY = rect.y + rect.height / 2;
+
+  const dx = x - centerX;
+  const dy = y - centerY;
+
+  const distance = Math.hypot(dx, dy);
+  const inside = isPointInside(rect, x, y, type === "foundation" ? 36 : 18);
+
+  let score = 0;
+  if (inside) {
+    score += 1000;
+  }
+
+  score -= distance;
+  if (type === "foundation") {
+    score += 140;
+  }
+
+  score -= Math.abs(dx) * 0.35;
+  return score;
+}
 
 export function resolveDropTarget(absoluteX: number, absoluteY: number, foundations: Array<LayoutRect | null>, tableaus: Array<LayoutRect | null>): MoveCardTarget | null {
-  const validTableaus = tableaus.filter((t): t is LayoutRect => t !== null);
-  const tableauTopBoundary = validTableaus.length > 0 ? validTableaus[0].y : 200;
+  const candidates: Array<TargetCandidate> = [];
 
-  // Foundation slots
-  if (absoluteY < tableauTopBoundary + DRAG_SNAP_GRACE.TABLEAU_BOUNDARY_TOP) {
-    let bestFoundation: MoveCardTarget | null = null;
-    let closestFoundationDist = Infinity;
-    for (let i = 0; i < foundations.length; i++) {
-      const rect = foundations[i];
-      if (!rect) continue;
+  foundations.forEach((rect, index) => {
+    if (!rect) return;
 
-      const minX = rect.x - DRAG_SNAP_GRACE.FOUNDATION_PADDING_HORIZONTAL;
-      const maxX = rect.x + rect.width + DRAG_SNAP_GRACE.FOUNDATION_PADDING_HORIZONTAL;
-      const minY = rect.y - DRAG_SNAP_GRACE.FOUNDATION_PADDING_TOP;
-      const maxY = rect.y + rect.height + DRAG_SNAP_GRACE.FOUNDATION_PADDING_BOTTOM;
+    candidates.push({
+      target: {
+        type: "foundation",
+        index,
+      },
+      score: scoreTarget(rect, absoluteX, absoluteY, "foundation"),
+    });
+  });
 
-      if (absoluteX >= minX && absoluteX <= maxX && absoluteY >= minY && absoluteY <= maxY) {
-        const centerX = rect.x + rect.width / 2;
-        const centerY = rect.y + rect.height / 2;
-        const distance = Math.hypot(absoluteX - centerX, absoluteY - centerY);
+  tableaus.forEach((rect, index) => {
+    if (!rect) return;
 
-        if (distance < closestFoundationDist) {
-          closestFoundationDist = distance;
-          bestFoundation = { type: "foundation", index: i };
-        }
-      }
-    }
-    return bestFoundation;
+    candidates.push({
+      target: {
+        type: "tableau",
+        index,
+      },
+      score: scoreTarget(rect, absoluteX, absoluteY, "tableau"),
+    });
+  });
+
+  candidates.sort((a, b) => b.score - a.score);
+  const best = candidates[0];
+
+  if (!best || best.score < 0) {
+    return null;
   }
 
-  let bestTableau: MoveCardTarget | null = null;
-  let closestTableauDist = Infinity;
-
-  // Tableau columns
-  for (let i = 0; i < tableaus.length; i++) {
-    const rect = tableaus[i];
-    if (!rect) continue;
-
-    const minX = rect.x - DRAG_SNAP_GRACE.TABLEAU_PADDING_HORIZONTAL;
-    const maxX = rect.x + rect.width + DRAG_SNAP_GRACE.TABLEAU_PADDING_HORIZONTAL;
-    const minY = rect.y;
-    const maxY = rect.y + rect.height + DRAG_SNAP_GRACE.TABLEAU_PADDING_BOTTOM;
-
-    if (absoluteX >= minX && absoluteX <= maxX && absoluteY >= minY && absoluteY <= maxY) {
-      const centerX = rect.x + rect.width / 2;
-      const centerY = rect.y + rect.height / 2;
-      const distance = Math.hypot(absoluteX - centerX, absoluteY - centerY);
-
-      if (distance < closestTableauDist) {
-        closestTableauDist = distance;
-        bestTableau = { type: "tableau", index: i };
-      }
-    }
-  }
-
-  return bestTableau;
+  return best.target;
 }

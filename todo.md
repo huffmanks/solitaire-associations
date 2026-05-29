@@ -8,8 +8,11 @@
 - [ ] animate card flip from deck to waste.
 - [ ] animate card on undoLastMove.
 - [ ] in foundation add total count to top card.
-- [ ] fix category card colors.
+- [ ] animation for completing category.
+- [ ] animation for successMove.
 
 ## fix
 
 - [ ] the drag/drop zone.
+- [ ] fix category card colors.
+- [ ] flashing cards when revealed or successful move.

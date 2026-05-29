@@ -41,14 +41,7 @@ export default function CardWrapper({ columnIndex, cardIndex, stackStartIndex, v
   if (isGestureEnabled) {
     return (
       <View style={[styles.baseSize, containerStyle]}>
-        <DraggableCardWrapper
-          columnIndex={columnIndex}
-          cardIndex={cardIndex}
-          stackStartIndex={stackStartIndex}
-          containerStyle={containerStyle}
-          style={{ flex: 1 }}
-          onDragStart={onDragStart}
-          onDragEnd={onDragEnd}>
+        <DraggableCardWrapper columnIndex={columnIndex} cardIndex={cardIndex} stackStartIndex={stackStartIndex} style={{ flex: 1 }} onDragStart={onDragStart} onDragEnd={onDragEnd}>
           {content}
         </DraggableCardWrapper>
       </View>
