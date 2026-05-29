@@ -8,7 +8,4 @@
 - [ ] animate card flip from deck to waste.
 - [ ] animate card on undoLastMove.
 - [ ] in foundation add total count to top card.
-
-## rules
-
-- [ ] there must be at least one category card in the deck and one in a column with depth 0 or 1.
+- [ ] fix category card colors.

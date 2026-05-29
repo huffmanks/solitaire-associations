@@ -96,11 +96,12 @@ export default function Board() {
         <View style={[styles.tableau, { gap: currentColumnGap }]}>
           {columns.map((column, columnIndex) => (
             <View key={columnIndex} style={{ width: measuredCardWidth }} onLayout={saveLayout(columnIndex, "tableau")}>
+              <View style={StyleSheet.absoluteFill}>
+                <EmptyCard />
+              </View>
               {column.map((card, cardIndex) => (
                 <TableauColumn key={card.id} card={card} column={column} cardIndex={cardIndex} columnIndex={columnIndex} measuredCardHeight={measuredCardHeight} handleDragEnd={handleDragEnd} />
               ))}
-
-              {column.length === 0 && <EmptyCard />}
             </View>
           ))}
         </View>

@@ -29,10 +29,10 @@ type LevelStoreState = {
   deck: Array<CardType>;
   waste: Array<CardType>;
   selectedCardInfo: SelectedCardInfo | null;
-  hasWon: boolean;
   completedCategories: Array<string>;
   movesCount: number;
   maxMoves: number;
+  hasWon: boolean;
   hasLost: boolean;
   history: Array<HistorySnapshot>;
 };
@@ -55,10 +55,10 @@ const initialLevelStoreState: LevelStoreState = {
   deck: [],
   waste: [],
   selectedCardInfo: null,
-  hasWon: false,
   completedCategories: [],
   movesCount: 0,
   maxMoves: 0,
+  hasWon: false,
   hasLost: false,
   history: [],
 };
@@ -79,11 +79,12 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         const initialGameState = generateInitialColumns({ currentLevel });
 
         const totalCardsCount = initialGameState.columns.reduce((sum, col) => sum + col.length, 0);
+        const deckCardsCount = initialGameState.deck?.length || 0;
         const colCount = initialGameState.numberOfColumns;
 
-        const baseMovesThreshold = totalCardsCount * MOVE_BALANCING.BASE_MOVES_PER_CARD;
-        const columnMultiplierTax = 1 + (colCount - 1) * MOVE_BALANCING.COLUMN_COMPLEXITY_MULTIPLIER;
-        const computedMaxMoves = Math.floor(baseMovesThreshold * columnMultiplierTax);
+        const tableauMoveBudget = totalCardsCount * (MOVE_BALANCING.BASE_MOVES_PER_CARD + colCount * MOVE_BALANCING.COLUMN_COMPLEXITY_MULTIPLIER);
+        const deckCycleBudget = deckCardsCount * MOVE_BALANCING.DECK_CYCLE_MULTIPLIER;
+        const computedMaxMoves = Math.ceil(tableauMoveBudget + deckCycleBudget);
 
         set({
           ...initialGameState,
@@ -113,11 +114,15 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
               chainStartIndex--;
             }
 
-            return sourceColumn.slice(chainStartIndex).sort((a, b) => {
-              if (a.type === "category") return -1;
-              if (b.type === "category") return 1;
-              return 0;
-            });
+            const slice = sourceColumn.slice(chainStartIndex);
+            const categoryCard = slice.find((c) => c.type === "category");
+            const wordCards = slice.filter((c) => c.type !== "category");
+
+            if (categoryCard) {
+              return [...wordCards, categoryCard];
+            }
+
+            return wordCards;
           }
 
           function extractMovingCards() {
@@ -196,11 +201,15 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
               chainStartIndex--;
             }
 
-            return sourceColumn.slice(chainStartIndex).sort((a, b) => {
-              if (a.type === "category") return -1;
-              if (b.type === "category") return 1;
-              return 0;
-            });
+            const slice = sourceColumn.slice(chainStartIndex);
+            const categoryCard = slice.find((c) => c.type === "category");
+            const wordCards = slice.filter((c) => c.type !== "category");
+
+            if (categoryCard) {
+              return [categoryCard, ...wordCards];
+            }
+
+            return wordCards;
           }
 
           function extractMovingCards() {

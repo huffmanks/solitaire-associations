@@ -32,7 +32,8 @@ export const DRAG_SNAP_GRACE = {
 
 export const MOVE_BALANCING = {
   BASE_MOVES_PER_CARD: 3,
-  COLUMN_COMPLEXITY_MULTIPLIER: 0.25,
+  COLUMN_COMPLEXITY_MULTIPLIER: 0.3,
+  DECK_CYCLE_MULTIPLIER: 2,
 };
 
 export const WORD_BANK: Record<string, Array<string>> = {
