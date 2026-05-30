@@ -27,7 +27,7 @@ export default function MenuModal({ isMenuOpen, setIsMenuOpen }: MenuModalProps)
 
   function handleRestart() {
     setIsMenuOpen(false);
-    initializeLevel({ currentLevel });
+    initializeLevel({ currentLevel, forceRefresh: true });
   }
 
   return (

@@ -55,7 +55,7 @@ export type LevelStoreState = {
 };
 
 export type LevelStoreActions = {
-  initializeLevel: ({ currentLevel }: { currentLevel: number }) => void;
+  initializeLevel: ({ currentLevel, forceRefresh }: { currentLevel: number; forceRefresh?: boolean }) => void;
   setSelectedCardInfo: ({ info }: { info: SelectedCardInfo | null }) => void;
   executeCardMove: ({ target, currentLevel }: { target: MoveCardTarget; currentLevel: number }) => boolean;
   drawCard: () => void;
@@ -70,4 +70,17 @@ export type HistorySnapshot = {
   deck: Array<CardType>;
   waste: Array<CardType>;
   completedCategories: Array<string>;
+};
+
+export type GameStoreState = {
+  currentLevel: number;
+  goldCount: number;
+  highestLevelBeaten: number;
+};
+
+export type GameStoreActions = {
+  recordLevelVictory: ({ currentLevel, score }: { currentLevel: number; score: number }) => void;
+  setCurrentLevel: ({ nextLevel }: { nextLevel: number }) => void;
+
+  reset: () => void;
 };

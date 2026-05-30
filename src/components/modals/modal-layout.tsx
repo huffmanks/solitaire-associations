@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Modal, StyleSheet, View } from "react-native";
 
 import { theme } from "@/lib/theme";
@@ -5,11 +6,34 @@ import { theme } from "@/lib/theme";
 interface ModalLayoutProps {
   isVisible: boolean;
   children: React.ReactNode;
+  delayMs?: number;
 }
 
-export default function ModalLayout({ isVisible, children }: ModalLayoutProps) {
+export default function ModalLayout({ isVisible, children, delayMs = 0 }: ModalLayoutProps) {
+  const [shouldRender, setShouldRender] = useState(false);
+
+  useEffect(() => {
+    let timeoutId: ReturnType<typeof setTimeout>;
+
+    if (isVisible) {
+      if (delayMs > 0) {
+        timeoutId = setTimeout(() => {
+          setShouldRender(true);
+        }, delayMs);
+      } else {
+        setShouldRender(true);
+      }
+    } else {
+      setShouldRender(false);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [isVisible, delayMs]);
+
   return (
-    <Modal visible={isVisible} transparent animationType="fade" statusBarTranslucent>
+    <Modal visible={shouldRender} transparent animationType="fade" statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>{children}</View>
       </View>

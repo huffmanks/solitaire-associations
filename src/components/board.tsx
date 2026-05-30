@@ -37,7 +37,25 @@ export default function Board() {
 
   useEffect(() => {
     initializeLevel({ currentLevel });
-  }, [numberOfColumns]);
+  }, [currentLevel]);
+
+  useEffect(() => {
+    measureLayouts();
+  }, [columns, foundation]);
+
+  const activeGridColumns = numberOfColumns || 3;
+  const currentPadding = BOARD_LAYOUT.MARGIN_INLINE_MAP[activeGridColumns];
+  const currentColumnGap = BOARD_LAYOUT.COLUMN_GAP_MAP[activeGridColumns];
+  const usableWidth = Math.min(SCREEN_WIDTH - currentPadding, BOARD_LAYOUT.MAX_WIDTH);
+  const totalGapsWidth = (activeGridColumns - 1) * currentColumnGap;
+
+  const measuredCardWidth = Math.floor((usableWidth - totalGapsWidth) / activeGridColumns);
+  const measuredCardHeight = Math.floor(measuredCardWidth * (3 / 2));
+
+  const cardSize = {
+    width: measuredCardWidth,
+    height: Math.floor(measuredCardWidth * (3 / 2)),
+  };
 
   function measureLayouts() {
     requestAnimationFrame(() => {
@@ -68,24 +86,6 @@ export default function Board() {
       });
     });
   }
-
-  useEffect(() => {
-    measureLayouts();
-  }, [columns, foundation]);
-
-  const activeGridColumns = numberOfColumns || 3;
-  const currentPadding = BOARD_LAYOUT.MARGIN_INLINE_MAP[activeGridColumns];
-  const currentColumnGap = BOARD_LAYOUT.COLUMN_GAP_MAP[activeGridColumns];
-  const usableWidth = Math.min(SCREEN_WIDTH - currentPadding, BOARD_LAYOUT.MAX_WIDTH);
-  const totalGapsWidth = (activeGridColumns - 1) * currentColumnGap;
-
-  const measuredCardWidth = Math.floor((usableWidth - totalGapsWidth) / activeGridColumns);
-  const measuredCardHeight = Math.floor(measuredCardWidth * (3 / 2));
-
-  const cardSize = {
-    width: measuredCardWidth,
-    height: Math.floor(measuredCardWidth * (3 / 2)),
-  };
 
   function handleDragEnd(absoluteX: number, absoluteY: number) {
     const adjustedY = absoluteY - measuredCardHeight * 0.35;

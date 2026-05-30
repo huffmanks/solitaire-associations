@@ -115,7 +115,6 @@ const styles = StyleSheet.create({
     ...StyleSheet.absoluteFill,
     borderWidth: 5,
     borderColor: theme.colors.greenLight,
-    // borderColor: "#4BB543",
     borderRadius: 12,
     zIndex: 999,
     pointerEvents: "none",

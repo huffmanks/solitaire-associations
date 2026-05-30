@@ -1,14 +1,15 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
 import { useShallow } from "zustand/shallow";
 
+import { ANIMATION_DELAY_MS } from "@/lib/constants";
 import { useGameStore } from "@/lib/store/game";
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
 
 import ModalLayout from "@/components/modals/modal-layout";
 import Button3d from "@/components/ui/button-3d";
-import { useRouter } from "expo-router";
 
 interface WonLevelModalProps {
   setIsMenuOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,10 +18,11 @@ interface WonLevelModalProps {
 export default function WonLevelModal({ setIsMenuOpen }: WonLevelModalProps) {
   const router = useRouter();
 
-  const { currentLevel, completeCurrentLevel } = useGameStore(
+  const { currentLevel, setCurrentLevel, recordLevelVictory } = useGameStore(
     useShallow((state) => ({
       currentLevel: state.currentLevel,
-      completeCurrentLevel: state.completeCurrentLevel,
+      setCurrentLevel: state.setCurrentLevel,
+      recordLevelVictory: state.recordLevelVictory,
     })),
   );
 
@@ -32,24 +34,34 @@ export default function WonLevelModal({ setIsMenuOpen }: WonLevelModalProps) {
     })),
   );
 
-  function handleGoHome() {
+  function handleCloseModal() {
     setIsMenuOpen(false);
+  }
+
+  function handleGoHome() {
+    handleCloseModal();
     router.navigate("/");
   }
 
   function handleNextLevel() {
-    setIsMenuOpen(false);
-    completeCurrentLevel({ score });
-    initializeLevel({ currentLevel: currentLevel + 1 });
+    handleCloseModal();
+
+    recordLevelVictory({ currentLevel, score });
+
+    const nextLevel = currentLevel + 1;
+    setCurrentLevel({ nextLevel });
+    initializeLevel({ currentLevel: nextLevel, forceRefresh: true });
   }
 
   function handlePlayAgain() {
-    setIsMenuOpen(false);
-    initializeLevel({ currentLevel });
+    handleCloseModal();
+
+    recordLevelVictory({ currentLevel, score });
+    initializeLevel({ currentLevel, forceRefresh: true });
   }
 
   return (
-    <ModalLayout isVisible={hasWon}>
+    <ModalLayout isVisible={hasWon} delayMs={ANIMATION_DELAY_MS.SHOW_MODAL}>
       <View style={styles.iconCircle}>
         <FontAwesome6 name="cake-candles" size={36} color={theme.colors.goldLight} />
       </View>

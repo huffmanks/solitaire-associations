@@ -2,7 +2,7 @@ import { createMMKV } from "react-native-mmkv";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { MOVE_BALANCING } from "@/lib/constants";
+import { ANIMATION_DELAY_MS, MOVE_BALANCING } from "@/lib/constants";
 import { completeTurn, createSnapshot, extractMovingCards, validateAndApplyFoundationMove, validateAndApplyTableauMove } from "@/lib/store/helpers";
 import { generateInitialColumns } from "@/lib/utils";
 import { LevelStoreActions, LevelStoreState } from "@/types";
@@ -33,9 +33,13 @@ const initialLevelStoreState: LevelStoreState = {
 
 export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       ...initialLevelStoreState,
-      initializeLevel: ({ currentLevel }) => {
+      initializeLevel: ({ currentLevel, forceRefresh = false }) => {
+        if (get().columns.length > 0 && !forceRefresh) {
+          return;
+        }
+
         const initialGameState = generateInitialColumns({ currentLevel });
         const totalCardsCount = initialGameState.columns.reduce((sum, col) => sum + col.length, 0);
         const deckCardsCount = initialGameState.deck?.length || 0;
@@ -46,15 +50,16 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         const computedMaxMoves = Math.ceil(tableauMoveBudget + deckCycleBudget);
 
         set({
-          ...initialGameState,
-          foundation: Array.from({ length: initialGameState.numberOfColumns }, () => null),
-          selectedCardInfo: null,
+          movesCount: 0,
+          score: 0,
           hasWon: false,
           hasLost: false,
-          movesCount: 0,
-          maxMoves: computedMaxMoves,
-          completedCategories: [],
           history: [],
+          selectedCardInfo: null,
+          completedCategories: [],
+          ...initialGameState,
+          foundation: Array.from({ length: initialGameState.numberOfColumns }, () => null),
+          maxMoves: computedMaxMoves,
         });
       },
       setSelectedCardInfo: ({ info }) => set({ selectedCardInfo: info }),
@@ -129,14 +134,14 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         });
 
         if (completedTargetIndex !== null) {
-          const targetIdx = completedTargetIndex;
+          const targetIndex = completedTargetIndex;
           setTimeout(() => {
             set((state) => {
               const cleanFoundation = [...state.foundation];
-              cleanFoundation[targetIdx] = null;
+              cleanFoundation[targetIndex] = null;
               return { foundation: cleanFoundation };
             });
-          }, 1500);
+          }, ANIMATION_DELAY_MS.COMPLETION);
         }
 
         return wasSuccessful;

@@ -19,6 +19,11 @@ export const BOARD_LAYOUT = {
   } as Record<number, number>,
 };
 
+export const ANIMATION_DELAY_MS = {
+  COMPLETION: 1500,
+  SHOW_MODAL: 1700,
+};
+
 export const CARD_COLUMN_VISIBLE_PEEK = 24;
 
 export const DRAG_SNAP_GRACE = {
