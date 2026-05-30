@@ -24,7 +24,7 @@ export default function WonLevelModal({ setIsMenuOpen }: WonLevelModalProps) {
     })),
   );
 
-  const { hasWon, score } = useLevelStore(
+  const { hasWon, score, initializeLevel } = useLevelStore(
     useShallow((state) => ({
       hasWon: state.hasWon,
       score: state.score,
@@ -40,30 +40,45 @@ export default function WonLevelModal({ setIsMenuOpen }: WonLevelModalProps) {
   function handleNextLevel() {
     setIsMenuOpen(false);
     completeCurrentLevel({ score });
+    initializeLevel({ currentLevel: currentLevel + 1 });
+  }
+
+  function handlePlayAgain() {
+    setIsMenuOpen(false);
+    initializeLevel({ currentLevel });
   }
 
   return (
     <ModalLayout isVisible={hasWon}>
       <View style={styles.iconCircle}>
-        <FontAwesome6 name="cake-candles" size={36} color={theme.colors.blueButtonRim} />
+        <FontAwesome6 name="cake-candles" size={36} color={theme.colors.goldLight} />
       </View>
 
       <Text style={styles.title}>You win!</Text>
       <Text style={styles.subtitle}>Score: {score}</Text>
 
-      <Button3d isFullWidth backgroundColor={theme.colors.greenLight} borderColor={theme.colors.greenButtonRim} onPress={handleGoHome}>
-        <View style={styles.buttonWrapper}>
-          <FontAwesome6 name="house-chimney" size={16} color={theme.colors.foreground} />
-          <Text style={styles.buttonText}>Home</Text>
-        </View>
-      </Button3d>
+      <View style={styles.buttons}>
+        <Button3d isFullWidth backgroundColor={theme.colors.greenLight} borderColor={theme.colors.greenButtonRim} onPress={handleGoHome}>
+          <View style={styles.buttonWrapper}>
+            <FontAwesome6 name="house-chimney" size={16} color={theme.colors.foreground} />
+            <Text style={styles.buttonText}>Home</Text>
+          </View>
+        </Button3d>
 
-      <Button3d isFullWidth onPress={handleNextLevel}>
-        <View style={styles.buttonWrapper}>
-          <FontAwesome6 name="circle-right" size={16} color={theme.colors.foreground} />
-          <Text style={styles.buttonText}>Next level</Text>
-        </View>
-      </Button3d>
+        <Button3d isFullWidth onPress={handleNextLevel}>
+          <View style={styles.buttonWrapper}>
+            <FontAwesome6 name="circle-right" size={16} color={theme.colors.foreground} />
+            <Text style={styles.buttonText}>Next level</Text>
+          </View>
+        </Button3d>
+
+        <Button3d isFullWidth backgroundColor={theme.colors.red} borderColor={theme.colors.redButtonRim} onPress={handlePlayAgain}>
+          <View style={styles.buttonWrapper}>
+            <FontAwesome6 name="rotate-right" size={16} color={theme.colors.foreground} />
+            <Text style={styles.buttonText}>Play again</Text>
+          </View>
+        </Button3d>
+      </View>
     </ModalLayout>
   );
 }
@@ -73,10 +88,11 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: theme.colors.blueDark,
+    backgroundColor: theme.colors.goldDarker,
     justifyContent: "center",
     alignItems: "center",
-    marginBottom: 15,
+    marginBlockStart: 10,
+    marginBlockEnd: 15,
   },
   title: {
     fontSize: 24,
@@ -92,6 +108,11 @@ const styles = StyleSheet.create({
     lineHeight: 20,
     marginBottom: 25,
     paddingHorizontal: 10,
+  },
+  buttons: {
+    width: "100%",
+    gap: 20,
+    marginBlockEnd: 10,
   },
   buttonWrapper: {
     flexDirection: "row",

@@ -30,7 +30,7 @@ export default function GameOverModal() {
       <Button3d isFullWidth backgroundColor={theme.colors.greenLight} borderColor={theme.colors.greenButtonRim} onPress={() => initializeLevel({ currentLevel })}>
         <View style={styles.buttonWrapper}>
           <FontAwesome6 name="rotate-right" size={16} color={theme.colors.foreground} />
-          <Text style={styles.buttonText}>Try Again</Text>
+          <Text style={styles.buttonText}>Try again</Text>
         </View>
       </Button3d>
     </ModalLayout>

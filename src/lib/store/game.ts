@@ -24,7 +24,7 @@ type GameStoreActions = {
 
 const initialGameStoreState: GameStoreState = {
   currentLevel: 1,
-  goldCount: 1000,
+  goldCount: 0,
   levelsWon: 0,
 };
 

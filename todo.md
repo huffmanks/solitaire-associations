@@ -2,17 +2,19 @@
 
 ## ui
 
-- [ ] add win state and go to next level.
 - [ ] deck show stack effect and in waste show top and previous 2 cards if applicable.
-- [ ] add scoring formula: (level, numberOfColumns, movesLeft).
 - [ ] animate card flip from deck to waste.
 - [ ] animate card on undoLastMove.
 - [ ] in foundation add total count to top card.
 - [ ] animation for completing category.
+  - [ ] card.
+  - [ ] completed box.
 - [ ] animation for successMove.
+- [ ] animation for beginning level shuffle cards into place.
 
 ## fix
 
-- [ ] the drag/drop zone.
 - [ ] fix category card colors.
-- [ ] flashing cards when revealed or successful move.
+- [ ] win state and go to next level.
+  - [ ] needs to wait and allow animations to finish before showing modal.
+  - [ ] fine tune the gameStore and logic for this.

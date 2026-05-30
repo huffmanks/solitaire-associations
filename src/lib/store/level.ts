@@ -60,6 +60,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
       setSelectedCardInfo: ({ info }) => set({ selectedCardInfo: info }),
       executeCardMove: ({ target, currentLevel }) => {
         let wasSuccessful = false;
+        let completedTargetIndex: number | null = null;
 
         set((state) => {
           const workingColumns = state.columns.map((col) => [...col]);
@@ -96,8 +97,21 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           }
 
           const dynamicColumns = resolution.nextColumns || workingColumns;
-          const dynamicFoundation = resolution.nextFoundation || state.foundation;
+          let dynamicFoundation = resolution.nextFoundation || state.foundation;
           const dynamicCompleted = resolution.nextCompletedCategories || state.completedCategories;
+
+          if (target.type === "foundation" && resolution.nextFoundation && resolution.nextFoundation[target.index] === null) {
+            completedTargetIndex = target.index;
+
+            const existingStack = state.foundation[target.index] || [];
+            const anchorMovingCard = movingCardsList.find((c) => c.type === "category");
+            const wordCards = movingCardsList.filter((c) => c.type !== "category");
+
+            const fullCompletedStack = existingStack.length === 0 ? [anchorMovingCard!, ...wordCards] : [...existingStack, ...wordCards];
+
+            dynamicFoundation = [...resolution.nextFoundation];
+            dynamicFoundation[target.index] = fullCompletedStack;
+          }
 
           return completeTurn(
             state,
@@ -113,6 +127,17 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             currentLevel,
           );
         });
+
+        if (completedTargetIndex !== null) {
+          const targetIdx = completedTargetIndex;
+          setTimeout(() => {
+            set((state) => {
+              const cleanFoundation = [...state.foundation];
+              cleanFoundation[targetIdx] = null;
+              return { foundation: cleanFoundation };
+            });
+          }, 1500);
+        }
 
         return wasSuccessful;
       },
