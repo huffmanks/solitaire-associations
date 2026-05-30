@@ -66,7 +66,7 @@ export const WORD_BANK: Record<string, Array<string>> = {
 
 export const LEVEL_CONFIGS: Record<number, LevelConfig> = {
   1: {
-    columnsCount: 3,
+    columnsCount: 4,
     categories: ["One", "Two"],
   },
   2: {

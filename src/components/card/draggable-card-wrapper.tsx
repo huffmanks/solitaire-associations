@@ -40,9 +40,40 @@ export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStar
   function handleOnDragEndBridge(x: number, y: number) {
     if (onDragEnd) {
       const isValidMove = onDragEnd(x, y);
-      if (isValidMove === false) {
+      if (isValidMove) {
+        sharedTranslateX.value = 0;
+        sharedTranslateY.value = 0;
+        scale.value = withSpring(1);
+        sharedActiveColIndex.value = -1;
+        sharedDragStartIndex.value = -1;
+        isDragging.value = false;
+      } else {
         triggerErrorShake();
+        sharedTranslateX.value = withSpring(0, {
+          damping: 22,
+          stiffness: 260,
+          mass: 0.7,
+          overshootClamping: true,
+        });
+        sharedTranslateY.value = withSpring(0, {
+          damping: 22,
+          stiffness: 260,
+          mass: 0.7,
+          overshootClamping: true,
+        });
+        scale.value = withSpring(1);
+
+        setTimeout(() => {
+          sharedActiveColIndex.value = -1;
+          sharedDragStartIndex.value = -1;
+          isDragging.value = false;
+        }, 200);
       }
+    } else {
+      sharedTranslateX.value = withSpring(0);
+      sharedTranslateY.value = withSpring(0);
+      scale.value = withSpring(1);
+      isDragging.value = false;
     }
   }
 
@@ -88,24 +119,6 @@ export default function DraggableCardWrapper({ columnIndex, cardIndex, stackStar
       if (onDragEnd) {
         scheduleOnRN(handleOnDragEndBridge, event.absoluteX, event.absoluteY);
       }
-
-      sharedTranslateX.value = withSpring(0, {
-        damping: 22,
-        stiffness: 260,
-        mass: 0.7,
-        overshootClamping: true,
-      });
-      sharedTranslateY.value = withSpring(0, {
-        damping: 22,
-        stiffness: 260,
-        mass: 0.7,
-        overshootClamping: true,
-      });
-
-      scale.value = withSpring(1);
-      sharedActiveColIndex.value = -1;
-      sharedDragStartIndex.value = -1;
-      isDragging.value = false;
     });
 
   return (
