@@ -37,22 +37,44 @@ export default function MenuModal({ isMenuOpen, setIsMenuOpen }: MenuModalProps)
           <Text style={styles.menuText}>Menu</Text>
 
           <View style={styles.closeButtonWrapper}>
-            <Button3d isCircle backgroundColor={theme.colors.red} borderColor={theme.colors.redButtonRim} onPress={() => setIsMenuOpen(false)}>
-              <FontAwesome6 name="x" size={16} color={theme.colors.foreground} />
+            <Button3d
+              isCircle
+              backgroundColor={theme.colors.red}
+              borderColor={theme.colors.redButtonRim}
+              onPress={() => setIsMenuOpen(false)}>
+              <FontAwesome6
+                name="x"
+                size={16}
+                color={theme.colors.foreground}
+              />
             </Button3d>
           </View>
         </View>
 
-        <Button3d isFullWidth backgroundColor={theme.colors.greenLight} borderColor={theme.colors.greenButtonRim} onPress={handleGoHome}>
+        <Button3d
+          isFullWidth
+          backgroundColor={theme.colors.greenLight}
+          borderColor={theme.colors.greenButtonRim}
+          onPress={handleGoHome}>
           <View style={styles.buttonWrapper}>
-            <FontAwesome6 name="house-chimney" size={16} color={theme.colors.foreground} />
+            <FontAwesome6
+              name="house-chimney"
+              size={16}
+              color={theme.colors.foreground}
+            />
             <Text style={styles.buttonText}>Home</Text>
           </View>
         </Button3d>
 
-        <Button3d isFullWidth onPress={handleRestart}>
+        <Button3d
+          isFullWidth
+          onPress={handleRestart}>
           <View style={styles.buttonWrapper}>
-            <FontAwesome6 name="rotate-right" size={16} color={theme.colors.foreground} />
+            <FontAwesome6
+              name="rotate-right"
+              size={16}
+              color={theme.colors.foreground}
+            />
             <Text style={styles.buttonText}>Restart</Text>
           </View>
         </Button3d>

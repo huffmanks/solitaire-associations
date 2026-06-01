@@ -19,10 +19,16 @@ export default function Completion() {
         const isCompleted = index < completedCount;
 
         return (
-          <View key={index} style={styles.completion}>
+          <View
+            key={index}
+            style={styles.completion}>
             {isCompleted && (
               <View style={styles.check}>
-                <FontAwesome name="check" size={14} color={theme.colors.foreground} />
+                <FontAwesome
+                  name="check"
+                  size={14}
+                  color={theme.colors.foreground}
+                />
               </View>
             )}
           </View>

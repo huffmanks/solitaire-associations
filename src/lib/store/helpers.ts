@@ -2,11 +2,19 @@ import { SCORING } from "@/lib/constants";
 import { getLevelConfig } from "@/lib/utils";
 import { CardType, HistorySnapshot, LevelStoreState } from "@/types";
 
-export function getSameCategoryGroup(sourceColumn: CardType[], touchedIndex: number, variant: "tableau" | "foundation") {
+export function getSameCategoryGroup(
+  sourceColumn: CardType[],
+  touchedIndex: number,
+  variant: "tableau" | "foundation"
+) {
   const category = sourceColumn[touchedIndex]?.category;
   let chainStartIndex = touchedIndex;
 
-  while (chainStartIndex > 0 && sourceColumn[chainStartIndex - 1].isFaceUp && sourceColumn[chainStartIndex - 1].category === category) {
+  while (
+    chainStartIndex > 0 &&
+    sourceColumn[chainStartIndex - 1].isFaceUp &&
+    sourceColumn[chainStartIndex - 1].category === category
+  ) {
     chainStartIndex--;
   }
 
@@ -20,16 +28,27 @@ export function getSameCategoryGroup(sourceColumn: CardType[], touchedIndex: num
   return wordCards;
 }
 
-export function extractMovingCards(state: LevelStoreState, columns: CardType[][], waste: CardType[], variant: "tableau" | "foundation") {
+export function extractMovingCards(
+  state: LevelStoreState,
+  columns: CardType[][],
+  waste: CardType[],
+  variant: "tableau" | "foundation"
+) {
   let movingCardsList: CardType[] = [];
   let sourceColumnIndex: number | null = null;
 
-  if (state.selectedCardInfo?.type === "tableau" && state.selectedCardInfo.columnIndex !== undefined) {
+  if (
+    state.selectedCardInfo?.type === "tableau" &&
+    state.selectedCardInfo.columnIndex !== undefined
+  ) {
     sourceColumnIndex = state.selectedCardInfo.columnIndex;
     const sourceColumn = columns[sourceColumnIndex];
 
     if (sourceColumn.length > 0) {
-      const startIndex = state.selectedCardInfo.cardIndex !== undefined ? state.selectedCardInfo.cardIndex : sourceColumn.length - 1;
+      const startIndex =
+        state.selectedCardInfo.cardIndex !== undefined
+          ? state.selectedCardInfo.cardIndex
+          : sourceColumn.length - 1;
       movingCardsList = getSameCategoryGroup(sourceColumn, startIndex, variant);
     }
   } else if (state.selectedCardInfo?.type === "waste") {
@@ -40,19 +59,32 @@ export function extractMovingCards(state: LevelStoreState, columns: CardType[][]
   return { movingCardsList, sourceColumnIndex };
 }
 
-export function validateAndApplyTableauMove(columns: CardType[][], targetIndex: number, movingCards: CardType[]) {
+export function validateAndApplyTableauMove(
+  columns: CardType[][],
+  targetIndex: number,
+  movingCards: CardType[]
+) {
   const leadMovingCard = movingCards[0];
   const targetColumn = columns[targetIndex] || [];
   const topTargetCard = targetColumn[targetColumn.length - 1];
 
-  const canMove = targetColumn.length === 0 || (topTargetCard?.category === leadMovingCard.category && topTargetCard?.type !== "category");
+  const canMove =
+    targetColumn.length === 0 ||
+    (topTargetCard?.category === leadMovingCard.category && topTargetCard?.type !== "category");
   if (!canMove) return null;
 
-  const nextColumns = columns.map((col, idx) => (idx === targetIndex ? [...targetColumn, ...movingCards] : col));
+  const nextColumns = columns.map((col, idx) =>
+    idx === targetIndex ? [...targetColumn, ...movingCards] : col
+  );
   return { nextColumns, nextFoundation: null, nextCompletedCategories: null };
 }
 
-export function validateAndApplyFoundationMove(foundation: Array<CardType[] | null>, targetIndex: number, movingCards: CardType[], completedCategories: string[]) {
+export function validateAndApplyFoundationMove(
+  foundation: Array<CardType[] | null>,
+  targetIndex: number,
+  movingCards: CardType[],
+  completedCategories: string[]
+) {
   const anchorMovingCard = movingCards.find((c) => c.type === "category");
   const leadMovingCard = movingCards[0];
   const existingStackAtSlot = foundation[targetIndex];
@@ -67,7 +99,11 @@ export function validateAndApplyFoundationMove(foundation: Array<CardType[] | nu
     }
   } else {
     const slotAnchorCard = existingStackAtSlot.find((c) => c.type === "category");
-    if (slotAnchorCard && leadMovingCard.category === slotAnchorCard.category && leadMovingCard.type !== "category") {
+    if (
+      slotAnchorCard &&
+      leadMovingCard.category === slotAnchorCard.category &&
+      leadMovingCard.type !== "category"
+    ) {
       nextFoundation[targetIndex] = [...existingStackAtSlot, ...movingCards];
       isMatch = true;
     }
@@ -100,11 +136,21 @@ export function createSnapshot(state: LevelStoreState): HistorySnapshot {
   };
 }
 
-export function checkWinCondition({ completedCategories, totalLevelCategoriesCount }: { completedCategories: Array<string>; totalLevelCategoriesCount: number }): boolean {
+export function checkWinCondition({
+  completedCategories,
+  totalLevelCategoriesCount,
+}: {
+  completedCategories: Array<string>;
+  totalLevelCategoriesCount: number;
+}): boolean {
   return completedCategories.length === totalLevelCategoriesCount;
 }
 
-export function completeTurn(state: LevelStoreState, updatedState: Partial<LevelStoreState>, currentLevel: number) {
+export function completeTurn(
+  state: LevelStoreState,
+  updatedState: Partial<LevelStoreState>,
+  currentLevel: number
+) {
   const nextMovesCount = updatedState.movesCount ?? state.movesCount;
   const nextCompletedCategories = updatedState.completedCategories ?? state.completedCategories;
   const maxMoves = state.maxMoves;
@@ -135,7 +181,11 @@ export function completeTurn(state: LevelStoreState, updatedState: Partial<Level
     const historyCount = updatedState.history?.length ?? state.history.length;
     const trackingMismatch = state.movesCount - historyCount;
 
-    const undoPenaltyMitigation = Math.max(SCORING.UNDO_PENALTY.MIN_MITIGATION_FLOOR, SCORING.UNDO_PENALTY.BASE_MITIGATION - trackingMismatch * SCORING.UNDO_PENALTY.PENALTY_PER_MISMATCH);
+    const undoPenaltyMitigation = Math.max(
+      SCORING.UNDO_PENALTY.MIN_MITIGATION_FLOOR,
+      SCORING.UNDO_PENALTY.BASE_MITIGATION -
+        trackingMismatch * SCORING.UNDO_PENALTY.PENALTY_PER_MISMATCH
+    );
 
     const baseScoreWithBonus = currentLevel + efficiencyBonus;
     finalScore = Math.floor(baseScoreWithBonus * performanceMultiplier * undoPenaltyMitigation);

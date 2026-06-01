@@ -1,6 +1,7 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { useRouter } from "expo-router";
 import { StyleSheet, Text, View } from "react-native";
+
 import { useShallow } from "zustand/shallow";
 
 import { ANIMATION_DELAY_MS } from "@/lib/constants";
@@ -23,7 +24,7 @@ export default function WonLevelModal({ setIsMenuOpen }: WonLevelModalProps) {
       currentLevel: state.currentLevel,
       setCurrentLevel: state.setCurrentLevel,
       recordLevelVictory: state.recordLevelVictory,
-    })),
+    }))
   );
 
   const { hasWon, score, initializeLevel } = useLevelStore(
@@ -31,7 +32,7 @@ export default function WonLevelModal({ setIsMenuOpen }: WonLevelModalProps) {
       hasWon: state.hasWon,
       score: state.score,
       initializeLevel: state.initializeLevel,
-    })),
+    }))
   );
 
   function handleCloseModal() {
@@ -61,32 +62,60 @@ export default function WonLevelModal({ setIsMenuOpen }: WonLevelModalProps) {
   }
 
   return (
-    <ModalLayout isVisible={hasWon} delayMs={ANIMATION_DELAY_MS.SHOW_MODAL}>
+    <ModalLayout
+      isVisible={hasWon}
+      delayMs={ANIMATION_DELAY_MS.SHOW_MODAL}>
       <View style={styles.iconCircle}>
-        <FontAwesome6 name="cake-candles" size={36} color={theme.colors.goldLight} />
+        <FontAwesome6
+          name="cake-candles"
+          size={36}
+          color={theme.colors.goldLight}
+        />
       </View>
 
       <Text style={styles.title}>You win!</Text>
       <Text style={styles.subtitle}>Score: {score}</Text>
 
       <View style={styles.buttons}>
-        <Button3d isFullWidth backgroundColor={theme.colors.greenLight} borderColor={theme.colors.greenButtonRim} onPress={handleGoHome}>
+        <Button3d
+          isFullWidth
+          backgroundColor={theme.colors.greenLight}
+          borderColor={theme.colors.greenButtonRim}
+          onPress={handleGoHome}>
           <View style={styles.buttonWrapper}>
-            <FontAwesome6 name="house-chimney" size={16} color={theme.colors.foreground} />
+            <FontAwesome6
+              name="house-chimney"
+              size={16}
+              color={theme.colors.foreground}
+            />
             <Text style={styles.buttonText}>Home</Text>
           </View>
         </Button3d>
 
-        <Button3d isFullWidth onPress={handleNextLevel}>
+        <Button3d
+          isFullWidth
+          onPress={handleNextLevel}>
           <View style={styles.buttonWrapper}>
-            <FontAwesome6 name="circle-right" size={16} color={theme.colors.foreground} />
+            <FontAwesome6
+              name="circle-right"
+              size={16}
+              color={theme.colors.foreground}
+            />
             <Text style={styles.buttonText}>Next level</Text>
           </View>
         </Button3d>
 
-        <Button3d isFullWidth backgroundColor={theme.colors.red} borderColor={theme.colors.redButtonRim} onPress={handlePlayAgain}>
+        <Button3d
+          isFullWidth
+          backgroundColor={theme.colors.red}
+          borderColor={theme.colors.redButtonRim}
+          onPress={handlePlayAgain}>
           <View style={styles.buttonWrapper}>
-            <FontAwesome6 name="rotate-right" size={16} color={theme.colors.foreground} />
+            <FontAwesome6
+              name="rotate-right"
+              size={16}
+              color={theme.colors.foreground}
+            />
             <Text style={styles.buttonText}>Play again</Text>
           </View>
         </Button3d>

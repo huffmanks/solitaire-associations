@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Dimensions, StyleSheet, View } from "react-native";
+
 import { useShallow } from "zustand/shallow";
 
 import { BOARD_LAYOUT } from "@/lib/constants";
@@ -24,7 +25,14 @@ export default function Board() {
   const tableauRefs = useRef<(View | null)[]>([]);
 
   const currentLevel = useGameStore((state) => state.currentLevel);
-  const { columns, foundation, numberOfColumns, setSelectedCardInfo, executeCardMove, initializeLevel } = useLevelStore(
+  const {
+    columns,
+    foundation,
+    numberOfColumns,
+    setSelectedCardInfo,
+    executeCardMove,
+    initializeLevel,
+  } = useLevelStore(
     useShallow((state) => ({
       columns: state.columns,
       foundation: state.foundation,
@@ -32,7 +40,7 @@ export default function Board() {
       setSelectedCardInfo: state.setSelectedCardInfo,
       executeCardMove: state.executeCardMove,
       initializeLevel: state.initializeLevel,
-    })),
+    }))
   );
 
   useEffect(() => {
@@ -89,7 +97,12 @@ export default function Board() {
 
   function handleDragEnd(absoluteX: number, absoluteY: number) {
     const adjustedY = absoluteY - measuredCardHeight * 0.35;
-    const hitTarget = resolveDropTarget(absoluteX, adjustedY, foundationLayouts.current, tableauLayouts.current);
+    const hitTarget = resolveDropTarget(
+      absoluteX,
+      adjustedY,
+      foundationLayouts.current,
+      tableauLayouts.current
+    );
 
     if (!hitTarget) {
       setSelectedCardInfo({ info: null });
@@ -107,7 +120,10 @@ export default function Board() {
 
   return (
     <View style={styles.container}>
-      <Deck cardWidth={measuredCardWidth} handleDragEnd={handleDragEnd} />
+      <Deck
+        cardWidth={measuredCardWidth}
+        handleDragEnd={handleDragEnd}
+      />
 
       <View style={styles.foundationRow}>
         {foundation.map((stack, i) => (
@@ -135,7 +151,15 @@ export default function Board() {
                 <EmptyCard />
               </View>
               {column.map((card, cardIndex) => (
-                <TableauColumn key={card.id} card={card} column={column} cardIndex={cardIndex} columnIndex={columnIndex} measuredCardHeight={measuredCardHeight} handleDragEnd={handleDragEnd} />
+                <TableauColumn
+                  key={card.id}
+                  card={card}
+                  column={column}
+                  cardIndex={cardIndex}
+                  columnIndex={columnIndex}
+                  measuredCardHeight={measuredCardHeight}
+                  handleDragEnd={handleDragEnd}
+                />
               ))}
             </View>
           ))}

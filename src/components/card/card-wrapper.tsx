@@ -20,17 +20,37 @@ interface CardWrapperProps {
   onDragEnd?: OnCardDragEnd;
 }
 
-export default function CardWrapper({ columnIndex, cardIndex, stackStartIndex, variant, isTopCard, children, containerStyle, onPress, onDragStart, onDragEnd }: CardWrapperProps) {
+export default function CardWrapper({
+  columnIndex,
+  cardIndex,
+  stackStartIndex,
+  variant,
+  isTopCard,
+  children,
+  containerStyle,
+  onPress,
+  onDragStart,
+  onDragEnd,
+}: CardWrapperProps) {
   const isGestureEnabled = Boolean(onDragStart && onDragEnd);
 
   const cardStyles = [styles.card, styles[variant]];
 
-  const textWrapperStyles = [styles.textWrapper, !isTopCard && variant !== "hidden" && variant !== "empty" && variant !== "waste" && styles.textWrapperPeekOverride];
+  const textWrapperStyles = [
+    styles.textWrapper,
+    !isTopCard &&
+      variant !== "hidden" &&
+      variant !== "empty" &&
+      variant !== "waste" &&
+      styles.textWrapperPeekOverride,
+  ];
 
   const content = (
     <View style={cardStyles}>
       {variant === "hidden" && (
-        <View style={styles.patternContainer} pointerEvents="none">
+        <View
+          style={styles.patternContainer}
+          pointerEvents="none">
           <StaticPattern />
         </View>
       )}
@@ -41,7 +61,13 @@ export default function CardWrapper({ columnIndex, cardIndex, stackStartIndex, v
   if (isGestureEnabled) {
     return (
       <View style={[styles.baseSize, containerStyle]}>
-        <DraggableCardWrapper columnIndex={columnIndex} cardIndex={cardIndex} stackStartIndex={stackStartIndex} style={{ flex: 1 }} onDragStart={onDragStart} onDragEnd={onDragEnd}>
+        <DraggableCardWrapper
+          columnIndex={columnIndex}
+          cardIndex={cardIndex}
+          stackStartIndex={stackStartIndex}
+          style={{ flex: 1 }}
+          onDragStart={onDragStart}
+          onDragEnd={onDragEnd}>
           {content}
         </DraggableCardWrapper>
       </View>
@@ -50,7 +76,9 @@ export default function CardWrapper({ columnIndex, cardIndex, stackStartIndex, v
 
   if (onPress) {
     return (
-      <Pressable style={[styles.baseSize, containerStyle]} onPress={onPress}>
+      <Pressable
+        style={[styles.baseSize, containerStyle]}
+        onPress={onPress}>
         {content}
       </Pressable>
     );
@@ -65,15 +93,25 @@ const StaticPattern = memo(function StaticPattern() {
 
   const singleRow = [];
   for (let c = 0; c < cols; c++) {
-    singleRow.push(<MaterialCommunityIcons key={`c-${c}`} name="cards-diamond" size={32} color={theme.colors.blueDark} style={styles.patternIcon} />);
+    singleRow.push(
+      <MaterialCommunityIcons
+        key={`c-${c}`}
+        name="cards-diamond"
+        size={32}
+        color={theme.colors.blueDark}
+        style={styles.patternIcon}
+      />
+    );
   }
 
   const grid = [];
   for (let r = 0; r < rows; r++) {
     grid.push(
-      <View key={`r-${r}`} style={{ flexDirection: "row" }}>
+      <View
+        key={`r-${r}`}
+        style={{ flexDirection: "row" }}>
         {singleRow}
-      </View>,
+      </View>
     );
   }
 

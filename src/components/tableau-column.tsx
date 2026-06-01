@@ -1,7 +1,6 @@
 import { ViewStyle } from "react-native";
 
 import { CARD_COLUMN_VISIBLE_PEEK } from "@/lib/constants";
-
 import { useLevelStore } from "@/lib/store/level";
 import { CardType } from "@/types";
 
@@ -17,21 +16,36 @@ interface TableauColumnProps {
   handleDragEnd: OnCardDragEnd;
 }
 
-export default function TableauColumn({ card, column, columnIndex, cardIndex, measuredCardHeight, handleDragEnd }: TableauColumnProps) {
+export default function TableauColumn({
+  card,
+  column,
+  columnIndex,
+  cardIndex,
+  measuredCardHeight,
+  handleDragEnd,
+}: TableauColumnProps) {
   const setSelectedCardInfo = useLevelStore((state) => state.setSelectedCardInfo);
 
   const isTopCard = cardIndex === column.length - 1;
   const topCardInColumn = column[column.length - 1];
-  const isContiguousActiveChain = card.isFaceUp && topCardInColumn && card.category === topCardInColumn.category;
+  const isContiguousActiveChain =
+    card.isFaceUp && topCardInColumn && card.category === topCardInColumn.category;
 
-  const dynamicMarginTop = cardIndex === 0 || measuredCardHeight === 0 ? 0 : -(measuredCardHeight - CARD_COLUMN_VISIBLE_PEEK);
+  const dynamicMarginTop =
+    cardIndex === 0 || measuredCardHeight === 0
+      ? 0
+      : -(measuredCardHeight - CARD_COLUMN_VISIBLE_PEEK);
 
   const containerStyle: ViewStyle = {
     marginTop: dynamicMarginTop,
   };
 
   let stackRootIndex = cardIndex;
-  while (stackRootIndex > 0 && column[stackRootIndex - 1].isFaceUp && column[stackRootIndex - 1].category === card.category) {
+  while (
+    stackRootIndex > 0 &&
+    column[stackRootIndex - 1].isFaceUp &&
+    column[stackRootIndex - 1].category === card.category
+  ) {
     stackRootIndex--;
   }
 

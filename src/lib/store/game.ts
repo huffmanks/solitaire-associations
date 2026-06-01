@@ -1,4 +1,5 @@
 import { createMMKV } from "react-native-mmkv";
+
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
@@ -36,8 +37,8 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
     {
       name: "game-store",
       storage: gameZustandStorage,
-    },
-  ),
+    }
+  )
 );
 
 export function resetGameStorage() {

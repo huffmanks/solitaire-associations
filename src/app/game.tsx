@@ -19,7 +19,10 @@ export default function Game() {
         <Header setIsMenuOpen={setIsMenuOpen} />
         <Board />
 
-        <MenuModal isMenuOpen={isMenuOpen} setIsMenuOpen={setIsMenuOpen} />
+        <MenuModal
+          isMenuOpen={isMenuOpen}
+          setIsMenuOpen={setIsMenuOpen}
+        />
         <GameOverModal />
         <WonLevelModal setIsMenuOpen={setIsMenuOpen} />
       </View>

@@ -26,9 +26,16 @@ export default function MenuButton({ setIsMenuOpen }: MenuButtonProps) {
   }
 
   return (
-    <Pressable onPress={() => setIsMenuOpen(true)} onPressIn={onPressIn} onPressOut={onPressOut}>
+    <Pressable
+      onPress={() => setIsMenuOpen(true)}
+      onPressIn={onPressIn}
+      onPressOut={onPressOut}>
       <Animated.View style={[styles.menu, { transform: [{ scale: scaleValue }] }]}>
-        <Ionicons name="menu" size={30} style={styles.icon} />
+        <Ionicons
+          name="menu"
+          size={30}
+          style={styles.icon}
+        />
       </Animated.View>
     </Pressable>
   );

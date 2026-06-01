@@ -1,4 +1,5 @@
 import { StyleSheet, Text, View } from "react-native";
+
 import { useShallow } from "zustand/shallow";
 
 import { BOARD_LAYOUT } from "@/lib/constants";
@@ -19,7 +20,7 @@ export default function Moves({ cardSize }: MovesProps) {
       maxMoves: state.maxMoves,
       movesCount: state.movesCount,
       numberOfColumns: state.numberOfColumns,
-    })),
+    }))
   );
   const currentLevel = useGameStore((state) => state.currentLevel);
 
@@ -27,9 +28,15 @@ export default function Moves({ cardSize }: MovesProps) {
 
   const containerStyles = {
     aspectRatio: numberOfColumns === 3 ? 2 / 3 : undefined,
-    width: numberOfColumns !== 3 && cardSize ? cardSize.width * 2 + BOARD_LAYOUT.COLUMN_GAP_MAP[numberOfColumns] : undefined,
+    width:
+      numberOfColumns !== 3 && cardSize
+        ? cardSize.width * 2 + BOARD_LAYOUT.COLUMN_GAP_MAP[numberOfColumns]
+        : undefined,
     height: cardSize.height,
-    flexDirection: numberOfColumns === 3 ? "column" : ("row" as "column" | "row" | "row-reverse" | "column-reverse" | undefined),
+    flexDirection:
+      numberOfColumns === 3
+        ? "column"
+        : ("row" as "column" | "row" | "row-reverse" | "column-reverse" | undefined),
     gap: numberOfColumns === 3 ? 10 : numberOfColumns === 4 ? 50 : 30,
   };
 

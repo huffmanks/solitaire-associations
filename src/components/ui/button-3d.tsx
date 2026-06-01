@@ -1,5 +1,11 @@
 import { Pressable, StyleSheet } from "react-native";
-import Animated, { useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 import { theme } from "@/lib/theme";
 
@@ -15,7 +21,15 @@ interface Button3dProps {
   children: React.ReactNode;
 }
 
-export default function Button3d({ isFullWidth = false, isCircle = false, isDisabled = false, backgroundColor, borderColor, onPress, children }: Button3dProps) {
+export default function Button3d({
+  isFullWidth = false,
+  isCircle = false,
+  isDisabled = false,
+  backgroundColor,
+  borderColor,
+  onPress,
+  children,
+}: Button3dProps) {
   const pressedProgress = useSharedValue(0);
   const shakeOffset = useSharedValue(0);
 
@@ -41,8 +55,15 @@ export default function Button3d({ isFullWidth = false, isCircle = false, isDisa
 
   const animatedButtonStyle = useAnimatedStyle(() => {
     return {
-      transform: [{ translateX: shakeOffset.value }, { translateY: withSpring(pressedProgress.value * 4, springConfig) }, { scaleY: withSpring(pressedProgress.value ? 0.95 : 1, springConfig) }],
-      borderBottomWidth: withSpring(pressedProgress.value ? borderBottomWidth.pressed : borderBottomWidth.static, springConfig),
+      transform: [
+        { translateX: shakeOffset.value },
+        { translateY: withSpring(pressedProgress.value * 4, springConfig) },
+        { scaleY: withSpring(pressedProgress.value ? 0.95 : 1, springConfig) },
+      ],
+      borderBottomWidth: withSpring(
+        pressedProgress.value ? borderBottomWidth.pressed : borderBottomWidth.static,
+        springConfig
+      ),
     };
   });
 
@@ -52,7 +73,7 @@ export default function Button3d({ isFullWidth = false, isCircle = false, isDisa
       withTiming(10, { duration: 40 }),
       withTiming(-6, { duration: 40 }),
       withTiming(6, { duration: 40 }),
-      withTiming(0, { duration: 40 }),
+      withTiming(0, { duration: 40 })
     );
   }
 

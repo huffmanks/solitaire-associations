@@ -33,7 +33,11 @@ export default function ModalLayout({ isVisible, children, delayMs = 0 }: ModalL
   }, [isVisible, delayMs]);
 
   return (
-    <Modal visible={shouldRender} transparent animationType="fade" statusBarTranslucent>
+    <Modal
+      visible={shouldRender}
+      transparent
+      animationType="fade"
+      statusBarTranslucent>
       <View style={styles.overlay}>
         <View style={styles.modalContainer}>{children}</View>
       </View>

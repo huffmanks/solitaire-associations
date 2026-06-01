@@ -55,9 +55,21 @@ export type LevelStoreState = {
 };
 
 export type LevelStoreActions = {
-  initializeLevel: ({ currentLevel, forceRefresh }: { currentLevel: number; forceRefresh?: boolean }) => void;
+  initializeLevel: ({
+    currentLevel,
+    forceRefresh,
+  }: {
+    currentLevel: number;
+    forceRefresh?: boolean;
+  }) => void;
   setSelectedCardInfo: ({ info }: { info: SelectedCardInfo | null }) => void;
-  executeCardMove: ({ target, currentLevel }: { target: MoveCardTarget; currentLevel: number }) => boolean;
+  executeCardMove: ({
+    target,
+    currentLevel,
+  }: {
+    target: MoveCardTarget;
+    currentLevel: number;
+  }) => boolean;
   drawCard: () => void;
   undoLastMove: () => void;
 

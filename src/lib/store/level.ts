@@ -1,9 +1,16 @@
 import { createMMKV } from "react-native-mmkv";
+
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
 import { ANIMATION_DELAY_MS, MOVE_BALANCING } from "@/lib/constants";
-import { completeTurn, createSnapshot, extractMovingCards, validateAndApplyFoundationMove, validateAndApplyTableauMove } from "@/lib/store/helpers";
+import {
+  completeTurn,
+  createSnapshot,
+  extractMovingCards,
+  validateAndApplyFoundationMove,
+  validateAndApplyTableauMove,
+} from "@/lib/store/helpers";
 import { generateInitialColumns } from "@/lib/utils";
 import { LevelStoreActions, LevelStoreState } from "@/types";
 
@@ -45,7 +52,10 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         const deckCardsCount = initialGameState.deck?.length || 0;
         const colCount = initialGameState.numberOfColumns;
 
-        const tableauMoveBudget = totalCardsCount * (MOVE_BALANCING.BASE_MOVES_PER_CARD + colCount * MOVE_BALANCING.COLUMN_COMPLEXITY_MULTIPLIER);
+        const tableauMoveBudget =
+          totalCardsCount *
+          (MOVE_BALANCING.BASE_MOVES_PER_CARD +
+            colCount * MOVE_BALANCING.COLUMN_COMPLEXITY_MULTIPLIER);
         const deckCycleBudget = deckCardsCount * MOVE_BALANCING.DECK_CYCLE_MULTIPLIER;
         const computedMaxMoves = Math.ceil(tableauMoveBudget + deckCycleBudget);
 
@@ -71,7 +81,12 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const workingColumns = state.columns.map((col) => [...col]);
           const workingWaste = [...state.waste];
 
-          const { movingCardsList, sourceColumnIndex } = extractMovingCards(state, workingColumns, workingWaste, target.type);
+          const { movingCardsList, sourceColumnIndex } = extractMovingCards(
+            state,
+            workingColumns,
+            workingWaste,
+            target.type
+          );
 
           if (movingCardsList.length === 0) return { selectedCardInfo: null };
 
@@ -83,7 +98,12 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           const resolution =
             target.type === "tableau"
               ? validateAndApplyTableauMove(workingColumns, target.index, movingCardsList)
-              : validateAndApplyFoundationMove(state.foundation, target.index, movingCardsList, state.completedCategories);
+              : validateAndApplyFoundationMove(
+                  state.foundation,
+                  target.index,
+                  movingCardsList,
+                  state.completedCategories
+                );
 
           if (!resolution) return { selectedCardInfo: null };
           wasSuccessful = true;
@@ -95,7 +115,10 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
             sourceColumn.splice(sourceColumn.length - movingCardsList.length);
 
             if (sourceColumn.length > 0) {
-              sourceColumn[sourceColumn.length - 1] = { ...sourceColumn[sourceColumn.length - 1], isFaceUp: true };
+              sourceColumn[sourceColumn.length - 1] = {
+                ...sourceColumn[sourceColumn.length - 1],
+                isFaceUp: true,
+              };
             }
           } else if (state.selectedCardInfo?.type === "waste") {
             workingWaste.pop();
@@ -105,14 +128,21 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           let dynamicFoundation = resolution.nextFoundation || state.foundation;
           const dynamicCompleted = resolution.nextCompletedCategories || state.completedCategories;
 
-          if (target.type === "foundation" && resolution.nextFoundation && resolution.nextFoundation[target.index] === null) {
+          if (
+            target.type === "foundation" &&
+            resolution.nextFoundation &&
+            resolution.nextFoundation[target.index] === null
+          ) {
             completedTargetIndex = target.index;
 
             const existingStack = state.foundation[target.index] || [];
             const anchorMovingCard = movingCardsList.find((c) => c.type === "category");
             const wordCards = movingCardsList.filter((c) => c.type !== "category");
 
-            const fullCompletedStack = existingStack.length === 0 ? [anchorMovingCard!, ...wordCards] : [...existingStack, ...wordCards];
+            const fullCompletedStack =
+              existingStack.length === 0
+                ? [anchorMovingCard!, ...wordCards]
+                : [...existingStack, ...wordCards];
 
             dynamicFoundation = [...resolution.nextFoundation];
             dynamicFoundation[target.index] = fullCompletedStack;
@@ -129,7 +159,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
               movesCount: state.movesCount + 1,
               history: [...state.history, snapshot],
             },
-            currentLevel,
+            currentLevel
           );
         });
 
@@ -211,8 +241,8 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
     {
       name: "level-store",
       storage: levelZustandStorage,
-    },
-  ),
+    }
+  )
 );
 
 export function resetLevelStorage() {

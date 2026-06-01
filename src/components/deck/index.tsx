@@ -38,7 +38,11 @@ export default function Deck({ cardWidth, handleDragEnd }: DeckProps) {
             <Text style={styles.deckCount}>{deck.length}</Text>
           ) : (
             <View style={styles.recycleCenter}>
-              <FontAwesome6 name="rotate-left" size={20} color={theme.colors.greenLight} />
+              <FontAwesome6
+                name="rotate-left"
+                size={20}
+                color={theme.colors.greenLight}
+              />
             </View>
           )}
         </DeckCard>

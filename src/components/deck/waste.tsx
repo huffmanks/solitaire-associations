@@ -1,5 +1,6 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { StyleSheet, View } from "react-native";
+
 import { useShallow } from "zustand/shallow";
 
 import { useLevelStore } from "@/lib/store/level";
@@ -19,7 +20,7 @@ export default function Waste({ handleDragEnd }: WasteProps) {
       waste: state.waste,
       numberOfColumns: state.numberOfColumns,
       setSelectedCardInfo: state.setSelectedCardInfo,
-    })),
+    }))
   );
 
   const topWasteCard = waste[waste.length - 1];
@@ -33,7 +34,11 @@ export default function Waste({ handleDragEnd }: WasteProps) {
     return (
       <View style={[styles.container, containerStyles]}>
         <EmptyCard variant="waste">
-          <FontAwesome6 name="layer-group" size={20} color={theme.colors.muted} />
+          <FontAwesome6
+            name="layer-group"
+            size={20}
+            color={theme.colors.muted}
+          />
         </EmptyCard>
       </View>
     );
@@ -46,13 +51,25 @@ export default function Waste({ handleDragEnd }: WasteProps) {
           <Card card={underWasteCard} />
         ) : (
           <EmptyCard variant="waste">
-            <FontAwesome6 name="layer-group" size={20} color={theme.colors.muted} />
+            <FontAwesome6
+              name="layer-group"
+              size={20}
+              color={theme.colors.muted}
+            />
           </EmptyCard>
         )}
       </View>
 
-      <View style={StyleSheet.absoluteFill} key={topWasteCard.id}>
-        <Card card={topWasteCard} onDragStart={() => setSelectedCardInfo({ info: { cardId: topWasteCard.id, type: "waste" } })} onDragEnd={handleDragEnd} />
+      <View
+        style={StyleSheet.absoluteFill}
+        key={topWasteCard.id}>
+        <Card
+          card={topWasteCard}
+          onDragStart={() =>
+            setSelectedCardInfo({ info: { cardId: topWasteCard.id, type: "waste" } })
+          }
+          onDragEnd={handleDragEnd}
+        />
       </View>
     </View>
   );

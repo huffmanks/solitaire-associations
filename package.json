@@ -10,6 +10,7 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "lint": "expo lint",
+    "format": "prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
     "build:dev": "pnpm dlx eas-cli build --clear-cache --platform android --profile development --local",
     "build:apk": "pnpm dlx eas-cli build --clear-cache --platform android --profile preview --local",
     "build:aab": "pnpm dlx eas-cli build --clear-cache --platform android --profile preview-bundle --local"
@@ -47,7 +48,9 @@
     "zustand": "^5.0.13"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "^6.0.2",
     "@types/react": "~19.2.2",
+    "prettier": "^3.8.3",
     "typescript": "~5.9.2"
   },
   "private": true

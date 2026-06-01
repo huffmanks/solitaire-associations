@@ -13,7 +13,9 @@ export function getLevelConfig({ currentLevel }: { currentLevel: number }): Leve
 }
 
 export function generateInitialColumns({ currentLevel }: { currentLevel: number }) {
-  const { columnsCount: numberOfColumns, categories: categoryNames } = getLevelConfig({ currentLevel });
+  const { columnsCount: numberOfColumns, categories: categoryNames } = getLevelConfig({
+    currentLevel,
+  });
 
   let allCards: Array<CardType> = [];
 
@@ -105,9 +107,14 @@ export function isPointInside(
   },
   pointX: number,
   pointY: number,
-  padding = 0,
+  padding = 0
 ) {
-  return pointX >= rect.x - padding && pointX <= rect.x + rect.width + padding && pointY >= rect.y - padding && pointY <= rect.y + rect.height + padding;
+  return (
+    pointX >= rect.x - padding &&
+    pointX <= rect.x + rect.width + padding &&
+    pointY >= rect.y - padding &&
+    pointY <= rect.y + rect.height + padding
+  );
 }
 function scoreTarget(rect: LayoutRect, x: number, y: number, type: "foundation" | "tableau") {
   const centerX = rect.x + rect.width / 2;
@@ -133,7 +140,12 @@ function scoreTarget(rect: LayoutRect, x: number, y: number, type: "foundation" 
   return score;
 }
 
-export function resolveDropTarget(absoluteX: number, absoluteY: number, foundations: Array<LayoutRect | null>, tableaus: Array<LayoutRect | null>): MoveCardTarget | null {
+export function resolveDropTarget(
+  absoluteX: number,
+  absoluteY: number,
+  foundations: Array<LayoutRect | null>,
+  tableaus: Array<LayoutRect | null>
+): MoveCardTarget | null {
   const candidates: Array<TargetCandidate> = [];
 
   foundations.forEach((rect, index) => {

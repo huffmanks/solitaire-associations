@@ -12,8 +12,14 @@ export default function ActionBar() {
 
   return (
     <View style={styles.container}>
-      <Button3d isDisabled={!canUndo} onPress={undoLastMove}>
-        <FontAwesome6 name="reply" size={16} color={theme.colors.cardFront} />
+      <Button3d
+        isDisabled={!canUndo}
+        onPress={undoLastMove}>
+        <FontAwesome6
+          name="reply"
+          size={16}
+          color={theme.colors.cardFront}
+        />
       </Button3d>
     </View>
   );

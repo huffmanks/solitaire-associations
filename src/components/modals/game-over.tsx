@@ -1,5 +1,6 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { StyleSheet, Text, View } from "react-native";
+
 import { useShallow } from "zustand/shallow";
 
 import { useGameStore } from "@/lib/store/game";
@@ -15,21 +16,35 @@ export default function GameOverModal() {
     useShallow((state) => ({
       hasLost: state.hasLost,
       initializeLevel: state.initializeLevel,
-    })),
+    }))
   );
 
   return (
     <ModalLayout isVisible={hasLost}>
       <View style={styles.iconCircle}>
-        <FontAwesome6 name="heart-crack" size={36} color={theme.colors.redButtonRim} />
+        <FontAwesome6
+          name="heart-crack"
+          size={36}
+          color={theme.colors.redButtonRim}
+        />
       </View>
 
       <Text style={styles.title}>Out of Moves!</Text>
-      <Text style={styles.subtitle}>You’ve reached your maximum move limit for this level. Don’t worry, you can try again!</Text>
+      <Text style={styles.subtitle}>
+        You’ve reached your maximum move limit for this level. Don’t worry, you can try again!
+      </Text>
 
-      <Button3d isFullWidth backgroundColor={theme.colors.greenLight} borderColor={theme.colors.greenButtonRim} onPress={() => initializeLevel({ currentLevel, forceRefresh: true })}>
+      <Button3d
+        isFullWidth
+        backgroundColor={theme.colors.greenLight}
+        borderColor={theme.colors.greenButtonRim}
+        onPress={() => initializeLevel({ currentLevel, forceRefresh: true })}>
         <View style={styles.buttonWrapper}>
-          <FontAwesome6 name="rotate-right" size={16} color={theme.colors.foreground} />
+          <FontAwesome6
+            name="rotate-right"
+            size={16}
+            color={theme.colors.foreground}
+          />
           <Text style={styles.buttonText}>Try again</Text>
         </View>
       </Button3d>

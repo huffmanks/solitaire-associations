@@ -17,7 +17,9 @@ export default function Index() {
       <View style={styles.container}>
         <Text style={styles.text}>Welcome to game</Text>
         <TouchableOpacity>
-          <Link href="/game" style={styles.link}>
+          <Link
+            href="/game"
+            style={styles.link}>
             Go to game
           </Link>
         </TouchableOpacity>

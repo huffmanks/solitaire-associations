@@ -1,6 +1,13 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import { StyleSheet, Text, View } from "react-native";
-import Animated, { useAnimatedReaction, useAnimatedStyle, useSharedValue, withSequence, withSpring, withTiming } from "react-native-reanimated";
+import Animated, {
+  useAnimatedReaction,
+  useAnimatedStyle,
+  useSharedValue,
+  withSequence,
+  withSpring,
+  withTiming,
+} from "react-native-reanimated";
 
 import { theme } from "@/lib/theme";
 import { CardType } from "@/types";
@@ -19,7 +26,11 @@ export default function Foundation({ stack }: FoundationProps) {
   const totalNeeded = anchorCard?.totalInCategory ?? 0;
 
   const isCategoryComplete = anchorCard !== null && currentCount === totalNeeded;
-  const topCard = isCategoryComplete ? anchorCard : stack && stack.length > 0 ? stack[stack.length - 1] : null;
+  const topCard = isCategoryComplete
+    ? anchorCard
+    : stack && stack.length > 0
+      ? stack[stack.length - 1]
+      : null;
 
   const containerScale = useSharedValue(1);
   const ringScale = useSharedValue(1);
@@ -48,21 +59,41 @@ export default function Foundation({ stack }: FoundationProps) {
         trackingCardId.value = prepareData.id;
 
         if (prepareData.complete) {
-          containerScale.value = withSequence(withSpring(1.05, { damping: 15, stiffness: 300 }), withSpring(1, { damping: 5, stiffness: 180, mass: 0.8 }));
+          containerScale.value = withSequence(
+            withSpring(1.05, { damping: 15, stiffness: 300 }),
+            withSpring(1, { damping: 5, stiffness: 180, mass: 0.8 })
+          );
 
-          ringScale.value = withSequence(withTiming(1, { duration: 600 }), withTiming(1.05, { duration: 300 }), withTiming(1, { duration: 600 }));
+          ringScale.value = withSequence(
+            withTiming(1, { duration: 600 }),
+            withTiming(1.05, { duration: 300 }),
+            withTiming(1, { duration: 600 })
+          );
 
-          ringOpacity.value = withSequence(withTiming(1, { duration: 600 }), withTiming(0.3, { duration: 300 }), withTiming(1, { duration: 600 }), withTiming(0, { duration: 300 }));
+          ringOpacity.value = withSequence(
+            withTiming(1, { duration: 600 }),
+            withTiming(0.3, { duration: 300 }),
+            withTiming(1, { duration: 600 }),
+            withTiming(0, { duration: 300 })
+          );
         } else {
           containerScale.value = 1;
 
-          ringScale.value = withSequence(withTiming(1, { duration: 400 }), withTiming(1.05, { duration: 200 }), withTiming(1, { duration: 400 }));
+          ringScale.value = withSequence(
+            withTiming(1, { duration: 400 }),
+            withTiming(1.05, { duration: 200 }),
+            withTiming(1, { duration: 400 })
+          );
 
-          ringOpacity.value = withSequence(withTiming(1, { duration: 400 }), withTiming(1, { duration: 200 }), withTiming(0, { duration: 400 }));
+          ringOpacity.value = withSequence(
+            withTiming(1, { duration: 400 }),
+            withTiming(1, { duration: 200 }),
+            withTiming(0, { duration: 400 })
+          );
         }
       }
     },
-    [currentCount, topCard?.id, isCategoryComplete],
+    [currentCount, topCard?.id, isCategoryComplete]
   );
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
@@ -78,15 +109,23 @@ export default function Foundation({ stack }: FoundationProps) {
     <View style={styles.container}>
       <View style={StyleSheet.absoluteFill}>
         <EmptyCard>
-          <FontAwesome6 name="crown" size={20} color={theme.colors.greenLight} />
+          <FontAwesome6
+            name="crown"
+            size={20}
+            color={theme.colors.greenLight}
+          />
         </EmptyCard>
       </View>
       {topCard && (
-        <Animated.View key={topCard.id} style={[styles.cardContainer, animatedContainerStyle]}>
+        <Animated.View
+          key={topCard.id}
+          style={[styles.cardContainer, animatedContainerStyle]}>
           <Animated.View style={[styles.greenFlashRing, animatedRingStyle]} />
           {hasStackedWords && !isCategoryComplete && (
             <View style={styles.badgeTab}>
-              <Text style={styles.badgeText} numberOfLines={1}>
+              <Text
+                style={styles.badgeText}
+                numberOfLines={1}>
                 {topCard.category.toUpperCase()}
               </Text>
               <View style={styles.textCountWrapper}>
