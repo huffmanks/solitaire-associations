@@ -24,6 +24,15 @@ export const ANIMATION_DELAY_MS = {
   SHOW_MODAL: 1200,
 };
 
+export const GAME_LAYERS = {
+  BASE: 0,
+  STATIC_CARD: 1,
+  CARD_ACCENT_UNDER: -1,
+  CARD_ACCENT_OVER: 10,
+  CARD_EFFECT: 20,
+  DRAGGED_STACK_BASE: 10000,
+} as const;
+
 export const CARD_COLUMN_VISIBLE_PEEK = 24;
 
 export const DRAG_SNAP_GRACE = {

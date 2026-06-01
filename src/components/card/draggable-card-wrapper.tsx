@@ -10,6 +10,7 @@ import Animated, {
 } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
+import { GAME_LAYERS } from "@/lib/constants";
 import {
   sharedActiveColIndex,
   sharedDragStartIndex,
@@ -106,20 +107,22 @@ export default function DraggableCardWrapper({
       cardIndex >= sharedDragStartIndex.value;
 
     if (isDragging.value || isInDraggedStack) {
+      const dynamicLayer = GAME_LAYERS.DRAGGED_STACK_BASE + (cardIndex ?? 0);
+
       return {
         transform: [
           { translateX: sharedTranslateX.value + shakeOffset.value },
           { translateY: sharedTranslateY.value },
           { scale: scale.value },
         ],
-        zIndex: 99999 + (cardIndex ?? 0),
-        elevation: 99999 + (cardIndex ?? 0),
+        zIndex: dynamicLayer,
+        elevation: dynamicLayer,
       };
     }
 
     return {
       transform: [{ translateX: shakeOffset.value }, { translateY: 0 }, { scale: 1 }],
-      zIndex: 1,
+      zIndex: GAME_LAYERS.STATIC_CARD,
       elevation: 0,
     };
   });

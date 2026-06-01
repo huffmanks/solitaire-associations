@@ -1,6 +1,6 @@
 import Animated, { useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
 
-import { CARD_COLUMN_VISIBLE_PEEK } from "@/lib/constants";
+import { CARD_COLUMN_VISIBLE_PEEK, GAME_LAYERS } from "@/lib/constants";
 import { useLevelStore } from "@/lib/store/level";
 import { CardType, SpacingVariant } from "@/types";
 
@@ -74,6 +74,8 @@ export default function TableauColumn({
 
   const animatedContainerStyle = useAnimatedStyle(() => ({
     marginTop: animatedMarginTop.value,
+    zIndex: isThisStackDragging ? GAME_LAYERS.DRAGGED_STACK_BASE + cardIndex : GAME_LAYERS.BASE,
+    elevation: isThisStackDragging ? GAME_LAYERS.DRAGGED_STACK_BASE + cardIndex : 0,
   }));
 
   function handleDragStart() {

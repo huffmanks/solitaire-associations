@@ -9,7 +9,7 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated";
 
-import { ANIMATION_DELAY_MS } from "@/lib/constants";
+import { ANIMATION_DELAY_MS, GAME_LAYERS } from "@/lib/constants";
 import { theme } from "@/lib/theme";
 import { CardType } from "@/types";
 
@@ -196,14 +196,14 @@ const styles = StyleSheet.create({
     borderWidth: 5,
     borderColor: theme.colors.greenLight,
     borderRadius: 13,
-    zIndex: 999,
+    zIndex: GAME_LAYERS.CARD_ACCENT_OVER,
     pointerEvents: "none",
   },
   sparkleContainer: {
     ...StyleSheet.absoluteFill,
     justifyContent: "center",
     alignItems: "center",
-    zIndex: 1000,
+    zIndex: GAME_LAYERS.CARD_EFFECT,
   },
   badgeTab: {
     position: "absolute",
@@ -217,7 +217,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 6,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: -1,
+    zIndex: GAME_LAYERS.CARD_ACCENT_UNDER,
   },
   badgeText: {
     color: theme.colors.categoryCardForeground,
@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 7,
     right: 8,
-    zIndex: 999,
+    zIndex: GAME_LAYERS.CARD_ACCENT_OVER,
     flexDirection: "row",
     gap: 2,
   },
