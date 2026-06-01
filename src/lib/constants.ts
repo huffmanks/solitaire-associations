@@ -21,7 +21,7 @@ export const BOARD_LAYOUT = {
 
 export const ANIMATION_DELAY_MS = {
   COMPLETION: 900,
-  SHOW_MODAL: 1400,
+  SHOW_MODAL: 1200,
 };
 
 export const CARD_COLUMN_VISIBLE_PEEK = 24;
@@ -70,12 +70,12 @@ export const WORD_BANK: Record<string, Array<string>> = {
 };
 
 export const LEVEL_CONFIGS: Record<number, LevelConfig> = {
-  1: {
-    columnsCount: 4,
+  2: {
+    columnsCount: 5,
     categories: ["One", "Two"],
   },
-  2: {
-    columnsCount: 3,
+  1: {
+    columnsCount: 4,
     categories: ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
   },
 };

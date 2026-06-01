@@ -187,7 +187,7 @@ const styles = StyleSheet.create({
   foundationRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    marginBlockStart: 15,
+    marginBlockStart: 25,
     marginBlockEnd: 30,
     marginInline: 15,
   },

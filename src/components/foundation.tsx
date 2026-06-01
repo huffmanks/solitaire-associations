@@ -141,21 +141,25 @@ export default function Foundation({ stack }: FoundationProps) {
           key={topCard.id}
           style={[styles.cardContainer, animatedContainerStyle]}>
           <Animated.View style={[styles.greenFlashRing, animatedRingStyle]} />
+
+          <Card card={topCard} />
+
           {hasStackedWords && !isCategoryComplete && (
-            <View style={styles.badgeTab}>
-              <Text
-                style={styles.badgeText}
-                numberOfLines={1}>
-                {topCard.category.toUpperCase()}
-              </Text>
+            <>
+              <View style={styles.badgeTab}>
+                <Text
+                  style={styles.badgeText}
+                  numberOfLines={1}>
+                  {topCard.category.toUpperCase()}
+                </Text>
+              </View>
               <View style={styles.textCountWrapper}>
                 <Text style={styles.textCount}>{currentCount}</Text>
                 <Text style={styles.textCount}>/</Text>
                 <Text style={styles.textCount}>{totalNeeded}</Text>
               </View>
-            </View>
+            </>
           )}
-          <Card card={topCard} />
 
           <Animated.View
             style={[styles.sparkleContainer, animatedSparkleContainerStyle]}
@@ -203,33 +207,36 @@ const styles = StyleSheet.create({
   },
   badgeTab: {
     position: "absolute",
-    top: 0,
-    left: 0,
-    right: 0,
-    backgroundColor: theme.colors.goldDark,
+    top: -15,
+    left: 8,
+    right: 8,
+    backgroundColor: theme.colors.categoryCardFront,
     paddingVertical: 2,
     paddingHorizontal: 4,
-    borderTopLeftRadius: 10,
-    borderTopRightRadius: 10,
+    borderTopLeftRadius: 6,
+    borderTopRightRadius: 6,
     alignItems: "center",
     justifyContent: "center",
-    zIndex: 100,
-    elevation: 4,
+    zIndex: -1,
   },
   badgeText: {
-    color: theme.colors.cardForeground,
+    color: theme.colors.categoryCardForeground,
     fontSize: 8,
     fontWeight: "900",
-    letterSpacing: 0.5,
+    letterSpacing: 0.05,
     textAlign: "center",
   },
   textCountWrapper: {
+    position: "absolute",
+    top: 7,
+    right: 8,
+    zIndex: 999,
     flexDirection: "row",
     gap: 2,
   },
   textCount: {
     color: theme.colors.cardForeground,
-    fontWeight: "700",
-    fontSize: 11,
+    fontWeight: "900",
+    fontSize: 12,
   },
 });

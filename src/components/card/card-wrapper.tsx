@@ -152,8 +152,8 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.foreground,
   },
   category: {
-    backgroundColor: theme.colors.goldDarker,
-    borderColor: theme.colors.goldDark,
+    backgroundColor: theme.colors.categoryCardFront,
+    borderColor: theme.colors.categoryCardFrontBorder,
   },
   empty: {
     backgroundColor: theme.colors.muted,
