@@ -33,6 +33,15 @@ export const GAME_LAYERS = {
   DRAGGED_STACK_BASE: 10000,
 } as const;
 
+export const INTRO_ANIMATION = {
+  DECK_ORIGIN_X: 16,
+  DECK_ORIGIN_Y: 40,
+
+  BASE_PARENT_RENDER: 350,
+  CARD_FLY_DURATION: 320,
+  STAGGER_DELAY: 60,
+} as const;
+
 export const CARD_COLUMN_VISIBLE_PEEK = 24;
 
 export const DRAG_SNAP_GRACE = {

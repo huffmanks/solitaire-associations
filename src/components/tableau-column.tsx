@@ -1,6 +1,12 @@
-import Animated, { useAnimatedStyle, useDerivedValue, withTiming } from "react-native-reanimated";
+import Animated, {
+  useAnimatedStyle,
+  useDerivedValue,
+  useSharedValue,
+  withDelay,
+  withTiming,
+} from "react-native-reanimated";
 
-import { CARD_COLUMN_VISIBLE_PEEK, GAME_LAYERS } from "@/lib/constants";
+import { CARD_COLUMN_VISIBLE_PEEK, GAME_LAYERS, INTRO_ANIMATION } from "@/lib/constants";
 import { useLevelStore } from "@/lib/store/level";
 import { CardType, SpacingVariant } from "@/types";
 
@@ -12,6 +18,7 @@ interface TableauColumnProps {
   column: Array<CardType>;
   columnIndex: number;
   cardIndex: number;
+  measuredCardWidth: number;
   measuredCardHeight: number;
   handleDragEnd: OnCardDragEnd;
 }
@@ -21,11 +28,15 @@ export default function TableauColumn({
   column,
   columnIndex,
   cardIndex,
+  measuredCardWidth,
   measuredCardHeight,
   handleDragEnd,
 }: TableauColumnProps) {
-  const setSelectedCardInfo = useLevelStore((state) => state.setSelectedCardInfo);
+  const numberOfColumns = useLevelStore((state) => state.numberOfColumns);
   const selectedCardInfo = useLevelStore((state) => state.selectedCardInfo);
+  const setSelectedCardInfo = useLevelStore((state) => state.setSelectedCardInfo);
+
+  const isFlying = useSharedValue(true);
 
   const isTopCard = cardIndex === column.length - 1;
   const topCardInColumn = column[column.length - 1];
@@ -47,7 +58,7 @@ export default function TableauColumn({
     selectedCardInfo.columnIndex === columnIndex &&
     cardIndex >= (selectedCardInfo.cardIndex ?? 0);
 
-  const isOvercrowded = column.length > 6;
+  const isOvercrowded = column.length > 7;
 
   const spacingVariant: SpacingVariant = isThisStackDragging
     ? "condensed"
@@ -72,11 +83,73 @@ export default function TableauColumn({
     return withTiming(targetMargin, { duration });
   }, [cardIndex, measuredCardHeight, isThisStackDragging, isOvercrowded]);
 
-  const animatedContainerStyle = useAnimatedStyle(() => ({
-    marginTop: animatedMarginTop.value,
-    zIndex: isThisStackDragging ? GAME_LAYERS.DRAGGED_STACK_BASE + cardIndex : GAME_LAYERS.BASE,
-    elevation: isThisStackDragging ? GAME_LAYERS.DRAGGED_STACK_BASE + cardIndex : 0,
-  }));
+  const globalDealingSequence = cardIndex * numberOfColumns + columnIndex;
+
+  const animatedContainerStyle = useAnimatedStyle(() => {
+    let layer = GAME_LAYERS.BASE;
+
+    if (isThisStackDragging) {
+      layer = GAME_LAYERS.DRAGGED_STACK_BASE + cardIndex;
+    } else if (isFlying.value) {
+      layer = GAME_LAYERS.DRAGGED_STACK_BASE + globalDealingSequence;
+    } else {
+      layer = GAME_LAYERS.BASE + cardIndex;
+    }
+
+    return {
+      marginTop: animatedMarginTop.value,
+      zIndex: layer,
+      elevation: isThisStackDragging || isFlying.value ? layer : 0,
+    };
+  }, [isThisStackDragging, cardIndex, globalDealingSequence]);
+
+  const customFlyInAnimation = () => {
+    "worklet";
+    const initialStaggerDelay =
+      globalDealingSequence * INTRO_ANIMATION.STAGGER_DELAY + INTRO_ANIMATION.BASE_PARENT_RENDER;
+
+    const columnsFromRightWall = numberOfColumns - 1 - columnIndex;
+    const estimatedDistanceToDeckX = columnsFromRightWall * (measuredCardWidth + 12);
+    const estimatedDistanceToDeckY = -(measuredCardHeight * 2);
+
+    const animations = {
+      opacity: withDelay(
+        initialStaggerDelay,
+        withTiming(1, { duration: INTRO_ANIMATION.CARD_FLY_DURATION })
+      ),
+      transform: [
+        {
+          translateX: withDelay(
+            initialStaggerDelay,
+            withTiming(0, { duration: INTRO_ANIMATION.CARD_FLY_DURATION })
+          ),
+        },
+        {
+          translateY: withDelay(
+            initialStaggerDelay,
+            withTiming(0, { duration: INTRO_ANIMATION.CARD_FLY_DURATION }, (finished) => {
+              if (finished) {
+                isFlying.value = false;
+              }
+            })
+          ),
+        },
+      ],
+    };
+
+    const initialValues = {
+      opacity: 0,
+      transform: [
+        { translateX: estimatedDistanceToDeckX },
+        { translateY: estimatedDistanceToDeckY },
+      ],
+    };
+
+    return {
+      initialValues,
+      animations,
+    };
+  };
 
   function handleDragStart() {
     setSelectedCardInfo({
@@ -90,7 +163,9 @@ export default function TableauColumn({
   }
 
   return (
-    <Animated.View style={animatedContainerStyle}>
+    <Animated.View
+      entering={customFlyInAnimation}
+      style={animatedContainerStyle}>
       <Card
         columnIndex={columnIndex}
         cardIndex={cardIndex}
