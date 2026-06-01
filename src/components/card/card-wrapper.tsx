@@ -1,9 +1,9 @@
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { memo } from "react";
-import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 
 import { theme } from "@/lib/theme";
-import { CardVariants } from "@/types";
+import { CardVariant, SpacingVariant } from "@/types";
 
 import DraggableCardWrapper, { type OnCardDragEnd } from "@/components/card/draggable-card-wrapper";
 
@@ -11,10 +11,10 @@ interface CardWrapperProps {
   columnIndex?: number;
   cardIndex?: number;
   stackStartIndex?: number;
-  variant: CardVariants;
+  variant: CardVariant;
+  spacingVariant?: SpacingVariant;
   isTopCard?: boolean;
   children?: React.ReactNode;
-  containerStyle?: ViewStyle;
   onPress?: () => void;
   onDragStart?: () => void;
   onDragEnd?: OnCardDragEnd;
@@ -27,7 +27,7 @@ export default function CardWrapper({
   variant,
   isTopCard,
   children,
-  containerStyle,
+  spacingVariant,
   onPress,
   onDragStart,
   onDragEnd,
@@ -41,8 +41,10 @@ export default function CardWrapper({
     !isTopCard &&
       variant !== "hidden" &&
       variant !== "empty" &&
-      variant !== "waste" &&
-      styles.textWrapperPeekOverride,
+      variant !== "waste" && [
+        styles.textWrapperPeekOverride,
+        spacingVariant === "default" && { paddingTop: 4 },
+      ],
   ];
 
   const content = (
@@ -60,7 +62,7 @@ export default function CardWrapper({
 
   if (isGestureEnabled) {
     return (
-      <View style={[styles.baseSize, containerStyle]}>
+      <View style={styles.baseSize}>
         <DraggableCardWrapper
           columnIndex={columnIndex}
           cardIndex={cardIndex}
@@ -77,14 +79,14 @@ export default function CardWrapper({
   if (onPress) {
     return (
       <Pressable
-        style={[styles.baseSize, containerStyle]}
+        style={styles.baseSize}
         onPress={onPress}>
         {content}
       </Pressable>
     );
   }
 
-  return <View style={[styles.baseSize, containerStyle]}>{content}</View>;
+  return <View style={styles.baseSize}>{content}</View>;
 }
 
 const StaticPattern = memo(function StaticPattern() {
@@ -141,7 +143,6 @@ const styles = StyleSheet.create({
   },
   textWrapperPeekOverride: {
     justifyContent: "flex-start",
-    paddingTop: 4,
   },
   visible: {
     backgroundColor: theme.colors.cardFront,

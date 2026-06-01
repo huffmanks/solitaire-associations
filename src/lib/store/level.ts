@@ -77,6 +77,11 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         let wasSuccessful = false;
         let completedTargetIndex: number | null = null;
 
+        if (target.type === "foundation" && target.index >= get().numberOfColumns) {
+          set({ selectedCardInfo: null });
+          return false;
+        }
+
         set((state) => {
           const workingColumns = state.columns.map((col) => [...col]);
           const workingWaste = [...state.waste];

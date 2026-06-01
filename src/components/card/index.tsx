@@ -1,9 +1,9 @@
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-import { StyleSheet, Text, View, ViewStyle } from "react-native";
+import { StyleSheet, Text, View } from "react-native";
 
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
-import { CardType } from "@/types";
+import { CardType, SpacingVariant } from "@/types";
 
 import CardWrapper from "@/components/card/card-wrapper";
 import type { OnCardDragEnd } from "@/components/card/draggable-card-wrapper";
@@ -13,8 +13,8 @@ interface CardProps {
   cardIndex?: number;
   stackStartIndex?: number;
   card: CardType;
-  containerStyle?: ViewStyle;
   isTopCard?: boolean;
+  spacingVariant?: SpacingVariant;
   onDragStart?: () => void;
   onDragEnd?: OnCardDragEnd;
 }
@@ -24,8 +24,8 @@ export default function Card({
   cardIndex,
   stackStartIndex,
   card,
-  containerStyle,
   isTopCard = true,
+  spacingVariant,
   onDragStart,
   onDragEnd,
 }: CardProps) {
@@ -40,7 +40,7 @@ export default function Card({
   const currentCount = stack ? stack.length - 1 : 0;
   const totalNeeded = card.totalInCategory || 0;
 
-  const dynamicSizes = {
+  const dynamicStyles = {
     categoryTextCount: {
       fontSize: numberOfColumns === 5 ? 9 : numberOfColumns === 4 ? 11 : 12,
     },
@@ -48,7 +48,9 @@ export default function Card({
       fontSize: numberOfColumns === 5 ? 11 : numberOfColumns === 4 ? 13 : 14,
     },
     peekTextOffset: {
-      fontSize: numberOfColumns === 3 ? 11 : 10,
+      fontSize: spacingVariant === "small" ? 8 : numberOfColumns === 3 ? 11 : 10,
+      lineHeight: spacingVariant === "small" ? 9 : 12,
+      display: spacingVariant === "condensed" ? ("none" as const) : ("flex" as const),
     },
     categoryCrownSize: numberOfColumns === 5 ? 12 : numberOfColumns === 4 ? 15 : 18,
   };
@@ -60,7 +62,6 @@ export default function Card({
         cardIndex={cardIndex}
         stackStartIndex={stackStartIndex}
         variant="hidden"
-        containerStyle={containerStyle}
       />
     );
   }
@@ -73,29 +74,28 @@ export default function Card({
         stackStartIndex={stackStartIndex}
         variant="category"
         isTopCard={isTopCard}
-        containerStyle={containerStyle}
         onDragStart={onDragStart}
         onDragEnd={onDragEnd}>
         <View style={styles.categoryHeader}>
           <View style={styles.categoryTextCountWrapper}>
-            <Text style={[styles.categoryTextCount, dynamicSizes.categoryTextCount]}>
+            <Text style={[styles.categoryTextCount, dynamicStyles.categoryTextCount]}>
               {currentCount}
             </Text>
-            <Text style={[styles.categoryTextCount, dynamicSizes.categoryTextCount]}>/</Text>
-            <Text style={[styles.categoryTextCount, dynamicSizes.categoryTextCount]}>
+            <Text style={[styles.categoryTextCount, dynamicStyles.categoryTextCount]}>/</Text>
+            <Text style={[styles.categoryTextCount, dynamicStyles.categoryTextCount]}>
               {totalNeeded}
             </Text>
           </View>
           <FontAwesome6
             name="crown"
-            size={dynamicSizes.categoryCrownSize}
+            size={dynamicStyles.categoryCrownSize}
             color={theme.colors.categoryCardForeground}
           />
         </View>
         <Text
           style={[
             styles.baseTextContent,
-            dynamicSizes.baseTextContent,
+            dynamicStyles.baseTextContent,
             styles.categoryTextContent,
             styles.categoryTextOffset,
           ]}>
@@ -111,16 +111,17 @@ export default function Card({
       cardIndex={cardIndex}
       stackStartIndex={stackStartIndex}
       variant="visible"
+      spacingVariant={spacingVariant}
       isTopCard={isTopCard}
-      containerStyle={containerStyle}
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}>
       <Text
+        numberOfLines={1}
         style={[
           styles.baseTextContent,
-          dynamicSizes.baseTextContent,
+          dynamicStyles.baseTextContent,
           styles.textContent,
-          !isTopCard ? [styles.peekTextOffset, dynamicSizes.peekTextOffset] : null,
+          !isTopCard ? [styles.peekTextOffset, dynamicStyles.peekTextOffset] : null,
         ]}>
         {card.content}
       </Text>
@@ -142,10 +143,11 @@ const styles = StyleSheet.create({
     paddingTop: 10,
   },
   peekTextOffset: {
-    lineHeight: 12,
-    fontWeight: "600",
+    width: "100%",
+    paddingInline: 4,
+    fontWeight: "900",
     textAlign: "center",
-    width: "90%",
+    letterSpacing: 0.05,
   },
   categoryTextCountWrapper: {
     flexDirection: "row",
@@ -158,6 +160,7 @@ const styles = StyleSheet.create({
   baseTextContent: {
     fontWeight: "900",
     textAlign: "center",
+    paddingInline: 4,
   },
   categoryTextContent: {
     color: theme.colors.categoryCardForeground,

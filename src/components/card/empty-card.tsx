@@ -1,9 +1,9 @@
-import { CardVariants } from "@/types";
+import { CardVariant } from "@/types";
 
 import CardWrapper from "@/components/card/card-wrapper";
 
 interface EmptyCardProps {
-  variant?: CardVariants;
+  variant?: CardVariant;
   children?: React.ReactNode;
 }
 

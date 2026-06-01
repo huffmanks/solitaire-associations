@@ -126,7 +126,7 @@ export default function Board() {
       />
 
       <View style={styles.foundationRow}>
-        {foundation.map((stack, i) => (
+        {foundation.slice(0, activeGridColumns).map((stack, i) => (
           <View
             key={i}
             style={cardSize}
