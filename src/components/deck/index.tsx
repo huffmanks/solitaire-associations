@@ -62,7 +62,7 @@ const styles = StyleSheet.create({
   },
   deckCount: {
     color: theme.colors.foreground,
-    fontWeight: "bold",
+    fontWeight: "700",
   },
   recycleCenter: {
     alignItems: "center",

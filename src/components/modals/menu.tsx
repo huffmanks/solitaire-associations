@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
   menuText: {
     color: theme.colors.muted,
     fontSize: 28,
-    fontWeight: 700,
+    fontWeight: "700",
     textAlign: "center",
   },
   buttonWrapper: {

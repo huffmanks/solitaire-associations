@@ -20,8 +20,8 @@ export const BOARD_LAYOUT = {
 };
 
 export const ANIMATION_DELAY_MS = {
-  COMPLETION: 1500,
-  SHOW_MODAL: 1700,
+  COMPLETION: 900,
+  SHOW_MODAL: 1400,
 };
 
 export const CARD_COLUMN_VISIBLE_PEEK = 24;

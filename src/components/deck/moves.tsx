@@ -79,10 +79,10 @@ const styles = StyleSheet.create({
   },
   heading: {
     color: theme.colors.greenButtonRim,
-    fontWeight: 700,
+    fontWeight: "700",
   },
   count: {
     color: theme.colors.greenButtonRim,
-    fontWeight: 900,
+    fontWeight: "900",
   },
 });

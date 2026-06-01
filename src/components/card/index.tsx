@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   peekTextOffset: {
     fontSize: 11,
     lineHeight: 12,
-    fontWeight: 600,
+    fontWeight: "600",
     textAlign: "center",
     width: "90%",
   },
@@ -127,11 +127,11 @@ const styles = StyleSheet.create({
   },
   categoryTextCount: {
     color: theme.colors.foreground,
-    fontWeight: 700,
+    fontWeight: "700",
     fontSize: 12,
   },
   baseTextContent: {
-    fontWeight: 900,
+    fontWeight: "900",
     fontSize: 14,
     textAlign: "center",
   },

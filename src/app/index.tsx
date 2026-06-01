@@ -47,6 +47,6 @@ const styles = StyleSheet.create({
   link: {
     color: theme.colors.goldDark,
     fontSize: 20,
-    fontWeight: 700,
+    fontWeight: "700",
   },
 });

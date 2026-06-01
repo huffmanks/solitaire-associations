@@ -1,6 +1,7 @@
 export const theme = {
   colors: {
     black: "hsl(0, 0%, 7%)",
+    gray: "hsl(0, 0%, 60%)",
     muted: "hsl(144, 100%, 10%)",
     foreground: "hsl(0, 0%, 100%)",
     modalOverlay: "hsla(0, 0%, 0%, 0.70)",
