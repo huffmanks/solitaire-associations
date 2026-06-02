@@ -107,7 +107,7 @@ export default function WonLevelModal({ setIsMenuOpen }: WonLevelModalProps) {
 
         <Button3d
           isFullWidth
-          backgroundColor={theme.colors.red}
+          backgroundColor={theme.colors.redLight}
           borderColor={theme.colors.redButtonRim}
           onPress={handlePlayAgain}>
           <View style={styles.buttonWrapper}>
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: theme.colors.goldDarker,
+    backgroundColor: theme.colors.goldDark,
     justifyContent: "center",
     alignItems: "center",
     marginBlockStart: 10,

@@ -57,7 +57,7 @@ const styles = StyleSheet.create({
     width: 70,
     height: 70,
     borderRadius: 35,
-    backgroundColor: theme.colors.red,
+    backgroundColor: theme.colors.redLight,
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 15,

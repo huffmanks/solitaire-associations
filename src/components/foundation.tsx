@@ -210,7 +210,7 @@ const styles = StyleSheet.create({
     top: -15,
     left: 8,
     right: 8,
-    backgroundColor: theme.colors.categoryCardFront,
+    backgroundColor: theme.colors.purpleDark,
     paddingVertical: 2,
     paddingHorizontal: 4,
     borderTopLeftRadius: 6,
@@ -220,7 +220,7 @@ const styles = StyleSheet.create({
     zIndex: GAME_LAYERS.CARD_ACCENT_UNDER,
   },
   badgeText: {
-    color: theme.colors.categoryCardForeground,
+    color: theme.colors.foreground,
     fontSize: 8,
     fontWeight: "900",
     letterSpacing: 0.05,

@@ -43,7 +43,7 @@ export default function Button3d({
     height: isCircle ? 40 : 60,
     borderWidth: borderBottomWidth.pressed,
     borderRadius: isCircle ? 9999 : 16,
-    backgroundColor: backgroundColor ?? theme.colors.blueDark,
+    backgroundColor: backgroundColor ?? theme.colors.blueLight,
     borderColor: borderColor ?? theme.colors.blueButtonRim,
   };
 

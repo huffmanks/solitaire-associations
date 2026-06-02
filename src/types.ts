@@ -5,6 +5,12 @@ export type CardType = {
   isFaceUp: boolean;
   type: "word" | "category";
   totalInCategory?: number;
+
+  isLock?: boolean;
+  isKey?: boolean;
+  keysRequired?: number;
+  keysCollected?: number;
+  lockColorId?: LockColorId;
 };
 
 export type SelectedCardInfo = {
@@ -14,12 +20,29 @@ export type SelectedCardInfo = {
   cardIndex?: number;
 };
 
+export type GameDifficulty = "easy" | "medium" | "hard" | "random";
+
 export type LevelConfig = {
   columnsCount: number;
   categories: Array<string>;
+  difficulty: GameDifficulty;
+  locks?: Array<{
+    id: string;
+    keysRequired: number;
+  }>;
 };
 
-export type CardVariant = "visible" | "hidden" | "category" | "empty" | "waste";
+export type LockColorId = "red" | "orange" | "yellow";
+
+export type CardVariant =
+  | "visible"
+  | "hidden"
+  | "category"
+  | "empty"
+  | "waste"
+  | "red"
+  | "orange"
+  | "yellow";
 export type SpacingVariant = "default" | "small" | "condensed";
 
 export type MoveCardTarget = {
@@ -50,6 +73,7 @@ export type LevelStoreState = {
   movesCount: number;
   maxMoves: number;
   score: number;
+  isGameDealt: boolean;
   hasWon: boolean;
   hasLost: boolean;
   history: Array<HistorySnapshot>;
@@ -63,6 +87,7 @@ export type LevelStoreActions = {
     currentLevel: number;
     forceRefresh?: boolean;
   }) => void;
+  setIsGameDealt: ({ isGameDealt }: { isGameDealt: boolean }) => void;
   setSelectedCardInfo: ({ info }: { info: SelectedCardInfo | null }) => void;
   executeCardMove: ({
     target,

@@ -33,6 +33,7 @@ const initialLevelStoreState: LevelStoreState = {
   movesCount: 0,
   maxMoves: 0,
   score: 0,
+  isGameDealt: false,
   hasWon: false,
   hasLost: false,
   history: [],
@@ -60,6 +61,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
         const computedMaxMoves = Math.ceil(tableauMoveBudget + deckCycleBudget);
 
         set({
+          isGameDealt: false,
           movesCount: 0,
           score: 0,
           hasWon: false,
@@ -72,6 +74,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           maxMoves: computedMaxMoves,
         });
       },
+      setIsGameDealt: ({ isGameDealt }) => set({ isGameDealt }),
       setSelectedCardInfo: ({ info }) => set({ selectedCardInfo: info }),
       executeCardMove: ({ target, currentLevel }) => {
         let wasSuccessful = false;
@@ -94,6 +97,18 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           );
 
           if (movingCardsList.length === 0) return { selectedCardInfo: null };
+
+          if (movingCardsList[0].isLock) {
+            return { selectedCardInfo: null };
+          }
+
+          if (target.type === "tableau") {
+            const targetColumn = workingColumns[target.index];
+            const targetTopCard = targetColumn[targetColumn.length - 1];
+            if (targetTopCard && targetTopCard.isLock) {
+              return { selectedCardInfo: null };
+            }
+          }
 
           if (target.type === "tableau" && sourceColumnIndex === target.index) {
             wasSuccessful = true;
@@ -118,20 +133,46 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           if (state.selectedCardInfo?.type === "tableau" && sourceColumnIndex !== null) {
             const sourceColumn = workingColumns[sourceColumnIndex];
             sourceColumn.splice(sourceColumn.length - movingCardsList.length);
-
-            if (sourceColumn.length > 0) {
-              sourceColumn[sourceColumn.length - 1] = {
-                ...sourceColumn[sourceColumn.length - 1],
-                isFaceUp: true,
-              };
-            }
           } else if (state.selectedCardInfo?.type === "waste") {
             workingWaste.pop();
           }
 
-          const dynamicColumns = resolution.nextColumns || workingColumns;
+          let dynamicColumns = resolution.nextColumns || workingColumns;
           let dynamicFoundation = resolution.nextFoundation || state.foundation;
           const dynamicCompleted = resolution.nextCompletedCategories || state.completedCategories;
+
+          dynamicColumns.forEach((col) => {
+            if (col.length > 0) {
+              col[col.length - 1].isFaceUp = true;
+
+              let topCard = col[col.length - 1];
+
+              if (topCard.isKey) {
+                const targetColor = topCard.lockColorId;
+
+                for (let searchCol of dynamicColumns) {
+                  const matchingLockCard = searchCol.find(
+                    (c) => c.isLock && c.lockColorId === targetColor
+                  );
+
+                  if (matchingLockCard) {
+                    matchingLockCard.keysCollected = (matchingLockCard.keysCollected || 0) + 1;
+
+                    if (matchingLockCard.keysCollected >= (matchingLockCard.keysRequired || 1)) {
+                      delete matchingLockCard.isLock;
+                      delete matchingLockCard.keysRequired;
+                      delete matchingLockCard.keysCollected;
+                      delete matchingLockCard.lockColorId;
+                    }
+                    break;
+                  }
+                }
+
+                delete topCard.isKey;
+                delete topCard.lockColorId;
+              }
+            }
+          });
 
           if (
             target.type === "foundation" &&

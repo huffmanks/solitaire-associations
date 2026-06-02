@@ -39,7 +39,7 @@ export default function MenuModal({ isMenuOpen, setIsMenuOpen }: MenuModalProps)
           <View style={styles.closeButtonWrapper}>
             <Button3d
               isCircle
-              backgroundColor={theme.colors.red}
+              backgroundColor={theme.colors.redLight}
               borderColor={theme.colors.redButtonRim}
               onPress={() => setIsMenuOpen(false)}>
               <FontAwesome6

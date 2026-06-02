@@ -5,6 +5,7 @@ import Animated, {
   withDelay,
   withTiming,
 } from "react-native-reanimated";
+import { scheduleOnRN } from "react-native-worklets";
 
 import { CARD_COLUMN_VISIBLE_PEEK, GAME_LAYERS, INTRO_ANIMATION } from "@/lib/constants";
 import { useLevelStore } from "@/lib/store/level";
@@ -33,10 +34,12 @@ export default function TableauColumn({
   handleDragEnd,
 }: TableauColumnProps) {
   const numberOfColumns = useLevelStore((state) => state.numberOfColumns);
+  const isGameDealt = useLevelStore((state) => state.isGameDealt);
   const selectedCardInfo = useLevelStore((state) => state.selectedCardInfo);
   const setSelectedCardInfo = useLevelStore((state) => state.setSelectedCardInfo);
+  const setIsGameDealt = useLevelStore((state) => state.setIsGameDealt);
 
-  const isFlying = useSharedValue(true);
+  const isFlying = useSharedValue(!isGameDealt);
 
   const isTopCard = cardIndex === column.length - 1;
   const topCardInColumn = column[column.length - 1];
@@ -56,6 +59,7 @@ export default function TableauColumn({
     selectedCardInfo !== null &&
     selectedCardInfo.type === "tableau" &&
     selectedCardInfo.columnIndex === columnIndex &&
+    stackRootIndex === selectedCardInfo.cardIndex &&
     cardIndex >= (selectedCardInfo.cardIndex ?? 0);
 
   const isOvercrowded = column.length > 7;
@@ -74,7 +78,7 @@ export default function TableauColumn({
     const activePeekValue = isThisStackDragging
       ? CARD_COLUMN_VISIBLE_PEEK / 4
       : isOvercrowded
-        ? CARD_COLUMN_VISIBLE_PEEK / 2
+        ? CARD_COLUMN_VISIBLE_PEEK / 1.5
         : CARD_COLUMN_VISIBLE_PEEK;
 
     const targetMargin = -(measuredCardHeight - activePeekValue);
@@ -105,6 +109,17 @@ export default function TableauColumn({
 
   const customFlyInAnimation = () => {
     "worklet";
+
+    if (isGameDealt) {
+      return {
+        initialValues: {
+          opacity: 1,
+          transform: [{ translateX: 0 }, { translateY: 0 }],
+        },
+        animations: {},
+      };
+    }
+
     const initialStaggerDelay =
       globalDealingSequence * INTRO_ANIMATION.STAGGER_DELAY + INTRO_ANIMATION.BASE_PARENT_RENDER;
 
@@ -130,6 +145,8 @@ export default function TableauColumn({
             withTiming(0, { duration: INTRO_ANIMATION.CARD_FLY_DURATION }, (finished) => {
               if (finished) {
                 isFlying.value = false;
+
+                scheduleOnRN(handleGameDealtBridge);
               }
             })
           ),
@@ -150,6 +167,10 @@ export default function TableauColumn({
       animations,
     };
   };
+
+  function handleGameDealtBridge() {
+    setIsGameDealt({ isGameDealt: true });
+  }
 
   function handleDragStart() {
     setSelectedCardInfo({

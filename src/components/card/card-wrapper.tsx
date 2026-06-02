@@ -1,9 +1,12 @@
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
 import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 import { memo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 
+import { GAME_LAYERS } from "@/lib/constants";
 import { theme } from "@/lib/theme";
-import { CardVariant, SpacingVariant } from "@/types";
+import { getLockKeyCardColors } from "@/lib/utils";
+import { CardVariant, LockColorId, SpacingVariant } from "@/types";
 
 import DraggableCardWrapper, { type OnCardDragEnd } from "@/components/card/draggable-card-wrapper";
 
@@ -14,6 +17,9 @@ interface CardWrapperProps {
   variant: CardVariant;
   spacingVariant?: SpacingVariant;
   isTopCard?: boolean;
+  isLock?: boolean;
+  isKey?: boolean;
+  lockColorId?: LockColorId;
   children?: React.ReactNode;
   onPress?: () => void;
   onDragStart?: () => void;
@@ -25,16 +31,21 @@ export default function CardWrapper({
   cardIndex,
   stackStartIndex,
   variant,
+  spacingVariant = "default",
   isTopCard,
+  isLock,
+  isKey,
+  lockColorId,
   children,
-  spacingVariant,
   onPress,
   onDragStart,
   onDragEnd,
 }: CardWrapperProps) {
   const isGestureEnabled = Boolean(onDragStart && onDragEnd);
 
-  const cardStyles = [styles.card, styles[variant]];
+  const dynamicVariant = lockColorId ? styles[lockColorId] : styles[variant];
+
+  const cardStyles = [styles.card, dynamicVariant];
 
   const textWrapperStyles = [
     styles.textWrapper,
@@ -47,14 +58,34 @@ export default function CardWrapper({
       ],
   ];
 
+  const lockKeyIndicatorStyles = [
+    styles.lockKeyIndicator,
+    spacingVariant === "default" && { top: 2 },
+    spacingVariant === "small" && { top: 1 },
+  ];
+
+  const { lightColor } = getLockKeyCardColors({ lockColorId });
+
   const content = (
     <View style={cardStyles}>
       {variant === "hidden" && (
-        <View
-          style={styles.patternContainer}
-          pointerEvents="none">
-          <StaticPattern />
-        </View>
+        <>
+          {isLock || isKey ? (
+            <View style={lockKeyIndicatorStyles}>
+              <FontAwesome6
+                name={isLock ? "lock" : "key"}
+                size={spacingVariant === "default" ? 16 : 11}
+                color={lightColor}
+              />
+            </View>
+          ) : (
+            <View
+              style={styles.patternContainer}
+              pointerEvents="none">
+              <StaticPattern />
+            </View>
+          )}
+        </>
       )}
       <View style={textWrapperStyles}>{children}</View>
     </View>
@@ -100,7 +131,7 @@ const StaticPattern = memo(function StaticPattern() {
         key={`c-${c}`}
         name="cards-diamond"
         size={32}
-        color={theme.colors.blueDark}
+        color={theme.colors.cardBackDiamond}
         style={styles.patternIcon}
       />
     );
@@ -144,17 +175,37 @@ const styles = StyleSheet.create({
   textWrapperPeekOverride: {
     justifyContent: "flex-start",
   },
+  lockKeyIndicator: {
+    position: "absolute",
+    left: 0,
+    right: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: GAME_LAYERS.CARD_ACCENT_OVER,
+  },
   visible: {
     backgroundColor: theme.colors.cardFront,
     borderColor: theme.colors.cardFrontBorder,
   },
+  red: {
+    backgroundColor: theme.colors.redDark,
+    borderColor: theme.colors.redBorder,
+  },
+  orange: {
+    backgroundColor: theme.colors.orangeDark,
+    borderColor: theme.colors.orangeBorder,
+  },
+  yellow: {
+    backgroundColor: theme.colors.yellowDark,
+    borderColor: theme.colors.yellowBorder,
+  },
   hidden: {
-    backgroundColor: theme.colors.blueLight,
-    borderColor: theme.colors.foreground,
+    backgroundColor: theme.colors.cardBack,
+    borderColor: theme.colors.blueButtonRim,
   },
   category: {
-    backgroundColor: theme.colors.categoryCardFront,
-    borderColor: theme.colors.categoryCardFrontBorder,
+    backgroundColor: theme.colors.purpleDark,
+    borderColor: theme.colors.purpleBorder,
   },
   empty: {
     backgroundColor: theme.colors.muted,
@@ -164,7 +215,6 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.greenDark,
     borderColor: theme.colors.muted,
   },
-  deck: {},
   patternContainer: {
     ...StyleSheet.absoluteFill,
     overflow: "hidden",

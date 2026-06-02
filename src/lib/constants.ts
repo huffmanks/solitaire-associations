@@ -88,12 +88,24 @@ export const WORD_BANK: Record<string, Array<string>> = {
 };
 
 export const LEVEL_CONFIGS: Record<number, LevelConfig> = {
-  2: {
-    columnsCount: 5,
-    categories: ["One", "Two"],
-  },
   1: {
     columnsCount: 4,
+    difficulty: "easy",
     categories: ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
+  },
+  2: {
+    columnsCount: 5,
+    difficulty: "easy",
+    categories: ["One", "Two"],
+  },
+  3: {
+    columnsCount: 4,
+    difficulty: "easy",
+    categories: ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
+    locks: [
+      { id: "lock-red", keysRequired: 2 },
+      { id: "lock-orange", keysRequired: 1 },
+      { id: "lock-yellow", keysRequired: 3 },
+    ],
   },
 };

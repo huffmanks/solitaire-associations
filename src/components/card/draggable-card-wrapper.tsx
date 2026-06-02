@@ -65,6 +65,7 @@ export default function DraggableCardWrapper({
         sharedTranslateX.value = 0;
         sharedTranslateY.value = 0;
         scale.value = withSpring(1);
+
         sharedActiveColIndex.value = -1;
         sharedDragStartIndex.value = -1;
         isDragging.value = false;
