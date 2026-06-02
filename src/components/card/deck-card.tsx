@@ -1,20 +1,16 @@
-import { useLevelStore } from "@/lib/store/level";
-
 import CardWrapper from "@/components/card/card-wrapper";
 
-export default function DeckCard({
-  isHidden,
-  children,
-}: {
+interface DeckCardProps {
   isHidden: boolean;
   children?: React.ReactNode;
-}) {
-  const drawCard = useLevelStore((state) => state.drawCard);
+  onPress: () => void;
+}
 
+export default function DeckCard({ isHidden, children, onPress }: DeckCardProps) {
   return (
     <CardWrapper
       variant={isHidden ? "hidden" : "empty"}
-      onPress={drawCard}>
+      onPress={onPress}>
       {children}
     </CardWrapper>
   );

@@ -3,7 +3,6 @@
 ## ui
 
 - [ ] deck show stack effect and in waste show top and previous 2 cards if applicable.
-- [ ] animate card flip from deck to waste.
 - [ ] animate card on undoLastMove.
 - [ ] add lockCards amd keyCards.
 
