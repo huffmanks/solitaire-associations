@@ -4,14 +4,14 @@ import { StyleSheet, View } from "react-native";
 import { useGameStore } from "@/lib/store/game";
 import { useLevelStore } from "@/lib/store/level";
 import { theme } from "@/lib/theme";
-import { getLevelConfig } from "@/lib/utils";
+import { loadLevelSession } from "@/lib/utils";
 
 export default function Completion() {
   const completedCategories = useLevelStore((state) => state.completedCategories);
   const currentLevel = useGameStore((state) => state.currentLevel);
 
-  const { categories } = getLevelConfig({ currentLevel });
-  const totalBoxes = categories.length;
+  const { levelPack } = loadLevelSession({ currentLevel });
+  const totalBoxes = levelPack.categories.length;
   const completedCount = completedCategories.length;
   return (
     <>

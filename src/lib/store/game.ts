@@ -17,6 +17,7 @@ const initialGameStoreState: GameStoreState = {
   currentLevel: 1,
   goldCount: 0,
   highestLevelBeaten: 0,
+  activeDifficulty: "easy",
 };
 
 export const useGameStore = create<GameStoreState & GameStoreActions>()(
@@ -24,6 +25,7 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
     (set) => ({
       ...initialGameStoreState,
       setCurrentLevel: ({ nextLevel }) => set({ currentLevel: nextLevel }),
+
       recordLevelVictory: ({ currentLevel, score }) =>
         set((state) => {
           const isNewMilestone = currentLevel > state.highestLevelBeaten;
@@ -32,6 +34,9 @@ export const useGameStore = create<GameStoreState & GameStoreActions>()(
             highestLevelBeaten: isNewMilestone ? currentLevel : state.highestLevelBeaten,
           };
         }),
+      setActiveDifficulty: ({ nextActiveDifficulty }) =>
+        set({ activeDifficulty: nextActiveDifficulty }),
+
       reset: () => set(initialGameStoreState),
     }),
     {

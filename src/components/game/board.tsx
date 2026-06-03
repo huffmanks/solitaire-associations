@@ -9,11 +9,11 @@ import { useLevelStore } from "@/lib/store/level";
 import { resolveDropTarget } from "@/lib/utils";
 import { LayoutRect } from "@/types";
 
-import ActionBar from "@/components/action-bar";
 import EmptyCard from "@/components/card/empty-card";
 import Deck from "@/components/deck";
-import Foundation from "@/components/foundation";
-import TableauColumn from "@/components/tableau-column";
+import ActionBar from "@/components/game/action-bar";
+import Foundation from "@/components/game/foundation";
+import TableauColumn from "@/components/game/tableau-column";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 
@@ -25,27 +25,16 @@ export default function Board() {
   const tableauRefs = useRef<(View | null)[]>([]);
 
   const currentLevel = useGameStore((state) => state.currentLevel);
-  const {
-    columns,
-    foundation,
-    numberOfColumns,
-    setSelectedCardInfo,
-    executeCardMove,
-    initializeLevel,
-  } = useLevelStore(
-    useShallow((state) => ({
-      columns: state.columns,
-      foundation: state.foundation,
-      numberOfColumns: state.numberOfColumns,
-      setSelectedCardInfo: state.setSelectedCardInfo,
-      executeCardMove: state.executeCardMove,
-      initializeLevel: state.initializeLevel,
-    }))
-  );
-
-  useEffect(() => {
-    initializeLevel({ currentLevel });
-  }, [currentLevel]);
+  const { columns, foundation, numberOfColumns, setSelectedCardInfo, executeCardMove } =
+    useLevelStore(
+      useShallow((state) => ({
+        columns: state.columns,
+        foundation: state.foundation,
+        numberOfColumns: state.numberOfColumns,
+        setSelectedCardInfo: state.setSelectedCardInfo,
+        executeCardMove: state.executeCardMove,
+      }))
+    );
 
   useEffect(() => {
     measureLayouts();

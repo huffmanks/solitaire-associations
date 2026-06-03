@@ -1,5 +1,5 @@
 import { SCORING } from "@/lib/constants";
-import { getLevelConfig } from "@/lib/utils";
+import { loadLevelSession } from "@/lib/utils";
 import { CardType, HistorySnapshot, LevelStoreState } from "@/types";
 
 export function getSameCategoryGroup(
@@ -138,12 +138,12 @@ export function createSnapshot(state: LevelStoreState): HistorySnapshot {
 
 export function checkWinCondition({
   completedCategories,
-  totalLevelCategoriesCount,
+  numberOfCategories,
 }: {
   completedCategories: Array<string>;
-  totalLevelCategoriesCount: number;
+  numberOfCategories: number;
 }): boolean {
-  return completedCategories.length === totalLevelCategoriesCount;
+  return completedCategories.length === numberOfCategories;
 }
 
 export function completeTurn(
@@ -155,10 +155,10 @@ export function completeTurn(
   const nextCompletedCategories = updatedState.completedCategories ?? state.completedCategories;
   const maxMoves = state.maxMoves;
 
-  const totalLevelCategoriesCount = getLevelConfig({ currentLevel }).categories.length;
+  const { levelPack } = loadLevelSession({ currentLevel });
   const isWin = checkWinCondition({
     completedCategories: nextCompletedCategories,
-    totalLevelCategoriesCount,
+    numberOfCategories: levelPack.numberOfCategories,
   });
 
   const isLoss = !isWin && nextMovesCount >= maxMoves;

@@ -1,4 +1,4 @@
-import { LevelConfig } from "@/types";
+import { LevelDifficulty, MaxMoves, NumberOfColumns } from "@/types";
 
 export const CARD_COUNT_PER_COLUMN = {
   MIN: 2,
@@ -75,37 +75,10 @@ export const SCORING = {
   },
 };
 
-export const WORD_BANK: Record<string, Array<string>> = {
-  Animals: ["Sheep", "Pig", "Goat", "Horse", "Monkey", "Bear"],
-  Cinema: ["Western", "Drama", "Comedy", "Horror", "Popcorn", "Ticket"],
-  Calendar: ["Day", "Week", "Month", "Year"],
-  Burger: ["Beef", "Bun", "Sauce", "Cheese"],
-  Book: ["Page", "Paper", "Cover"],
-  Landmass: ["Asia", "Africa", "Europe"],
-  One: ["10", "11"],
-  Two: ["20", "21"],
-  Three: ["30", "31", "32"],
-};
+export const LEVEL_DIFFICULTIES: Array<LevelDifficulty> = ["easy", "medium", "hard"];
 
-export const LEVEL_CONFIGS: Record<number, LevelConfig> = {
-  1: {
-    columnsCount: 4,
-    difficulty: "easy",
-    categories: ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
-  },
-  2: {
-    columnsCount: 5,
-    difficulty: "easy",
-    categories: ["One", "Two"],
-  },
-  3: {
-    columnsCount: 4,
-    difficulty: "easy",
-    categories: ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
-    locks: [
-      { id: "lock-red", keysRequired: 2 },
-      { id: "lock-orange", keysRequired: 1 },
-      { id: "lock-yellow", keysRequired: 3 },
-    ],
-  },
+export const MAX_MOVES_MAP: Record<NumberOfColumns, MaxMoves> = {
+  3: 72,
+  4: 132,
+  5: 196,
 };

@@ -3,7 +3,8 @@ import { createMMKV } from "react-native-mmkv";
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 
-import { ANIMATION_DELAY_MS, MOVE_BALANCING } from "@/lib/constants";
+import { ANIMATION_DELAY_MS, MAX_MOVES_MAP } from "@/lib/constants";
+import { useGameStore } from "@/lib/store/game";
 import {
   completeTurn,
   createSnapshot,
@@ -11,7 +12,7 @@ import {
   validateAndApplyFoundationMove,
   validateAndApplyTableauMove,
 } from "@/lib/store/helpers";
-import { generateInitialColumns } from "@/lib/utils";
+import { loadLevelSession } from "@/lib/utils";
 import { LevelStoreActions, LevelStoreState } from "@/types";
 
 const levelStorage = createMMKV({ id: "level" });
@@ -31,7 +32,7 @@ const initialLevelStoreState: LevelStoreState = {
   selectedCardInfo: null,
   completedCategories: [],
   movesCount: 0,
-  maxMoves: 0,
+  maxMoves: MAX_MOVES_MAP[3],
   score: 0,
   isGameDealt: false,
   hasWon: false,
@@ -48,17 +49,19 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           return;
         }
 
-        const initialGameState = generateInitialColumns({ currentLevel });
-        const totalCardsCount = initialGameState.columns.reduce((sum, col) => sum + col.length, 0);
-        const deckCardsCount = initialGameState.deck?.length || 0;
-        const colCount = initialGameState.numberOfColumns;
+        const { levelPack } = loadLevelSession({ currentLevel });
+        const activeDifficulty = useGameStore.getState().activeDifficulty || "medium";
+        const chosenLayout = levelPack.modes[activeDifficulty];
 
-        const tableauMoveBudget =
-          totalCardsCount *
-          (MOVE_BALANCING.BASE_MOVES_PER_CARD +
-            colCount * MOVE_BALANCING.COLUMN_COMPLEXITY_MULTIPLIER);
-        const deckCycleBudget = deckCardsCount * MOVE_BALANCING.DECK_CYCLE_MULTIPLIER;
-        const computedMaxMoves = Math.ceil(tableauMoveBudget + deckCycleBudget);
+        const initialGameState = {
+          numberOfColumns: levelPack.numberOfColumns,
+          numberOfCategories: levelPack.numberOfCategories,
+          columns: chosenLayout.columns.map((col) => col.map((card) => ({ ...card }))),
+          deck: chosenLayout.deck.map((card) => ({ ...card })),
+          waste: [],
+        };
+
+        const maxMoves = MAX_MOVES_MAP[initialGameState.numberOfColumns];
 
         set({
           isGameDealt: false,
@@ -71,7 +74,7 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           completedCategories: [],
           ...initialGameState,
           foundation: Array.from({ length: initialGameState.numberOfColumns }, () => null),
-          maxMoves: computedMaxMoves,
+          maxMoves,
         });
       },
       setIsGameDealt: ({ isGameDealt }) => set({ isGameDealt }),

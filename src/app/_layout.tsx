@@ -11,7 +11,8 @@ export default function RootLayout() {
           navigationBarHidden: true,
         }}>
         <Stack.Screen name="index" />
-        <Stack.Screen name="game" />
+        <Stack.Screen name="game/index" />
+        <Stack.Screen name="game/[level]" />
       </Stack>
     </GestureHandlerRootView>
   );

@@ -1,0 +1,1534 @@
+[
+  {
+    "levelNumber": 1,
+    "numberOfColumns": 4,
+    "numberOfCategories": 6,
+    "categories": ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
+    "modes": {
+      "easy": {
+        "columns": [
+          [
+            {
+              "id": "b727cf79-0210-4e3c-8d7b-0e0d0a93cafe",
+              "content": "Week",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "1b1112b3-cae0-4f31-9dd1-f10fd3062eac",
+              "content": "Book",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3
+            },
+            {
+              "id": "ecf8c475-b5ef-4303-9be2-3b63d4e00876",
+              "content": "Monkey",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "dcc64803-1e42-454d-9bb9-9eb3c787032e",
+              "content": "Landmass",
+              "category": "Landmass",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 3
+            }
+          ],
+          [
+            {
+              "id": "676c0e6a-51d8-45bf-983c-6af9857e421b",
+              "content": "Popcorn",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "71d98bda-c6da-4d5e-ba92-986ae34933b0",
+              "content": "Goat",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "5a45bd96-578f-4b50-a1cf-30d3bfac7ab6",
+              "content": "Day",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "9ef64429-9e69-48c9-8259-af57393d161a",
+              "content": "Month",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "f97ca3ec-c3a8-4e82-ac81-280744ba9c57",
+              "content": "Animals",
+              "category": "Animals",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 6
+            }
+          ],
+          [
+            {
+              "id": "ef6a0663-36ea-44f8-b005-d8541295a4bb",
+              "content": "Asia",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "0b9ab78f-5b52-4b61-89dc-5aa6c76a3c9a",
+              "content": "Europe",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "629a8313-4c2e-47e6-b605-756118ff2ddb",
+              "content": "Cinema",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 6
+            },
+            {
+              "id": "4209c8b9-f5b6-498e-819f-8adb131a8a32",
+              "content": "Horse",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "e8e2cdd4-708c-4b92-8e50-45eef065b74e",
+              "content": "Sheep",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "7b0f5b23-64d9-4bf7-ad30-1e6d3e1f36f8",
+              "content": "Calendar",
+              "category": "Calendar",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 4
+            }
+          ],
+          [
+            {
+              "id": "38316731-c52c-4e2c-bf96-2b9c9264a22e",
+              "content": "Beef",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "50e6b211-a600-4d35-9ef4-4ed927d49774",
+              "content": "Western",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "55a0b091-8980-454d-b2fa-709051922258",
+              "content": "Comedy",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "48f2dc77-fa38-4618-a696-5dc5602b1150",
+              "content": "Bear",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "aac434a0-9912-4b1b-9d8f-803c6114c62e",
+              "content": "Year",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "7a470bd6-dbd1-4917-a1b9-412a1104a2bb",
+              "content": "Burger",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 4
+            },
+            {
+              "id": "a7c5e54a-0482-407c-ba21-becd00fdf7b8",
+              "content": "Cover",
+              "category": "Book",
+              "isFaceUp": true,
+              "type": "word"
+            }
+          ]
+        ],
+        "deck": [
+          {
+            "id": "cdcfec12-3779-4906-b732-c25bb902175c",
+            "content": "Ticket",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "91a7e8a0-bf91-4bbd-84cc-3283323af154",
+            "content": "Bun",
+            "category": "Burger",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "634cbdcc-ca2b-4e69-a841-76a474cff95a",
+            "content": "Pig",
+            "category": "Animals",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "90e440ee-fd12-4c92-8092-a57c95f61c14",
+            "content": "Page",
+            "category": "Book",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "0e00990b-a2c3-4db9-a94a-be6b5e86ba0a",
+            "content": "Horror",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "d6332435-3ddd-4a16-bcd2-5321c0f89598",
+            "content": "Paper",
+            "category": "Book",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "41fbc5c3-c56e-4021-92a7-fc399f281a2a",
+            "content": "Africa",
+            "category": "Landmass",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "f3035aed-4217-4026-8c3b-f2f6fc0d16b6",
+            "content": "Drama",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "993c6e0f-3c7d-4ad6-a9e8-86fb3e5dcc94",
+            "content": "Sauce",
+            "category": "Burger",
+            "isFaceUp": false,
+            "type": "word"
+          }
+        ]
+      },
+      "medium": {
+        "columns": [
+          [
+            {
+              "id": "82182639-456e-4901-aed2-8a2172ca79f4",
+              "content": "Goat",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "42ae2c38-184f-4765-90e1-d10c5cf0c884",
+              "content": "Comedy",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "512a137d-622c-4c01-850a-3aa5fdca64f2",
+              "content": "Horse",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "1560fc5b-3fe3-455d-a196-b51e897a5ba0",
+              "content": "Calendar",
+              "category": "Calendar",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 4
+            }
+          ],
+          [
+            {
+              "id": "9e91ee81-fdc9-47b5-a2a7-77e008891417",
+              "content": "Sauce",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "df2d94f1-ad8c-4e67-b44b-bb83bb64a54c",
+              "content": "Cinema",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 6
+            },
+            {
+              "id": "0378b52b-6d83-41d6-9ed9-8e9ef1529bdf",
+              "content": "Sheep",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "f3a6fd74-395a-4e45-80fa-ea94022c3153",
+              "content": "Monkey",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "39a8a75c-9e3d-46c5-bbee-368877243da6",
+              "content": "Animals",
+              "category": "Animals",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 6
+            }
+          ],
+          [
+            {
+              "id": "159fbc46-9502-4c97-8e65-3fd0d467d8cc",
+              "content": "Popcorn",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "9e92403d-b1e5-4f6b-a261-1d236bf9ed1b",
+              "content": "Cheese",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "f8d5b545-c7ea-4aba-ae42-29dd75ba00ee",
+              "content": "Beef",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "a1ff7a4e-c8ea-4981-a720-aa4905caa690",
+              "content": "Paper",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "8be42dfd-377c-4624-8483-0890692b43a2",
+              "content": "Ticket",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "324b9cff-88ef-4119-aa59-1ab29ce842d7",
+              "content": "Horror",
+              "category": "Cinema",
+              "isFaceUp": true,
+              "type": "word"
+            }
+          ],
+          [
+            {
+              "id": "6a12628a-5bf3-41fb-b1ef-828fd8ecc6fe",
+              "content": "Bun",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "070c7969-6cea-49b3-922d-5f3ff5237373",
+              "content": "Burger",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 4
+            },
+            {
+              "id": "1a838c61-3db2-4949-b68a-6ddfa6a34ff4",
+              "content": "Week",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "e966dc5b-76c8-415f-876e-870ff9c0a4fb",
+              "content": "Western",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "04a66708-5436-4d00-8d9d-42d05236f23c",
+              "content": "Book",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3
+            },
+            {
+              "id": "2f1d52a0-253e-42b3-a961-1663c10ab7d7",
+              "content": "Pig",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "74cc7065-29bd-4a82-afc7-0a7a2a556578",
+              "content": "Landmass",
+              "category": "Landmass",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 3
+            }
+          ]
+        ],
+        "deck": [
+          {
+            "id": "bfbf90cc-f595-4184-8b55-e5da9b604a46",
+            "content": "Page",
+            "category": "Book",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "8d5305fd-62ab-4019-95d2-df9a5f36db0c",
+            "content": "Africa",
+            "category": "Landmass",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "1ecde1e0-58d3-4234-ae59-1d5951019739",
+            "content": "Asia",
+            "category": "Landmass",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "afb7815d-4e24-43be-8ddb-d7fc11083d29",
+            "content": "Europe",
+            "category": "Landmass",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "a5a1da06-67f1-4268-b45f-5439492d4cde",
+            "content": "Cover",
+            "category": "Book",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "01933e0b-f58b-4cee-9dee-1efc6c497b79",
+            "content": "Bear",
+            "category": "Animals",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "e66e0912-639f-440e-b032-1083b45cb626",
+            "content": "Month",
+            "category": "Calendar",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "f4f73517-d233-4ed6-84a9-4d7be45e168a",
+            "content": "Drama",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "0353fdfb-cc6e-4570-a1da-e3bbcbe77ad2",
+            "content": "Day",
+            "category": "Calendar",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "fb553ea8-b8f5-49c7-a50f-75a5dcd8a7ee",
+            "content": "Year",
+            "category": "Calendar",
+            "isFaceUp": false,
+            "type": "word"
+          }
+        ]
+      },
+      "hard": {
+        "columns": [
+          [
+            {
+              "id": "5d78df6b-d747-42aa-957a-669ffe1151f7",
+              "content": "Animals",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 6
+            },
+            {
+              "id": "12be5122-89f9-4f66-bee2-d482b1cf865f",
+              "content": "Western",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "26e462b0-e1c8-42a6-9a36-916a986a4028",
+              "content": "Book",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3
+            },
+            {
+              "id": "79298eca-34e3-48a6-86e1-2d318e487d71",
+              "content": "Africa",
+              "category": "Landmass",
+              "isFaceUp": true,
+              "type": "word"
+            }
+          ],
+          [
+            {
+              "id": "e26f3825-e616-4c1d-8484-54decd985a39",
+              "content": "Cinema",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 6
+            },
+            {
+              "id": "89663d78-64ad-4448-a976-3eb5a86a335e",
+              "content": "Paper",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "02400074-7c47-4f66-a91c-6bc970e7059a",
+              "content": "Calendar",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 4
+            },
+            {
+              "id": "c0b215c7-a155-492d-9ffa-12f05e924f56",
+              "content": "Landmass",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3
+            },
+            {
+              "id": "4647488c-d1b8-41fc-90f9-5df32b5682b9",
+              "content": "Burger",
+              "category": "Burger",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 4
+            }
+          ],
+          [
+            {
+              "id": "2f3c116a-e2e9-4154-8076-3c777098aab7",
+              "content": "Horse",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "d9034596-32ea-4f0e-9366-deff370fdd44",
+              "content": "Sheep",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "41790f2a-8742-4e6f-beaf-e40971f0c1b4",
+              "content": "Ticket",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "651a58ec-ded3-42fb-b8b3-37c9eb23e0b5",
+              "content": "Bear",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "6f24c901-6aaf-4aab-99b0-c9472778941d",
+              "content": "Asia",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "4ce2caca-fc6d-4b10-890c-72c12ae85c89",
+              "content": "Popcorn",
+              "category": "Cinema",
+              "isFaceUp": true,
+              "type": "word"
+            }
+          ],
+          [
+            {
+              "id": "8558409a-4303-4449-a6c8-5dfef68719cb",
+              "content": "Week",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "cbf96e44-15ac-4c3d-bf5d-e1329a5a3c6f",
+              "content": "Sauce",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "bd66435f-0391-410c-a3f3-a19510f2af8b",
+              "content": "Horror",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "767e16c1-9992-4787-9e7a-2887192d9fd2",
+              "content": "Beef",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "1b7c9148-f34b-476b-9d41-daaf812ec17b",
+              "content": "Monkey",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "02ecefba-eef8-492f-8ba4-4906e881e73e",
+              "content": "Europe",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "632d3384-10ae-4a60-8b26-69b9fb64a989",
+              "content": "Bun",
+              "category": "Burger",
+              "isFaceUp": true,
+              "type": "word"
+            }
+          ]
+        ],
+        "deck": [
+          {
+            "id": "2b2bd710-251e-4e3f-9d3f-65671fd26799",
+            "content": "Cover",
+            "category": "Book",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "c6779b62-4f27-4f51-8e9d-ef90b378ab73",
+            "content": "Cheese",
+            "category": "Burger",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "20ad2238-72a7-4f7e-b158-4b6319932161",
+            "content": "Comedy",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "5d8148dd-c099-4a4c-9949-80207e38cb33",
+            "content": "Pig",
+            "category": "Animals",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "d878126f-1927-410c-8d08-62231d171a26",
+            "content": "Goat",
+            "category": "Animals",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "8f98382a-3941-4ecc-9292-07cca2a3e881",
+            "content": "Month",
+            "category": "Calendar",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "8170d169-7c87-463f-8590-87b0f6479496",
+            "content": "Page",
+            "category": "Book",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "8011990f-62d7-47a5-a935-30204aa1049b",
+            "content": "Drama",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "3f49ff59-5dfd-4130-8ffd-3764f71e0b17",
+            "content": "Year",
+            "category": "Calendar",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "6b75d8fe-3b8d-476e-92c2-8738fa9b3cc1",
+            "content": "Day",
+            "category": "Calendar",
+            "isFaceUp": false,
+            "type": "word"
+          }
+        ]
+      }
+    }
+  },
+  {
+    "levelNumber": 3,
+    "numberOfColumns": 5,
+    "numberOfCategories": 6,
+    "categories": ["Animals", "Cinema", "Calendar", "Burger", "Book", "Landmass"],
+    "modes": {
+      "easy": {
+        "columns": [
+          [
+            {
+              "id": "4853d87a-2109-4863-8843-30234d934bba",
+              "content": "Comedy",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "ea955ff3-6d0a-4ef5-8027-0d246cdf56f7",
+              "content": "Africa",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "d5b279a7-7157-482a-9322-ecab10bc330b",
+              "content": "Western",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word",
+              "isLock": true,
+              "lockColorId": "yellow",
+              "keysRequired": 1,
+              "keysCollected": 0
+            },
+            {
+              "id": "9124244f-add0-410f-a2e0-854c3ce0991d",
+              "content": "Monkey",
+              "category": "Animals",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ],
+          [
+            {
+              "id": "53aed8a7-18c4-4231-9f6f-6d13f312c4f7",
+              "content": "Bun",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "28a51d38-7a08-4d63-aea4-c6b35ed6797e",
+              "content": "Bear",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "3457f124-e1bc-4f24-b5aa-a1b2391dc9c2",
+              "content": "Burger",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 4
+            },
+            {
+              "id": "5b8ae5a9-4074-4f3c-8ca0-f2620dc1fc92",
+              "content": "Popcorn",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "357321d6-f60d-4d8b-94ae-b54943200703",
+              "content": "Cinema",
+              "category": "Cinema",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 6,
+              "isKey": true,
+              "lockColorId": "orange"
+            }
+          ],
+          [
+            {
+              "id": "a327fef4-9253-41f7-b7dd-2517d1255b1c",
+              "content": "Cover",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "41269b8e-3a2c-45c8-bbd1-bca9af17d6bc",
+              "content": "Goat",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "215ab0fe-4257-4079-bcdf-0b7572f015e6",
+              "content": "Animals",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 6
+            },
+            {
+              "id": "9e583ae3-6f99-40d9-88c6-d124946f50b9",
+              "content": "Asia",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word",
+              "isLock": true,
+              "lockColorId": "red",
+              "keysRequired": 3,
+              "keysCollected": 0
+            },
+            {
+              "id": "a9cef353-2b6f-47f4-8e49-c6cbadd714c6",
+              "content": "Book",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3
+            },
+            {
+              "id": "a52102a7-33f3-47ec-a219-bb2e50a2b900",
+              "content": "Calendar",
+              "category": "Calendar",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 4
+            }
+          ],
+          [
+            {
+              "id": "753cf421-d9e6-4219-8a9b-049287d31b83",
+              "content": "Pig",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "60924b30-370d-4a61-bb82-e61ed8e10834",
+              "content": "Landmass",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3
+            },
+            {
+              "id": "088533a6-5ff9-435c-b50a-692c04908a49",
+              "content": "Day",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "04f0e460-34cc-4f1f-a4e8-b0c7cb050a30",
+              "content": "Horror",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "f9e593ea-602e-4303-a329-cbf95f8ed214",
+              "content": "Cheese",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "354c8ed5-4aa1-472a-9698-1f2811ea10ed",
+              "content": "Beef",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "8deb3492-a992-4883-9269-d4f2eed78d5c",
+              "content": "Page",
+              "category": "Book",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ],
+          [
+            {
+              "id": "a0fe393c-87c8-4611-acf5-079a7a22cb03",
+              "content": "Paper",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "db7b1b5c-da8f-4ee4-819c-97e8f35f72e6",
+              "content": "Sheep",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "9df16372-853c-4221-a07b-b826dd6aa5ab",
+              "content": "Year",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "75020c93-a531-4d68-9e4c-a3610bd58df5",
+              "content": "Europe",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word",
+              "isLock": true,
+              "lockColorId": "orange",
+              "keysRequired": 2,
+              "keysCollected": 0
+            },
+            {
+              "id": "aa02bd17-797a-4715-9c18-9d807a15fb3e",
+              "content": "Horse",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "a20c22bf-ec05-4363-bbd7-592d722ea3a5",
+              "content": "Week",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "5a8590f5-a985-4d3c-b07c-61d4f883a257",
+              "content": "Sauce",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "9d63393e-91e0-4a10-99e5-cd5d83ab2524",
+              "content": "Drama",
+              "category": "Cinema",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ]
+        ],
+        "deck": [
+          {
+            "id": "c0562867-43d3-4e18-9bd5-9a3d29db8c18",
+            "content": "Ticket",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          }
+        ]
+      },
+      "medium": {
+        "columns": [
+          [
+            {
+              "id": "0e9c426b-c9d6-422f-9f36-ee2afa6b4e4c",
+              "content": "Pig",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "593ee81e-6062-4c2b-8ffd-1288652a1273",
+              "content": "Bun",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "bafc38b6-62fd-48f0-bbbd-a4ff722ded13",
+              "content": "Ticket",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "802b2467-3b11-4ccc-a876-7a8b154765a1",
+              "content": "Goat",
+              "category": "Animals",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ],
+          [
+            {
+              "id": "83b9067d-c755-4ecf-be23-41d4f5fd1b8e",
+              "content": "Drama",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "11645296-671c-4333-ab0f-dc0bbb865d7e",
+              "content": "Horse",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "ff15a04c-6b69-46d8-b26a-c5cd8b7f48c7",
+              "content": "Month",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "59e4845d-14ff-45ea-82db-ba7dc667aca8",
+              "content": "Sauce",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "f804770e-9b5b-4a7e-86f8-73871818c92a",
+              "content": "Africa",
+              "category": "Landmass",
+              "isFaceUp": true,
+              "type": "word"
+            }
+          ],
+          [
+            {
+              "id": "0bed2c2c-96dd-4a8e-a2ff-f8f7ebc883e9",
+              "content": "Popcorn",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "b05f821c-e9fb-4d3e-b66a-5a0cd0d881f7",
+              "content": "Beef",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "bf4d631f-064b-46ac-88a1-5cc31ddac8fa",
+              "content": "Calendar",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 4
+            },
+            {
+              "id": "0750963c-5f1c-4e44-9c24-a06144710ea4",
+              "content": "Landmass",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3,
+              "isLock": true,
+              "lockColorId": "red",
+              "keysRequired": 3,
+              "keysCollected": 0
+            },
+            {
+              "id": "fb6f041b-df66-42dc-907d-5eb88b716d81",
+              "content": "Book",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3
+            },
+            {
+              "id": "ea525b25-c901-43b6-a767-00c065e72daa",
+              "content": "Cinema",
+              "category": "Cinema",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 6
+            }
+          ],
+          [
+            {
+              "id": "e00acfe5-9f5b-404c-b89a-0b866c8b5b85",
+              "content": "Cheese",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "1458a9ce-55b4-4b20-80be-97776b77ab1f",
+              "content": "Sheep",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "35beba3d-8f92-4b43-985f-d9a7cf4acc0f",
+              "content": "Day",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word",
+              "isLock": true,
+              "lockColorId": "yellow",
+              "keysRequired": 1,
+              "keysCollected": 0
+            },
+            {
+              "id": "5df16906-3b67-495a-9082-662ff31ee729",
+              "content": "Western",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word",
+              "isLock": true,
+              "lockColorId": "orange",
+              "keysRequired": 2,
+              "keysCollected": 0
+            },
+            {
+              "id": "6a99b310-ac2d-4887-94e1-80926efd2475",
+              "content": "Monkey",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "14222072-8adc-4176-8688-bbe23d6e046f",
+              "content": "Animals",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 6
+            },
+            {
+              "id": "7c730081-ba64-490f-ac6e-31f86842ac6f",
+              "content": "Cover",
+              "category": "Book",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ],
+          [
+            {
+              "id": "eda1c3a6-6228-4b0a-8b0d-a56c78e8c4f6",
+              "content": "Year",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "0e10b01b-0589-4a5a-808c-4008684c3460",
+              "content": "Paper",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "cfe68bc5-f7b2-4ad8-ae6c-2e26781a3f81",
+              "content": "Week",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "227e78ea-ff4f-4566-86ac-8ce14030d20e",
+              "content": "Asia",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "9a329b86-d373-4da8-a915-a4645acf8e4c",
+              "content": "Page",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "d2c39f29-8cf0-480a-88a6-aba98f073a2a",
+              "content": "Horror",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "40e55b36-1d67-413a-b3f1-c69b098dcc28",
+              "content": "Europe",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "9d6fd661-39e6-4a62-9da9-c52d69b49c09",
+              "content": "Burger",
+              "category": "Burger",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 4,
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ]
+        ],
+        "deck": [
+          {
+            "id": "844d2386-c48f-4210-85e7-2933f7452fce",
+            "content": "Comedy",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "4da9cad6-b8ac-468f-bd4f-9b9954668fa9",
+            "content": "Bear",
+            "category": "Animals",
+            "isFaceUp": false,
+            "type": "word"
+          }
+        ]
+      },
+      "hard": {
+        "columns": [
+          [
+            {
+              "id": "e18281dd-a218-40e3-8f3d-ad5fcc6a3efb",
+              "content": "Animals",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 6
+            },
+            {
+              "id": "660ae989-47ff-41de-8a9c-ca205fdb34c8",
+              "content": "Bun",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "f19bbd1d-499a-4746-8cd7-452122380cd9",
+              "content": "Burger",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 4,
+              "isLock": true,
+              "lockColorId": "orange",
+              "keysRequired": 2,
+              "keysCollected": 0
+            },
+            {
+              "id": "b591e62a-208a-47e8-b541-4e9eb5b6eb4b",
+              "content": "Africa",
+              "category": "Landmass",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ],
+          [
+            {
+              "id": "27ac9511-9362-4387-b085-40ef0a26c36d",
+              "content": "Cinema",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 6
+            },
+            {
+              "id": "8129cbe4-f553-4bad-8af3-305262dd6a00",
+              "content": "Sheep",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "673203a0-a0cd-47f7-af67-c264be2444a2",
+              "content": "Europe",
+              "category": "Landmass",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "e64d30cf-cbc0-4846-bcc7-955bd85fa618",
+              "content": "Cheese",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "7449c03f-4442-4836-a7c7-27684bba7aaa",
+              "content": "Landmass",
+              "category": "Landmass",
+              "isFaceUp": true,
+              "type": "category",
+              "totalInCategory": 3,
+              "isKey": true,
+              "lockColorId": "orange"
+            }
+          ],
+          [
+            {
+              "id": "4b9c79bc-5257-4c0b-829b-8efde87a5287",
+              "content": "Horror",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "d63453eb-1ea0-43c1-9c3d-b699f72d35c6",
+              "content": "Cover",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "31fc3fad-32f4-431e-8f44-fec480453575",
+              "content": "Beef",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word",
+              "isLock": true,
+              "lockColorId": "yellow",
+              "keysRequired": 1,
+              "keysCollected": 0
+            },
+            {
+              "id": "86676edb-8d56-496b-abbf-b2cb8ea2972c",
+              "content": "Sauce",
+              "category": "Burger",
+              "isFaceUp": false,
+              "type": "word",
+              "isLock": true,
+              "lockColorId": "red",
+              "keysRequired": 3,
+              "keysCollected": 0
+            },
+            {
+              "id": "d45421e5-5541-4299-b27a-3a632916954e",
+              "content": "Year",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "99b91389-1ecc-4380-9b86-f4f8eadcd9e1",
+              "content": "Page",
+              "category": "Book",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "orange"
+            }
+          ],
+          [
+            {
+              "id": "bae1ad31-2a0e-47a9-8973-7c26bb92a395",
+              "content": "Day",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "4785aa7d-50df-4c80-b935-7fe7f82cb994",
+              "content": "Monkey",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "63e9808b-83a4-4504-b0c1-0006f6867e95",
+              "content": "Horse",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "822acddb-0193-48a8-bd07-bdccfaf034a0",
+              "content": "Book",
+              "category": "Book",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 3
+            },
+            {
+              "id": "920d7eb0-7f73-4d32-b179-015f00fdfd84",
+              "content": "Pig",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "2b10a506-5849-4a56-a5ba-96051f998e7b",
+              "content": "Week",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "2aa7b0b6-72f8-4012-bfb8-91f5a29b1d5a",
+              "content": "Ticket",
+              "category": "Cinema",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ],
+          [
+            {
+              "id": "fa52c8f8-33f6-426b-97fe-d8926c21a609",
+              "content": "Bear",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "e09a74bc-ff7c-490a-ae82-ff70c53b5030",
+              "content": "Comedy",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "4cf75a97-edd7-4d4d-9dd5-a1d8f92423ba",
+              "content": "Western",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "1a630d67-130e-4f17-b4f5-fd0b3b17a86b",
+              "content": "Month",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "e0312c8e-e389-485a-82c4-b5a794adfad0",
+              "content": "Popcorn",
+              "category": "Cinema",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "16beedfd-2aa6-4b0a-9a46-ed91ba4b9517",
+              "content": "Calendar",
+              "category": "Calendar",
+              "isFaceUp": false,
+              "type": "category",
+              "totalInCategory": 4
+            },
+            {
+              "id": "3c19ee2c-9131-418a-a1c9-8f1d04b49df5",
+              "content": "Goat",
+              "category": "Animals",
+              "isFaceUp": false,
+              "type": "word"
+            },
+            {
+              "id": "b13fca8e-1965-4bee-8615-5e91e0e65b6b",
+              "content": "Asia",
+              "category": "Landmass",
+              "isFaceUp": true,
+              "type": "word",
+              "isKey": true,
+              "lockColorId": "red"
+            }
+          ]
+        ],
+        "deck": [
+          {
+            "id": "5ea8ae9a-eed7-4a3f-b16e-84ec599bf317",
+            "content": "Drama",
+            "category": "Cinema",
+            "isFaceUp": false,
+            "type": "word"
+          },
+          {
+            "id": "e98488ab-6d00-4056-9d65-9f5d9d83e8be",
+            "content": "Paper",
+            "category": "Book",
+            "isFaceUp": false,
+            "type": "word"
+          }
+        ]
+      }
+    }
+  }
+]

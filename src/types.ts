@@ -1,3 +1,64 @@
+// Level
+export type LevelDifficulty = "easy" | "medium" | "hard";
+export type NumberOfColumns = 3 | 4 | 5;
+export type MaxMoves = 72 | 132 | 196;
+
+export type RawLevelConfig = {
+  levelNumber: number;
+  numberOfColumns: NumberOfColumns;
+  categories: Array<string>;
+  locks?: Array<{
+    id: LockColorId;
+    keysRequired: number;
+  }>;
+};
+
+export type LockRegistry = Record<
+  LockColorId,
+  { needed: number; collected: number; open: boolean }
+>;
+
+export type SimState = {
+  deckCycles: number;
+  columns: CardType[][];
+  deck: CardType[];
+  waste: CardType[];
+  foundations: string[];
+  activeLocks: LockRegistry;
+};
+
+export type PuzzleDataPool = Record<string, Array<string>>;
+
+export type PackDifficultyVariant = { columns: CardType[][]; deck: CardType[] };
+
+export type PackDifficultyVariants = {
+  easy: PackDifficultyVariant;
+  medium: PackDifficultyVariant;
+  hard: PackDifficultyVariant;
+};
+
+export type StaticLevelPack = {
+  levelNumber: number;
+  numberOfColumns: NumberOfColumns;
+  numberOfCategories: number;
+  categories: Array<string>;
+  modes: PackDifficultyVariants;
+};
+
+export type LevelSystemMetadata = {
+  totalLevels: number;
+  isCyclicFallback: boolean;
+  maxUniqueLevelNumber: number;
+  nextLevelNumber: number | null;
+  hasMoreLevels: boolean;
+};
+
+export type LevelDataResponse = {
+  levelPack: StaticLevelPack;
+  metadata: LevelSystemMetadata;
+};
+
+// Card
 export type CardType = {
   id: string;
   content: string;
@@ -13,26 +74,8 @@ export type CardType = {
   lockColorId?: LockColorId;
 };
 
-export type SelectedCardInfo = {
-  cardId: string;
-  type: "tableau" | "waste";
-  columnIndex?: number;
-  cardIndex?: number;
-};
-
-export type GameDifficulty = "easy" | "medium" | "hard" | "random";
-
-export type LevelConfig = {
-  columnsCount: number;
-  categories: Array<string>;
-  difficulty: GameDifficulty;
-  locks?: Array<{
-    id: string;
-    keysRequired: number;
-  }>;
-};
-
 export type LockColorId = "red" | "orange" | "yellow";
+export type SpacingVariant = "default" | "small" | "condensed";
 
 export type CardVariant =
   | "visible"
@@ -43,8 +86,8 @@ export type CardVariant =
   | "red"
   | "orange"
   | "yellow";
-export type SpacingVariant = "default" | "small" | "condensed";
 
+// Drag
 export type MoveCardTarget = {
   type: "tableau" | "foundation";
   index: number;
@@ -62,8 +105,9 @@ export type LayoutRect = {
   height: number;
 };
 
+// LevelStore
 export type LevelStoreState = {
-  numberOfColumns: number;
+  numberOfColumns: NumberOfColumns;
   columns: Array<Array<CardType>>;
   foundation: Array<Array<CardType> | null>;
   deck: Array<CardType>;
@@ -71,7 +115,7 @@ export type LevelStoreState = {
   selectedCardInfo: SelectedCardInfo | null;
   completedCategories: Array<string>;
   movesCount: number;
-  maxMoves: number;
+  maxMoves: MaxMoves;
   score: number;
   isGameDealt: boolean;
   hasWon: boolean;
@@ -110,15 +154,29 @@ export type HistorySnapshot = {
   completedCategories: Array<string>;
 };
 
+export type SelectedCardInfo = {
+  cardId: string;
+  type: "tableau" | "waste";
+  columnIndex?: number;
+  cardIndex?: number;
+};
+
+// GameStore
 export type GameStoreState = {
   currentLevel: number;
   goldCount: number;
   highestLevelBeaten: number;
+  activeDifficulty: LevelDifficulty;
 };
 
 export type GameStoreActions = {
   recordLevelVictory: ({ currentLevel, score }: { currentLevel: number; score: number }) => void;
   setCurrentLevel: ({ nextLevel }: { nextLevel: number }) => void;
+  setActiveDifficulty: ({
+    nextActiveDifficulty,
+  }: {
+    nextActiveDifficulty: LevelDifficulty;
+  }) => void;
 
   reset: () => void;
 };

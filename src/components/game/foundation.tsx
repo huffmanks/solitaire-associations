@@ -140,7 +140,15 @@ export default function Foundation({ stack }: FoundationProps) {
         <Animated.View
           key={topCard.id}
           style={[styles.cardContainer, animatedContainerStyle]}>
-          <Animated.View style={[styles.greenFlashRing, animatedRingStyle]} />
+          <Animated.View
+            style={[
+              styles.flashRing,
+              {
+                borderColor: isCategoryComplete ? theme.colors.goldLight : theme.colors.greenLight,
+              },
+              animatedRingStyle,
+            ]}
+          />
 
           <Card card={topCard} />
 
@@ -187,14 +195,13 @@ const styles = StyleSheet.create({
     flex: 1,
     position: "relative",
   },
-  greenFlashRing: {
+  flashRing: {
     position: "absolute",
     top: -1,
     left: -1,
     right: -1,
     bottom: -1,
     borderWidth: 5,
-    borderColor: theme.colors.greenLight,
     borderRadius: 13,
     zIndex: GAME_LAYERS.CARD_ACCENT_OVER,
     pointerEvents: "none",
