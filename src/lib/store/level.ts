@@ -49,13 +49,13 @@ export const useLevelStore = create<LevelStoreState & LevelStoreActions>()(
           return;
         }
 
-        const { levelPack } = loadLevelSession({ currentLevel });
+        const { level } = loadLevelSession({ currentLevel });
         const activeDifficulty = useGameStore.getState().activeDifficulty || "medium";
-        const chosenLayout = levelPack.modes[activeDifficulty];
+        const chosenLayout = level.modes[activeDifficulty];
 
         const initialGameState = {
-          numberOfColumns: levelPack.numberOfColumns,
-          numberOfCategories: levelPack.numberOfCategories,
+          numberOfColumns: level.numberOfColumns,
+          numberOfCategories: level.numberOfCategories,
           columns: chosenLayout.columns.map((col) => col.map((card) => ({ ...card }))),
           deck: chosenLayout.deck.map((card) => ({ ...card })),
           waste: [],

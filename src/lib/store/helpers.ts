@@ -155,10 +155,10 @@ export function completeTurn(
   const nextCompletedCategories = updatedState.completedCategories ?? state.completedCategories;
   const maxMoves = state.maxMoves;
 
-  const { levelPack } = loadLevelSession({ currentLevel });
+  const { level } = loadLevelSession({ currentLevel });
   const isWin = checkWinCondition({
     completedCategories: nextCompletedCategories,
-    numberOfCategories: levelPack.numberOfCategories,
+    numberOfCategories: level.numberOfCategories,
   });
 
   const isLoss = !isWin && nextMovesCount >= maxMoves;

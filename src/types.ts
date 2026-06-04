@@ -5,18 +5,18 @@ export type NumberOfColumns = 3 | 4 | 5;
 export type PuzzleDataPool = Record<string, Array<string>>;
 
 export interface ModeLayout {
-  columns: CardType[][];
-  deck: CardType[];
+  columns: Array<Array<CardType>>;
+  deck: Array<CardType>;
   maxMoves: number;
   status: "valid" | "failed_validation";
-  validationErrors: string[];
+  validationErrors: Array<string>;
 }
 
 export interface LevelData {
   levelNumber: number;
   numberOfColumns: NumberOfColumns;
   numberOfCategories: number;
-  categories: string[];
+  categories: Array<string>;
   modes: {
     easy: ModeLayout;
     medium: ModeLayout;
@@ -24,17 +24,25 @@ export interface LevelData {
   };
 }
 
-export type LevelSystemMetadata = {
-  totalLevels: number;
-  isCyclicFallback: boolean;
-  maxUniqueLevelNumber: number;
-  nextLevelNumber: number | null;
-  hasMoreLevels: boolean;
+export type LevelsMetadata = {
+  generatedAt: string;
+  totalRequestedLevels: number;
+  successfullyValidated: number;
+  failedValidation: number;
+  breakdown: {
+    structuralFailures: number;
+    gridlockFailures: number;
+  };
 };
 
-export type LevelDataResponse = {
-  levelPack: LevelData;
-  metadata: LevelSystemMetadata;
+export type LevelsDataResponse = {
+  levels: Array<LevelData>;
+  meta: LevelsMetadata;
+};
+
+export type LevelInfo = {
+  level: LevelData;
+  meta: LevelsMetadata;
 };
 
 // Card

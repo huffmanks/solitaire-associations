@@ -17,7 +17,7 @@ const initialGameStoreState: GameStoreState = {
   currentLevel: 1,
   goldCount: 0,
   highestLevelBeaten: 0,
-  activeDifficulty: "easy",
+  activeDifficulty: "hard",
 };
 
 export const useGameStore = create<GameStoreState & GameStoreActions>()(

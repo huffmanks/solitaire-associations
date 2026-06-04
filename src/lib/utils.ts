@@ -2,47 +2,33 @@ import LEVEL_MANIFEST_JSON from "@/gen/levels-manifest.json";
 import { theme } from "@/lib/theme";
 import {
   LayoutRect,
-  LevelDataResponse,
   LevelDifficulty,
+  LevelInfo,
+  LevelsDataResponse,
   LockColorId,
   MoveCardTarget,
-  StaticLevelPack,
   TargetCandidate,
 } from "@/types";
 
-const LEVEL_MANIFEST = LEVEL_MANIFEST_JSON as { meta: any; levels: StaticLevelPack[] };
+const LEVEL_MANIFEST = LEVEL_MANIFEST_JSON as LevelsDataResponse;
 
-export function loadLevelSession({ currentLevel }: { currentLevel: number }): LevelDataResponse {
+export function loadLevelSession({ currentLevel }: { currentLevel: number }): LevelInfo {
   if (!LEVEL_MANIFEST || LEVEL_MANIFEST.levels.length === 0) {
     throw new Error("Level manifest is empty or undefined. Cannot load levels.");
   }
 
-  const totalLevels = LEVEL_MANIFEST.levels.length;
-
   let matchedLevel = LEVEL_MANIFEST.levels.find((config) => config.levelNumber === currentLevel);
-  const isCyclicFallback = !matchedLevel;
 
   if (!matchedLevel) {
-    const cyclicIndex = currentLevel > 0 ? (currentLevel - 1) % totalLevels : 0;
-    matchedLevel = LEVEL_MANIFEST.levels[cyclicIndex];
+    throw new Error(`Level ${currentLevel} could not be found in the manifest.`);
   }
 
-  const maxUniqueLevelNumber = Math.max(...LEVEL_MANIFEST.levels.map((l) => l.levelNumber));
-  const hasMoreLevels = currentLevel < maxUniqueLevelNumber;
-  const nextLevelNumber = currentLevel + 1;
-
   return {
-    levelPack: {
+    level: {
       ...matchedLevel,
       levelNumber: currentLevel,
     },
-    metadata: {
-      totalLevels,
-      isCyclicFallback,
-      maxUniqueLevelNumber,
-      nextLevelNumber,
-      hasMoreLevels,
-    },
+    meta: { ...LEVEL_MANIFEST.meta },
   };
 }
 

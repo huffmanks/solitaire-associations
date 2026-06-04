@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 
 import { LEVEL_DIFFICULTIES } from "@/lib/constants";
@@ -17,18 +17,28 @@ export default function Index() {
   const activeDifficulty = useGameStore((state) => state.activeDifficulty);
   const setActiveDifficulty = useGameStore((state) => state.setActiveDifficulty);
 
-  const { metadata } = loadLevelSession({ currentLevel });
+  const { meta } = loadLevelSession({ currentLevel });
 
   function handleReset() {
     resetGameStorage();
     resetLevelStorage();
   }
 
-  return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.container}>
+  function renderHeader() {
+    return (
+      <View style={styles.headerContainer}>
         <View style={styles.header}>
           <Text style={styles.heading}>Welcome to game</Text>
+        </View>
+
+        <View style={[styles.buttonGroupWrapper, { paddingHorizontal: 10 }]}>
+          <Button3d
+            isFullWidth
+            backgroundColor={theme.colors.redBorder}
+            borderColor={theme.colors.redButtonRim}
+            onPress={handleReset}>
+            <Text style={styles.wordText}>Reset storage</Text>
+          </Button3d>
         </View>
 
         <View style={styles.buttonGroupWrapper}>
@@ -55,59 +65,69 @@ export default function Index() {
             );
           })}
         </View>
-
-        <View style={styles.buttonGroupWrapper}>
-          {Array.from({ length: 12 }).map((_, index) => {
-            const levelNumber = index + 1;
-            const isCurrentLevel = levelNumber === currentLevel;
-            return (
-              <View
-                key={levelNumber}
-                style={styles.buttonWrapper}>
-                <Button3d
-                  isFullWidth
-                  backgroundColor={isCurrentLevel ? undefined : theme.colors.black}
-                  borderColor={isCurrentLevel ? undefined : theme.colors.muted}
-                  onPress={() => {
-                    handleReset();
-                    router.push(`/game/${levelNumber}`);
-                  }}>
-                  <Text style={styles.levelText}>{levelNumber}</Text>
-                </Button3d>
-              </View>
-            );
-          })}
-        </View>
-
-        {/* <View style={[styles.buttonGroupWrapper, { paddingInline: 10 }]}>
-          <Button3d
-            isFullWidth
-            backgroundColor={theme.colors.redBorder}
-            borderColor={theme.colors.redButtonRim}
-            onPress={handleReset}>
-            <Text style={styles.wordText}>Reset storage</Text>
-          </Button3d>
-        </View> */}
       </View>
+    );
+  }
+
+  return (
+    <SafeAreaView style={styles.safeArea}>
+      <FlatList
+        data={Array.from({ length: meta.totalRequestedLevels }, (_, i) => i + 1)}
+        keyExtractor={(item) => item.toString()}
+        numColumns={3}
+        ListHeaderComponent={renderHeader}
+        columnWrapperStyle={styles.columnWrapper}
+        contentContainerStyle={styles.listContainer}
+        initialNumToRender={30}
+        maxToRenderPerBatch={30}
+        windowSize={5}
+        renderItem={({ item: levelNumber }) => {
+          const isCurrentLevel = levelNumber === currentLevel;
+
+          return (
+            <View style={styles.buttonWrapper}>
+              <Button3d
+                isFullWidth
+                backgroundColor={isCurrentLevel ? undefined : theme.colors.black}
+                borderColor={isCurrentLevel ? undefined : theme.colors.muted}
+                onPress={() => {
+                  handleReset();
+                  router.push(`/game/${levelNumber}`);
+                }}>
+                <Text style={styles.levelText}>{levelNumber}</Text>
+              </Button3d>
+            </View>
+          );
+        }}
+      />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  safeArea: {
     flex: 1,
-    alignItems: "center",
-    justifyContent: "center",
-    width: "100%",
     backgroundColor: theme.colors.greenDark,
-    marginInline: 15,
+  },
+  listContainer: {
+    paddingInline: 15,
+    paddingBlockEnd: 60,
+    rowGap: 25,
+  },
+  columnWrapper: {
+    justifyContent: "space-between",
+    paddingInline: 15,
+  },
+  headerContainer: {
+    alignItems: "center",
+    width: "100%",
+    marginBlockStart: 20,
   },
   header: {
     marginBlockEnd: 40,
   },
   buttonGroupWrapper: {
     marginBlockEnd: 50,
-    marginInline: 15,
     flexDirection: "row",
     flexWrap: "wrap",
     columnGap: 25,

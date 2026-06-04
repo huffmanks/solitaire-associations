@@ -33,7 +33,7 @@ class LayoutGenerator {
         id: uuidv4(),
         content: catData.name,
         category: catData.name,
-        isFaceUp: true,
+        isFaceUp: false,
         type: "category",
         totalInCategory: wordCount,
       });
@@ -43,7 +43,7 @@ class LayoutGenerator {
           id: uuidv4(),
           content: word,
           category: catData.name,
-          isFaceUp: true,
+          isFaceUp: false,
           type: "word",
           totalInCategory: wordCount,
         });
@@ -101,6 +101,13 @@ class LayoutGenerator {
         } else {
           columns[c].push(potentialCard);
         }
+      }
+    }
+
+    for (let c = 0; c < config.numberOfColumns; c++) {
+      const col = columns[c];
+      if (col.length > 0) {
+        col[col.length - 1].isFaceUp = true;
       }
     }
 
@@ -633,7 +640,7 @@ export class LevelGeneratorEngine {
       levels: finalLevelsOutput,
     };
 
-    return JSON.stringify(completeOutputJson, null, 2);
+    return JSON.stringify(completeOutputJson);
   }
 
   private buildModeLayout(
