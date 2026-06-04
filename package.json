@@ -11,7 +11,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "format": "prettier \"**/*.{js,jsx,ts,tsx,json}\" --write",
-    "gen:levels": "node --experimental-transform-types src/gen/build-levels.ts",
+    "gen:levels": "node --experimental-transform-types src/gen/main.ts",
     "build:dev": "pnpm dlx eas-cli build --clear-cache --platform android --profile development --local",
     "build:apk": "pnpm dlx eas-cli build --clear-cache --platform android --profile preview --local",
     "build:aab": "pnpm dlx eas-cli build --clear-cache --platform android --profile preview-bundle --local"
@@ -54,7 +54,8 @@
     "@types/react": "~19.2.2",
     "fallow": "^2.86.0",
     "prettier": "^3.8.3",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "uuid": "^14.0.0"
   },
   "private": true
 }

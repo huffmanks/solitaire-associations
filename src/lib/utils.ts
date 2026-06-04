@@ -10,24 +10,24 @@ import {
   TargetCandidate,
 } from "@/types";
 
-const LEVEL_MANIFEST = LEVEL_MANIFEST_JSON as StaticLevelPack[];
+const LEVEL_MANIFEST = LEVEL_MANIFEST_JSON as { meta: any; levels: StaticLevelPack[] };
 
 export function loadLevelSession({ currentLevel }: { currentLevel: number }): LevelDataResponse {
-  if (!LEVEL_MANIFEST || LEVEL_MANIFEST.length === 0) {
+  if (!LEVEL_MANIFEST || LEVEL_MANIFEST.levels.length === 0) {
     throw new Error("Level manifest is empty or undefined. Cannot load levels.");
   }
 
-  const totalLevels = LEVEL_MANIFEST.length;
+  const totalLevels = LEVEL_MANIFEST.levels.length;
 
-  let matchedLevel = LEVEL_MANIFEST.find((config) => config.levelNumber === currentLevel);
+  let matchedLevel = LEVEL_MANIFEST.levels.find((config) => config.levelNumber === currentLevel);
   const isCyclicFallback = !matchedLevel;
 
   if (!matchedLevel) {
     const cyclicIndex = currentLevel > 0 ? (currentLevel - 1) % totalLevels : 0;
-    matchedLevel = LEVEL_MANIFEST[cyclicIndex];
+    matchedLevel = LEVEL_MANIFEST.levels[cyclicIndex];
   }
 
-  const maxUniqueLevelNumber = Math.max(...LEVEL_MANIFEST.map((l) => l.levelNumber));
+  const maxUniqueLevelNumber = Math.max(...LEVEL_MANIFEST.levels.map((l) => l.levelNumber));
   const hasMoreLevels = currentLevel < maxUniqueLevelNumber;
   const nextLevelNumber = currentLevel + 1;
 
