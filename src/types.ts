@@ -1,49 +1,28 @@
 // Level
 export type LevelDifficulty = "easy" | "medium" | "hard";
 export type NumberOfColumns = 3 | 4 | 5;
-export type MaxMoves = 72 | 132 | 196;
-
-export type RawLevelConfig = {
-  levelNumber: number;
-  numberOfColumns: NumberOfColumns;
-  categories: Array<string>;
-  locks?: Array<{
-    id: LockColorId;
-    keysRequired: number;
-  }>;
-};
-
-export type LockRegistry = Record<
-  LockColorId,
-  { needed: number; collected: number; open: boolean }
->;
-
-export type SimState = {
-  deckCycles: number;
-  columns: CardType[][];
-  deck: CardType[];
-  waste: CardType[];
-  foundations: string[];
-  activeLocks: LockRegistry;
-};
 
 export type PuzzleDataPool = Record<string, Array<string>>;
 
-export type PackDifficultyVariant = { columns: CardType[][]; deck: CardType[] };
+export interface ModeLayout {
+  columns: CardType[][];
+  deck: CardType[];
+  maxMoves: number;
+  status: "valid" | "failed_validation";
+  validationErrors: string[];
+}
 
-export type PackDifficultyVariants = {
-  easy: PackDifficultyVariant;
-  medium: PackDifficultyVariant;
-  hard: PackDifficultyVariant;
-};
-
-export type StaticLevelPack = {
+export interface LevelData {
   levelNumber: number;
   numberOfColumns: NumberOfColumns;
   numberOfCategories: number;
-  categories: Array<string>;
-  modes: PackDifficultyVariants;
-};
+  categories: string[];
+  modes: {
+    easy: ModeLayout;
+    medium: ModeLayout;
+    hard: ModeLayout;
+  };
+}
 
 export type LevelSystemMetadata = {
   totalLevels: number;
@@ -54,7 +33,7 @@ export type LevelSystemMetadata = {
 };
 
 export type LevelDataResponse = {
-  levelPack: StaticLevelPack;
+  levelPack: LevelData;
   metadata: LevelSystemMetadata;
 };
 
@@ -115,7 +94,7 @@ export type LevelStoreState = {
   selectedCardInfo: SelectedCardInfo | null;
   completedCategories: Array<string>;
   movesCount: number;
-  maxMoves: MaxMoves;
+  maxMoves: number;
   score: number;
   isGameDealt: boolean;
   hasWon: boolean;

@@ -1,55 +1,17 @@
 import { v4 as uuidv4 } from "uuid";
 
-export type LockColorId = "red" | "orange" | "yellow";
+import type {
+  CardType,
+  LevelData,
+  LevelDifficulty,
+  LockColorId,
+  ModeLayout,
+  NumberOfColumns,
+} from "../types.ts";
+import { CATEGORY_POOL } from "./category-pool.ts";
+import type { CategoryDataset, LevelRequestConfig, LockConfig } from "./types.ts";
 
-export type CardType = {
-  id: string;
-  content: string;
-  category: string;
-  isFaceUp: boolean;
-  type: "word" | "category";
-  totalInCategory?: number;
-
-  isLock?: boolean;
-  isKey?: boolean;
-  keysRequired?: number;
-  keysCollected?: number;
-  lockColorId?: LockColorId;
-};
-
-export interface ModeLayout {
-  columns: CardType[][];
-  deck: CardType[];
-  maxMoves: number;
-  status: "valid" | "failed_validation";
-  validationErrors: string[];
-}
-
-export interface LevelData {
-  levelNumber: number;
-  numberOfColumns: number;
-  numberOfCategories: number;
-  categories: string[];
-  modes: {
-    easy: ModeLayout;
-    medium: ModeLayout;
-    hard: ModeLayout;
-  };
-}
-
-export interface LockConfig {
-  id: LockColorId;
-  keysRequired: number;
-}
-
-export interface LevelRequestConfig {
-  levelNumber: number;
-  numberOfColumns: number;
-  numberOfCategories: number;
-  locks?: LockConfig[];
-}
-
-const COLUMN_DISTRIBUTIONS: Record<number, number[]> = {
+const COLUMN_DISTRIBUTIONS: Record<NumberOfColumns, Array<number>> = {
   3: [3, 4, 5],
   4: [4, 5, 6, 7],
   5: [5, 6, 7, 8, 9],
@@ -57,33 +19,20 @@ const COLUMN_DISTRIBUTIONS: Record<number, number[]> = {
 
 // --- LAYOUT GENERATOR ---
 class LayoutGenerator {
-  private static categoryPool: { name: string; words: string[] }[] = [
-    { name: "Animals", words: ["Cat", "Dog", "Lion", "Tiger", "Bear", "Wolf", "Deer", "Fox"] },
-    { name: "Cinema", words: ["Actor", "Director", "Camera", "Script", "Oscar"] },
-    { name: "Calendar", words: ["Month", "Week", "Year", "Day"] },
-    { name: "Burger", words: ["Bun", "Patty", "Cheese"] },
-    { name: "Book", words: ["Page", "Cover", "Chapter", "Author"] },
-    { name: "Landmass", words: ["Asia", "Africa", "Europe", "America", "Australia"] },
-    { name: "Space", words: ["Mars", "Venus", "Earth", "Pluto", "Moon", "Sun", "Star", "Rocket"] },
-  ];
-
   public static generateRawLayout(
     config: LevelRequestConfig,
-    selectedCategories: string[],
-    difficulty: "easy" | "medium" | "hard"
+    selectedCategories: Array<CategoryDataset>,
+    difficulty: LevelDifficulty
   ): { columns: CardType[][]; deck: CardType[]; maxMoves: number } {
     const categoryCards: CardType[] = [];
     const wordCards: CardType[] = [];
 
-    selectedCategories.forEach((catName) => {
-      const catData = this.categoryPool.find((c) => c.name === catName);
-      if (!catData) return;
-
+    selectedCategories.forEach((catData) => {
       const wordCount = catData.words.length;
       categoryCards.push({
         id: uuidv4(),
-        content: catName.toUpperCase(),
-        category: catName,
+        content: catData.name,
+        category: catData.name,
         isFaceUp: true,
         type: "category",
         totalInCategory: wordCount,
@@ -93,7 +42,7 @@ class LayoutGenerator {
         wordCards.push({
           id: uuidv4(),
           content: word,
-          category: catName,
+          category: catData.name,
           isFaceUp: true,
           type: "word",
           totalInCategory: wordCount,
@@ -104,7 +53,7 @@ class LayoutGenerator {
     let shuffledCategories = this.shuffle(categoryCards);
     let shuffledWords = this.shuffle(wordCards);
 
-    const columnDistribution = COLUMN_DISTRIBUTIONS[config.numberOfColumns] || [4, 5, 6, 7];
+    const columnDistribution = COLUMN_DISTRIBUTIONS[config.numberOfColumns];
     const columns: CardType[][] = Array.from({ length: config.numberOfColumns }, () => []);
     const deck: CardType[] = [];
 
@@ -520,6 +469,116 @@ class LevelSolver {
   }
 }
 
+// --- PROGRESSION CORE PIPELINE ---
+export class LevelProgressionPipeline {
+  private static COLUMN_PATTERN = [3, 4, 3, 4, 5, 3, 4, 3, 4, 5];
+
+  private categoryHistory: Array<string> = [];
+
+  public buildPipelineConfigs(totalLevelsToGenerate: number): LevelRequestConfig[] {
+    const configs: LevelRequestConfig[] = [];
+
+    for (let currentLevel = 1; currentLevel <= totalLevelsToGenerate; currentLevel++) {
+      const patternIndex = (currentLevel - 1) % LevelProgressionPipeline.COLUMN_PATTERN.length;
+      const calculatedColumns = LevelProgressionPipeline.COLUMN_PATTERN[
+        patternIndex
+      ] as NumberOfColumns;
+
+      let levelLocks: LockConfig[] | undefined = undefined;
+      const isClimaxOfSequence =
+        patternIndex === 3 || patternIndex === 4 || patternIndex === 8 || patternIndex === 9;
+
+      if (isClimaxOfSequence && currentLevel > 10) {
+        const maxBudget = currentLevel <= 200 ? 2 : currentLevel <= 500 ? 4 : 5;
+
+        let keyBudget = Math.floor(1 + Math.random() * maxBudget);
+
+        const colorPool: LockColorId[] = ["red", "orange", "yellow"];
+        const selectedLocks: LockConfig[] = [];
+
+        while (keyBudget > 0 && selectedLocks.length < 3) {
+          const lockColor = colorPool[selectedLocks.length];
+          const maxKeysForThisLock = Math.min(3, keyBudget);
+          const assignedKeys = Math.floor(1 + Math.random() * maxKeysForThisLock);
+
+          selectedLocks.push({
+            id: lockColor,
+            keysRequired: assignedKeys,
+          });
+          keyBudget -= assignedKeys;
+        }
+        levelLocks = selectedLocks;
+      }
+
+      let targetTotalMin = 32;
+      let targetTotalMax = 40;
+
+      if (calculatedColumns === 4) {
+        targetTotalMin = 56;
+        targetTotalMax = 72;
+      } else if (calculatedColumns === 5) {
+        targetTotalMin = 118;
+        targetTotalMax = 138;
+      }
+
+      const selectedCategories = this.gatherBalancedCategories(targetTotalMin, targetTotalMax);
+
+      configs.push({
+        levelNumber: currentLevel,
+        numberOfColumns: calculatedColumns,
+        numberOfCategories: selectedCategories.length,
+        locks: levelLocks,
+        selectedCategories: selectedCategories,
+      });
+    }
+
+    return configs;
+  }
+
+  private gatherBalancedCategories(minCards: number, maxCards: number): Array<CategoryDataset> {
+    const choices: CategoryDataset[] = [];
+    let currentCardAccumulation = 0;
+    let usablePool = CATEGORY_POOL.filter((cat) => !this.categoryHistory.includes(cat.name));
+
+    if (usablePool.length < 5) {
+      this.categoryHistory = [];
+      usablePool = CATEGORY_POOL;
+    }
+
+    const randomizedPool = [...usablePool].sort(() => Math.random() - 0.5);
+
+    for (const cat of randomizedPool) {
+      const remainingSpace = maxCards - currentCardAccumulation;
+      if (remainingSpace < 4) break;
+
+      const shuffledWords = [...cat.words].sort(() => Math.random() - 0.5);
+      const maxWordsAllowed = remainingSpace - 1;
+
+      const targetWordCount = Math.min(
+        shuffledWords.length,
+        Math.max(4, Math.floor(4 + Math.random() * 5)),
+        maxWordsAllowed
+      );
+
+      const dynamicWords = shuffledWords.slice(0, targetWordCount);
+      const costForThisCategory = 1 + dynamicWords.length;
+
+      choices.push({
+        name: cat.name,
+        words: dynamicWords,
+      });
+
+      currentCardAccumulation += costForThisCategory;
+      this.categoryHistory.push(cat.name);
+
+      if (this.categoryHistory.length > 5) this.categoryHistory.shift();
+      if (currentCardAccumulation >= minCards) break;
+    }
+
+    return choices;
+  }
+}
+
 // --- ENGINE CORE ---
 export class LevelGeneratorEngine {
   public generateBatch(configs: LevelRequestConfig[]): string {
@@ -529,16 +588,7 @@ export class LevelGeneratorEngine {
     let totalGridlockFailures = 0;
 
     for (const config of configs) {
-      const availableCategories = [
-        "Animals",
-        "Cinema",
-        "Calendar",
-        "Burger",
-        "Book",
-        "Landmass",
-        "Space",
-      ];
-      const selectedCategories = availableCategories.slice(0, config.numberOfCategories);
+      const selectedCategories = config.selectedCategories || [];
 
       const easyMode = this.buildModeLayout(config, selectedCategories, "easy");
       const mediumMode = this.buildModeLayout(config, selectedCategories, "medium");
@@ -546,9 +596,8 @@ export class LevelGeneratorEngine {
 
       [easyMode, mediumMode, hardMode].forEach((mode) => {
         mode.validationErrors.forEach((err) => {
-          if (err.includes("structural validation rules breached")) totalStructuralFailures++;
-          if (err.includes("Solver state pathing found this board layout gridlocked"))
-            totalGridlockFailures++;
+          if (err.includes("Structural Rule Breached")) totalStructuralFailures++;
+          if (err.includes("Board State Gridlocked")) totalGridlockFailures++;
         });
       });
 
@@ -556,7 +605,7 @@ export class LevelGeneratorEngine {
         levelNumber: config.levelNumber,
         numberOfColumns: config.numberOfColumns,
         numberOfCategories: config.numberOfCategories,
-        categories: selectedCategories,
+        categories: selectedCategories.map((c) => c.name),
         modes: {
           easy: easyMode,
           medium: mediumMode,
@@ -573,7 +622,7 @@ export class LevelGeneratorEngine {
     const completeOutputJson = {
       meta: {
         generatedAt: new Date().toISOString(),
-        totalRequested: configs.length,
+        totalRequestedLevels: configs.length,
         successfullyValidated: totalModesRequested - totalFailures,
         failedValidation: totalFailures,
         breakdown: {
@@ -589,10 +638,10 @@ export class LevelGeneratorEngine {
 
   private buildModeLayout(
     config: LevelRequestConfig,
-    selectedCategories: string[],
-    difficulty: "easy" | "medium" | "hard"
+    selectedCategories: Array<CategoryDataset>,
+    difficulty: LevelDifficulty
   ): ModeLayout {
-    const issues: string[] = [];
+    const issues: Array<string> = [];
     let layout: { columns: CardType[][]; deck: CardType[]; maxMoves: number } | null = null;
 
     const errorPrefix = `[LVL ${config.levelNumber} - ${difficulty.toUpperCase()}]`;

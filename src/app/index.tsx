@@ -45,7 +45,10 @@ export default function Index() {
                   isFullWidth
                   backgroundColor={backgroundColor}
                   borderColor={borderColor}
-                  onPress={() => setActiveDifficulty({ nextActiveDifficulty: diff })}>
+                  onPress={() => {
+                    handleReset();
+                    setActiveDifficulty({ nextActiveDifficulty: diff });
+                  }}>
                   <Text style={styles.wordText}>{diff}</Text>
                 </Button3d>
               </View>
@@ -54,7 +57,7 @@ export default function Index() {
         </View>
 
         <View style={styles.buttonGroupWrapper}>
-          {Array.from({ length: metadata.totalLevels + 4 }).map((_, index) => {
+          {Array.from({ length: 12 }).map((_, index) => {
             const levelNumber = index + 1;
             const isCurrentLevel = levelNumber === currentLevel;
             return (
@@ -65,7 +68,10 @@ export default function Index() {
                   isFullWidth
                   backgroundColor={isCurrentLevel ? undefined : theme.colors.black}
                   borderColor={isCurrentLevel ? undefined : theme.colors.muted}
-                  onPress={() => router.push(`/game/${levelNumber}`)}>
+                  onPress={() => {
+                    handleReset();
+                    router.push(`/game/${levelNumber}`);
+                  }}>
                   <Text style={styles.levelText}>{levelNumber}</Text>
                 </Button3d>
               </View>
@@ -73,7 +79,7 @@ export default function Index() {
           })}
         </View>
 
-        <View style={[styles.buttonGroupWrapper, { paddingInline: 10 }]}>
+        {/* <View style={[styles.buttonGroupWrapper, { paddingInline: 10 }]}>
           <Button3d
             isFullWidth
             backgroundColor={theme.colors.redBorder}
@@ -81,7 +87,7 @@ export default function Index() {
             onPress={handleReset}>
             <Text style={styles.wordText}>Reset storage</Text>
           </Button3d>
-        </View>
+        </View> */}
       </View>
     </SafeAreaView>
   );
